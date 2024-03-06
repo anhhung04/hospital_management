@@ -1,0 +1,39 @@
+version: '3.8'
+
+x-db-environment:
+  - &POSTGRES_USER "$POSTGRES_USER"
+  - &POSTGRES_PASSWORD "$POSTGRES_PASSWORD"
+  - &POSTGRES_DB "$POSTGRES_DB"
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - 8080:80
+    networks:
+      - internal
+    restart: unless-stopped
+    depends_on:
+      - backend
+  backend:
+    build: ./backend
+    networks:
+      - internal
+    depends_on:
+      - database
+    environment: 
+      POSTGRES_USER: *POSTGRES_USER
+      POSTGRES_PASSWORD: *POSTGRES_PASSWORD
+      POSTGRES_DB: *POSTGRES_DB
+  database:
+    image: postgres:13
+    networks:
+      - internal
+    environment: 
+      POSTGRES_USER: *POSTGRES_USER
+      POSTGRES_PASSWORD: *POSTGRES_PASSWORD
+      POSTGRES_DB: *POSTGRES_DB
+    
+networks:
+  internal:
+    driver: bridge
