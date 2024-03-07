@@ -1,4 +1,4 @@
-.PHONY: setup_env up down log db clean_db
+.PHONY: setup_env up down log db clean_db test
 setup_env:
 	pip3 install virtualenv
 	virtualenv hostpital_management_backend
@@ -21,3 +21,5 @@ db:
 clean_db:
 	docker stop dev_hospital_management_db
 	docker rm dev_hospital_management_db
+test:
+	cd ./src && PYTHONPATH=./ pytest  --disable-warnings

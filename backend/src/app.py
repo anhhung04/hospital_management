@@ -22,3 +22,5 @@ if __name__ == "__main__":
         'workers': config['workers'] if config['PROD'] else 1
     }
     uvicorn.run("app:app", **configs)
+
+__all__ = ["app"]
