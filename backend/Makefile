@@ -4,6 +4,7 @@ setup_env:
 	virtualenv hostpital_management_backend
 	source hostpital_management_backend/bin/activate
 	pip3 install -r requirements.txt
+	pip3 install -r requirements-dev.txt
 
 up:
 	docker compose up -d --build
