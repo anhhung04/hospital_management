@@ -33,8 +33,5 @@
     "vite": {
       "rollup": "npm:@rollup/wasm-node"
     }
-  },
-  "resolutions": {
-    "rollup": "npm:@rollup/wasm-node"
   }
 }
