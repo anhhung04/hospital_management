@@ -16,7 +16,7 @@ export function makeServer({ environment, namespace } =
             this.namespace = 'api/';
             this.get('/demo/hello', (schema, request) => {
                 return {
-                    message: "Hello World"
+                    message: "Hello user with cred: " + request.requestHeaders.Authorization
                 };
             });
         }
