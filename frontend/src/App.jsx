@@ -17,7 +17,7 @@ function App() {
   );
   return (
     <div>
-      <p>{text}</p>
+      <p className="">{text}</p>
     </div>
   );
 }
