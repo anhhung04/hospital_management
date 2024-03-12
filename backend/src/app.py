@@ -3,9 +3,15 @@ import uvicorn
 from fastapi import FastAPI
 from config import config
 
+from fastapi_sqlalchemy import DBSessionMiddleware
+
 app = FastAPI(docs_url='/api/docs' if not config['PROD'] else None,
               redoc_url='/api/redoc' if not config['PROD'] else None,
               openapi_url='/api/openapi.json' if not config['PROD'] else None)
+
+POSTGRES_SQL_URL = config['POSTGRES_SQL_URL']
+
+app.add_middleware(DBSessionMiddleware, db_url=POSTGRES_SQL_URL)
 
 for file in os.listdir("routes"):
     if not file.startswith('_'):

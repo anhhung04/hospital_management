@@ -21,4 +21,4 @@ starlette==0.35.1
 typing-extensions==4.9.0
 urllib3==2.0.7
 python-multipart
-psycopg2
+psycopg2-binary
