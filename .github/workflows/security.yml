@@ -31,5 +31,4 @@ jobs:
             semgrep scan \
               --error \
               --metrics=off \
-              --baseline-commit $ \
               --config="p/default"
