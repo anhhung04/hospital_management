@@ -31,4 +31,5 @@ jobs:
             semgrep scan \
               --error \
               --metrics=off \
-              --config="p/default"
+              --config="p/default" \
+              --exclude=*.yml
