@@ -16,7 +16,7 @@ log:
 	docker compose logs
 
 db:
-	docker run -p5432:5432 --name=dev_hospital_management_db -d -e POSTGRES_USER=dev_user -e POSTGRES_PASSWORD=secret -e POSTGRES_DATABASE=dev_hospital_management postgres:13
+	docker run -p5432:5432 --name=dev_hospital_management_db -d -e POSTGRES_USER=dev_user -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=dev_hospital_management postgres:13
 
 clean_db:
 	docker stop dev_hospital_management_db
