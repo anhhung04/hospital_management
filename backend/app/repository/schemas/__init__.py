@@ -1,7 +1,3 @@
-import os
+from sqlalchemy.ext.declarative import declarative_base
 
-for file in os.listdir(os.path.dirname(__file__)):
-    if not file.startswith("_"):
-        module_name, _ = os.path.splitext(file)
-        module = __import__(f"repository.schemas.{module_name}", fromlist=[module_name])
-        globals()[module_name] = module
+Base = declarative_base()

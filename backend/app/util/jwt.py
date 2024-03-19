@@ -1,24 +1,28 @@
-from repository import redis_client
+from repository import get_redis
 from typing import Tuple
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from util.crypto import random_key
+from util.log import logger
+from redis import Redis
 
-async def create_access_token(data: dict, userid: str, expire_minutes: int = 15) -> Tuple[str, Exception]:
-    to_encode = data.copy()
-    to_encode.update({"sub": userid})
+
+def create_access_token(redis_client: Redis, data: dict, userid: str, expire_minutes: int = 15, ) -> Tuple[str, Exception]:
+    data.update({"sub": userid})
     secret_key = random_key()
     try:
         redis_client.delete(userid)
         redis_client.set(userid, secret_key, ex=expire_minutes*60)
     except Exception as e:
+        logger.error(f"create_access_token error: %s", e)
         return None, e
     expire = datetime.now() + timedelta(minutes=expire_minutes)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, secret_key, algorithm="HS256")
+    data.update({"exp": expire.timestamp()})
+    encoded_jwt = jwt.encode(data, secret_key, algorithm="HS256")
     return encoded_jwt, None
 
-async def verify_token(token: str, userid: str) -> Tuple[str, Exception]:
+
+def verify_token(token: str, userid: str) -> Tuple[str, Exception]:
     try:
         secret_key = redis_client.get(userid)
         if not secret_key:
@@ -26,4 +30,5 @@ async def verify_token(token: str, userid: str) -> Tuple[str, Exception]:
         payload = jwt.decode(token, secret_key, algorithms=["HS256"])
         return payload, None
     except JWTError as e:
+        logger.error(f"verify_token error: %s", e)
         return None, e

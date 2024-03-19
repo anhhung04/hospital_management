@@ -6,4 +6,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY ./app .
 
-CMD ["python3", "app.py"]
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+CMD ["./entrypoint.sh"]

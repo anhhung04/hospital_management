@@ -1,10 +1,13 @@
 import uuid
-from passlib.context import CryptContext
+from hashlib import sha256
 
 def random_key() -> str:
     return uuid.uuid4().hex
 
-password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str, salt: str) -> str:
+    return sha256(password.encode() + salt.encode()).hexdigest()
 
 
-__all__ = ["random_key", "password_context"]
+def verify_password(hashed_password: str, password: str, salt: str) -> bool:
+    return hashed_password == hash_password(password, salt)

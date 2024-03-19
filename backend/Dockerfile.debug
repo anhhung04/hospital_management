@@ -15,8 +15,12 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY ./src .
+COPY ./app .
+
+ENV POSTGRES_USER=dev_user
+ENV POSTGRES_PASSWORD=secret
+ENV POSTGRES_DB=dev_hospital_management
 
 RUN pip install debugpy
 
-CMD ["python3", "-m","debugpy","--listen","8888","--wait-for-client","app.py"]
+CMD ["python3", "-m","debugpy","--listen","8888","app.py"]

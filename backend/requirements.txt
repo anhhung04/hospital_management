@@ -1,5 +1,4 @@
 fastapi==0.109.0
-fastapi-sqlalchemy==0.2.1
 pydantic==2.5.3
 uvicorn==0.27.0
 python-dotenv==1.0.1
@@ -23,5 +22,5 @@ urllib3==2.0.7
 python-multipart
 psycopg2-binary
 python-jose[cryptography]
-passlib[bcrypt]
 redis
+alembic

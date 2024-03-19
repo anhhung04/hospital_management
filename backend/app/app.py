@@ -1,22 +1,20 @@
 import uvicorn
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, HTTPException
 from config import config
 
-from fastapi_sqlalchemy import DBSessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 from util.response import wrap_respponse, status
 
-from repository import get_db
+from repository import SessionLocal
 
 app = FastAPI(docs_url='/api/docs' if not config['PROD'] else None,
               redoc_url='/api/redoc' if not config['PROD'] else None,
               openapi_url='/api/openapi.json' if not config['PROD'] else None)
 
-app.add_middleware(DBSessionMiddleware, db_url=config['POSTGRES_SQL_URL'])
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,7 +24,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for route in os.listdir(os.path.dirname(__file__) + '/routes'):
+
+@app.middleware("http")
+async def db_session_middleware(request: Request, call_next):
+    response = wrap_respponse(
+        status.HTTP_500_INTERNAL_SERVER_ERROR, "internal server error", {})
+    try:
+        request.state.db = SessionLocal()
+        response = await call_next(request)
+    finally:
+        request.state.db.close()
+    return response
+
+
+for route in os.listdir('./routes'):
     if route.startswith('_') or not route.endswith('.py'):
         continue
     module_name = route.removesuffix('.py')
