@@ -30,7 +30,11 @@ services:
       POSTGRES_DB: $POSTGRES_DB
     security_opt:
       - no-new-privileges:true
-
+  redis:
+    image: redis:alpine3.19
+    restart: unless-stopped
+    sysctls:
+      net.core.somaxconn: 1024
 networks:
   internal:
     driver: bridge
