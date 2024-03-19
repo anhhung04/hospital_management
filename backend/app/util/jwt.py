@@ -1,8 +1,8 @@
-from app import redis_client
+from repository import redis_client
 from typing import Tuple
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from app.util.crypto import random_key
+from util.crypto import random_key
 
 async def create_access_token(data: dict, userid: str, expire_minutes: int = 15) -> Tuple[str, Exception]:
     to_encode = data.copy()
