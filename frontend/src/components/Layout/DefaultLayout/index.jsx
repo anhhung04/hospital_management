@@ -1,11 +1,5 @@
 import Header from "./Header";
 import Footer from "./Footer";
-<<<<<<< HEAD
-import Sidebar from "./SideBar";
-import { useState } from "react";
-
-=======
->>>>>>> 5ecb818 (fix; build failed)
 
 function DefaultLayout({children}) {
     const [current_content, setCurrent_content] = useState("general");  
@@ -14,13 +8,8 @@ function DefaultLayout({children}) {
     }
     return (<div className="flex flex-col h-full w-full justify-between mb-0">
         <Header/>
-        <div className="flex flex-row h-full">
-            <Sidebar {
-                ...{
-                    handleClick: handleClick,
-                    current_content: current_content
-                }
-            } />
+        <div class="flex flex-row">
+            <div class="flex-1 p-10">
                 {children}
         </div>
         <Footer/>
