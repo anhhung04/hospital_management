@@ -1,9 +1,10 @@
-from models.response import CustomResponse
 from fastapi import status
-from fastapi.responses import Response
+from fastapi.responses import JSONResponse
 
-def wrap_response(code, message, data) -> CustomResponse:
-    return Response(
-        status_code=code,
-        content=CustomResponse(code, message, data).dict()
-    )
+
+def wrap_response(code, message, data):
+    return JSONResponse(status_code=code, content={
+        "status_code": code,
+        "message": message,
+        "data": data
+    })

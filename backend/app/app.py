@@ -3,7 +3,6 @@ import os
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, HTTPException
-from fastapi.responses import JSONResponse
 from config import config
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,19 +45,12 @@ for route in os.listdir('./routes'):
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=wrap_response(exc.status_code, exc.detail, {}).dict()
-    )
+    return wrap_response(exc.status_code, exc.detail, {})
 
 @app.exception_handler(RequestValidationError)
 async def http_exception_handler(request, exc):
     print(exc)
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=wrap_response(
-            status.HTTP_422_UNPROCESSABLE_ENTITY, 'field missing or invalid', exc._errors).dict()
-    )
+    return wrap_response(status.HTTP_422_UNPROCESSABLE_ENTITY, 'field missing or invalid', exc._errors)
 
 if __name__ == "__main__":
     configs = {
