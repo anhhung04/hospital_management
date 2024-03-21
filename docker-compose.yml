@@ -1,7 +1,7 @@
 version: "3.3"
 
 services:
-  frontend:
+  reverse_proxy:
     build: ./frontend
     ports:
       - 8080:80
@@ -26,7 +26,7 @@ services:
       REDIS_HOST: redis
       PROD: 1
   database:
-    image: postgres:13
+    image: postgres:13-alpine3.19
     networks:
       - internal
     environment:
