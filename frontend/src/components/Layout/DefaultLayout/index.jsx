@@ -1,8 +1,11 @@
 import Header from "./Header";
 import Footer from "./Footer";
+<<<<<<< HEAD
 import Sidebar from "./SideBar";
 import { useState } from "react";
 
+=======
+>>>>>>> 5ecb818 (fix; build failed)
 
 function DefaultLayout({children}) {
     const [current_content, setCurrent_content] = useState("general");  
