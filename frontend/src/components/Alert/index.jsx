@@ -1,64 +1,37 @@
-import { Modal, Button } from "flowbite-react";
+import { Modal } from "flowbite-react";
 
 let icons = {
-  error: (
-    <>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="81"
-        height="80"
-        viewBox="0 0 81 80"
-        fill="none"
-        className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200"
-      >
-        <path
-          d="M25.5 24L40.5 39L55.5 54"
-          stroke="#F44336"
-          strokeWidth="5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M25.5 54L40.5 39L55.5 24"
-          stroke="#F44336"
-          strokeWidth="5"
-          strokeLinecap="round"
-        />
-        <circle cx="40" cy="39.5" r="35" stroke="#F44336" strokeWidth="5" />
-      </svg>
-    </>
-  ),
+  error: "/images/Failed.png",
 };
 
 function Alert(props) {
   return (
       <Modal
         show={props.isAlert}
-        size="md"
         onClose={props.closeAlert}
         popup
-        className="bg-opacity-100 w-[623px] h-[312px] flex my-[20%] mx-[33.156%] gap-[24px] flex-start p-[24px] justify-center bg-[#FFF] shadow-2xl rounded-[32px] "
+        className="bg-opacity-100 w-[623px] h-[312px] flex my-[20%] mx-[33.156%] flex-col gap-[24px]  p-[24px] justify-center bg-[#FFF] shadow-2xl rounded-[32px]"
       >
-        <Modal.Header >{props.type}</Modal.Header>
-        <Modal.Body>
-          <div className="text-center">
-            {icons.error}
-            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-              {props.message}
-            </h3>
-            <div className="flex justify-center gap-4">
-              <Button theme={
-                {
-                  color: {
-                    primary:"text-black bg-gray-800 border border-transparent enabled:hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 dark:bg-gray-800 dark:enabled:hover:bg-gray-700 dark:focus:ring-gray-800 dark:border-gray-700"
-                  }
-                }
-              } color="primary" onClick={props.closeAlert} >
-                Ok
-              </Button>
+    <div className="w-[575px] h-[264px] flex flex-col gap-[24px] ">
+    <div className="w-[575px] h-[36px] gap-[8px] flex items-center justify-between ">
+        <h5 className="text-[24px] font-semibold leading-[36px] font-sans ">{props.type}</h5>
+        <div className="w-[304px] h-[32px] gap-[10px] mr-[0px] flex justify-end items-center ">
+            <div className="w-[66px] h-[66px]  " onClick={()=>props.closeAlert()}>
+                <img src="/images/Alert_exit_button.png" alt="exit button" className="hover:w-[66px] hover:h-[66px]"/>
             </div>
-          </div>
-        </Modal.Body>
-      </Modal>
+        </div>
+    </div>
+    <div className="w-[575px] h-[80px] flex justify-center items-center" >
+        <img src={icons[props.icon_type]} alt="" />
+    </div>
+    <div className="w-[575px] h-[24px] text-center font-base text-[16px] leading-[24px]">{props.message}</div>
+    <div className="w-[575px] h-[52px] gap-[18px] flex justify-end items-center ">
+        <button className="hover:w-[125px] hover:h-[57px] w-[120px] h-[52px] flex items-center justify-center gap-[10px] rounded-[20px] bg-[#032B91] text-[24px] font-semibold leading-[36px] font-sans text-[#F9FBFF]"
+            onClick={()=>props.closeAlert()}
+        >OK</button>
+    </div>
+    </div>
+    </Modal>
 
   );
 }
