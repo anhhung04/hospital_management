@@ -3,8 +3,8 @@ import Footer from "../DefaultLayout/Footer";
 
 function LoginLayout({children}) {
     return (
-        <div class="flex flex-col h-screen justify-between">
-            <Header class="my-0 py-0"/>
+        <div className="flex flex-col h-full justify-between">
+            <Header className="my-0 py-0"/>
             {children}
             <Footer/>
         </div>
