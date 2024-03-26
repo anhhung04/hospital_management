@@ -1,21 +1,27 @@
-name: Deploy
+name: Docker Deploy
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-      - uses: alex-ac/github-action-ssh-docker-compose@master
-        name: Docker-Compose Remote Deployment
-        with:
-          ssh_host: vps.hah4.me
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          ssh_user: ${{ secrets.SSH_USER }}
-          docker_compose_prefix: hosital_management
-          docker_compose_filename: docker-compose.yml
+      - name: Set up Docker Compose
+        run: echo "CF_TOKEN=${{ secrets.CF_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Navigate to Code Directory
+        run: cd ${{ github.workspace }}
+
+      - name: Run Docker Compose Up with Sudo
+        env:
+          CF_TOKEN: ${{ secrets.CF_TOKEN }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        run: sudo -E docker compose up -d --build

@@ -29,6 +29,7 @@ services:
     image: postgres:13-alpine3.19
     networks:
       - internal
+    restart: unless-stopped
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
@@ -42,6 +43,16 @@ services:
       net.core.somaxconn: 1024
     networks:
       - internal
+  cloudflare_tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CF_TOKEN}
+    restart: always
+    networks:
+      - internal
+    environment:
+      - CF_TOKEN
+    depends_on:
+      - reverse_proxy
 networks:
   internal:
     driver: bridge

@@ -5,7 +5,7 @@ from typing import Any
 
 from fastapi import Depends, HTTPException
 from util.response import status
-from permissions.const import Allow, Deny, Everyone, Authenticated
+from permissions.const import Allow, Deny, Everyone
 
 
 class _AllPermissions:
