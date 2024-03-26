@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from repository.schemas import Base
 
 class Medicine(Base):
-    __tablename__ = 'medicine'
+    __tablename__ = 'medicines'
 
     medID = Column(Integer, ForeignKey('medical_warehouse_management.container_id'), primary_key=True, index=True)
     medName = Column(String)
@@ -15,5 +15,5 @@ class Medicine(Base):
     medPrice = Column(Integer)
     medExpDate = Column(Date)
     medQuantity = Column(Integer)
-    medical_warehouse_management = relationship("MedicalWarehouseManagement", back_populates="medicine")
-    medicine_report = relationship("MedicineReport", back_populates="medicine")
+    medical_warehouse_management = relationship("MedicalWarehouseManagement", back_populates="medicines")
+    medicine_report = relationship("MedicineReport", back_populates="medicines")

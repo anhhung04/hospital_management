@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from repository.schemas import Base
 
 class Prescription(Base):
-    __tablename__ = 'prescription'
+    __tablename__ = 'prescriptions'
 
     medID = Column(Integer, primary_key=True, index=True)
     medical_record_id = Column(Integer, primary_key=True, index=True)
@@ -15,5 +15,5 @@ class Prescription(Base):
     dosage = Column(String)
     usage = Column(String)
     note = Column(String)
-    patient_progress = relationship("PatientProgress", back_populates="prescription")
-    prescribe = relationship("Prescribe", back_populates="prescription")
+    patient_progress = relationship("PatientProgress", back_populates="prescriptions")
+    prescribe = relationship("Prescribe", back_populates="prescriptions")

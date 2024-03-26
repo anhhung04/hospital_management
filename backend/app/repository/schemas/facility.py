@@ -6,10 +6,10 @@ from sqlalchemy.orm import relationship
 from repository.schemas import Base
 
 class Facility(Base):
-    __tablename__ = 'facility'
+    __tablename__ = 'facilities'
 
     facility_id = Column(Integer, ForeignKey('medical_warehouse_management.container_id'), primary_key=True, index=True)
     facility_name = Column(String)
     availability = Column(String)
     maintanance_date = Column(Date)
-    medical_warehouse_management = relationship("MedicalWarehouseManagement", back_populates="facility")
+    medical_warehouse_management = relationship("MedicalWarehouseManagement", back_populates="facilities")

@@ -10,4 +10,4 @@ class TakingCare(Base):
 
     nurse_id = Column(Integer, ForeignKey('nurse.nurse_id'), index=True)
     patient_id = Column(Integer, ForeignKey('patient.patient_id'), primary_key=True, index=True)
-    employess = relationship("Employees", back_populates="taking_care")
+    employee = relationship("Employee", back_populates="taking_care")

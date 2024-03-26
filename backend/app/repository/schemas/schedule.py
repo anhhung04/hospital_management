@@ -6,9 +6,11 @@ from sqlalchemy.orm import relationship
 from repository.schemas import Base
 
 class Schedule(Base):
-    __tablename__ = 'schedule'
+    __tablename__ = 'schedules'
 
     employee_id = Column(Integer, ForeignKey('Employees.employee_id'), index=True)
     begin = Column(Date)
     end = Column(Date)
     status = Column(String)
+    employee = relationship("Employee", back_populates="schedules", uselist=False)
+    
