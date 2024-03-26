@@ -29,6 +29,7 @@ services:
     image: postgres:13-alpine3.19
     networks:
       - internal
+    restart: unless-stopped
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
