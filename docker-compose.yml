@@ -42,6 +42,14 @@ services:
       net.core.somaxconn: 1024
     networks:
       - internal
+  cloudflare_tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CF_TOKEN}
+    restart: always
+    networks:
+      - internal
+    environment:
+      - CF_TOKEN
 networks:
   internal:
     driver: bridge
