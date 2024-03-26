@@ -9,8 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from util.response import wrap_respponse, status
 
-from repository import SessionLocal, engine
-from repository.schemas import Base
+from repository import SessionLocal
 
 app = FastAPI(docs_url='/api/docs' if not config['PROD'] else None,
               redoc_url='/api/redoc' if not config['PROD'] else None,
