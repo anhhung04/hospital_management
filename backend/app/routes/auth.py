@@ -25,6 +25,7 @@ async def login(user_auth: UserAuth, db: Session = Depends(get_db), redis_client
     try:
         access_token, err = create_access_token(redis_client, {
             "username": user.username,
+            "user_id": user.id,
         }, str(user.id))
         if err:
             raise Exception
