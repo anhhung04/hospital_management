@@ -18,8 +18,8 @@ def create_access_token(redis_client: Redis, data: dict, userid: str, expire_min
         logger.error(f"create_access_token error")
         return None, e
     expire = datetime.now() + timedelta(minutes=expire_minutes)
-    data.update({"exp": expire.timestamp()})
-    encoded_jwt = jwt.encode(data, secret_key, algorithm="HS256")
+    encoded_payload.update({"exp": expire.timestamp()})
+    encoded_jwt = jwt.encode(encoded_payload, secret_key, algorithm="HS256")
     return encoded_jwt, None
 
 
