@@ -8,7 +8,8 @@ from redis import Redis
 
 
 def create_access_token(redis_client: Redis, data: dict, userid: str, expire_minutes: int = 15, ) -> Tuple[str, Exception]:
-    data.update({"sub": userid})
+    encoded_payload = {"sub": userid, "iat": datetime.now().timestamp()}
+    encoded_payload.update({"info": data})
     secret_key = random_key()
     try:
         redis_client.delete(userid)
@@ -22,8 +23,9 @@ def create_access_token(redis_client: Redis, data: dict, userid: str, expire_min
     return encoded_jwt, None
 
 
-def verify_token(token: str, userid: str) -> Tuple[str, Exception]:
+def verify_token(redis_client: Redis, token: str) -> Tuple[str, Exception]:
     try:
+        userid = jwt.get_unverified_claims(token).get("sub")
         secret_key = redis_client.get(userid)
         if not secret_key:
             return None, Exception("Token expired")
