@@ -32,5 +32,5 @@ def verify_token(redis_client: Redis, token: str) -> Tuple[str, Exception]:
         payload = jwt.decode(token, secret_key, algorithms=["HS256"])
         return payload, None
     except JWTError as e:
-        logger.error(f"verify_token error: %s")
+        logger.error(f"verify_token error")
         return None, e
