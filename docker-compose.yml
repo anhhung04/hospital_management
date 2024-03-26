@@ -50,6 +50,8 @@ services:
       - internal
     environment:
       - CF_TOKEN
+    depends_on:
+      - reverse_proxy
 networks:
   internal:
     driver: bridge
