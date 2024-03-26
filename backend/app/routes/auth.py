@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from models.user import UserAuth
+from models.user import UserAuth, UserAuthResponse
 from util.crypto import verify_password
 from util.response import wrap_response, status
 from util.jwt import create_access_token
@@ -9,8 +9,7 @@ from repository import get_db, get_redis
 
 router = APIRouter()
 
-
-@router.post("/login")
+@router.post("/login", response_model=UserAuthResponse)
 async def login(user_auth: UserAuth, db: Session = Depends(get_db), redis_client=Depends(get_redis)):
     try: 
         user: UserInDB = db.query(UserInDB).filter(UserInDB.username == user_auth.username).first()
