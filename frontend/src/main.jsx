@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.jsx';
 import { makeServer } from "../mock/server.js";
+import DefaultLayout from "./components/Layout/DefaultLayout";
+import {Fragment} from "react";
+import {publicRoutes} from "./routes";
 import './index.css';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 if (process.env.NODE_ENV === 'development' &&
   typeof makeServer === 'function'
@@ -13,6 +16,19 @@ if (process.env.NODE_ENV === 'development' &&
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+    <Routes>
+        {publicRoutes.map((route,index) =>{
+          let Layout = DefaultLayout
+          if(route.layout){
+            Layout = route.layout
+          }else if(route.layout === null){
+            Layout = Fragment
+          }
+          const Page = route.component;
+          return (<Route key={index} path ={route.path} element = {<Layout><Page/></Layout>}/>)
+        })}
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>,
 );
