@@ -52,7 +52,6 @@ async def http_exception_handler(request, exc):
 @app.exception_handler(RequestValidationError)
 async def http_exception_handler(request, exc):
     return wrap_respponse(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid request" ,exc.errors())
-Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
     configs = {
