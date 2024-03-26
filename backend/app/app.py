@@ -7,13 +7,12 @@ from config import config
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from util.response import wrap_respponse, status
+from util.response import wrap_response, status
 
 from repository import SessionLocal
 
-app = FastAPI(docs_url='/api/docs' if not config['PROD'] else None,
-              redoc_url='/api/redoc' if not config['PROD'] else None,
-              openapi_url='/api/openapi.json' if not config['PROD'] else None)
+app = FastAPI(docs_url='/api/docs', redoc_url='/api/redoc',
+              openapi_url='/api/openapi.json')
 
 
 app.add_middleware(
@@ -27,7 +26,7 @@ app.add_middleware(
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
-    response = wrap_respponse(
+    response = wrap_response(
         status.HTTP_500_INTERNAL_SERVER_ERROR, "internal server error", {})
     try:
         request.state.db = SessionLocal()
@@ -46,11 +45,12 @@ for route in os.listdir('./routes'):
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
-    return wrap_respponse(exc.status_code, exc.detail, exc.headers)
+    return wrap_response(exc.status_code, exc.detail, {})
 
 @app.exception_handler(RequestValidationError)
 async def http_exception_handler(request, exc):
-    return wrap_respponse(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid request" ,exc.errors())
+    print(exc)
+    return wrap_response(status.HTTP_422_UNPROCESSABLE_ENTITY, 'field missing or invalid', exc._errors)
 
 if __name__ == "__main__":
     configs = {
