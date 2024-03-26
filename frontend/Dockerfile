@@ -3,7 +3,7 @@ FROM node:21.7-alpine3.18 as build
 WORKDIR /app
 COPY . /app
 
-RUN npm install
+RUN npm install --frozen-lockfile --skip-integrity-check
 RUN npm run build
 
 FROM nginx:1.21.3-alpine
