@@ -5,22 +5,10 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import relationship
 from repository.schemas import Base
 
-class User(Base):
-    __tablename__ = 'user'
+class Schedule(Base):
+    __tablename__ = 'schedule'
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    password = Column(String)
-
-
-
-
-
-
-
-
-
-
-
-
-    
+    employee_id = Column(Integer, ForeignKey('Employees.employee_id'), index=True)
+    begin = Column(Date)
+    end = Column(Date)
+    status = Column(String)

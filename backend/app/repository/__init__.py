@@ -6,6 +6,7 @@ from fastapi import Request
 
 engine = create_engine(config['POSTGRES_SQL_URL'])
 
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 redis_client = redis.Redis(
