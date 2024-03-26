@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from models.user import UserAuth, UserAuthResponse
 from util.crypto import verify_password
-from util.response import wrap_response, status
+from util.response import wrap_response
 from util.jwt import create_access_token
 from repository.schemas.user import User as UserInDB
 from repository import get_db, get_redis
