@@ -49,8 +49,7 @@ async def http_exception_handler(request, exc):
 
 @app.exception_handler(RequestValidationError)
 async def http_exception_handler(request, exc):
-    print(exc)
-    return wrap_response(status.HTTP_422_UNPROCESSABLE_ENTITY, 'field missing or invalid', exc._errors)
+    return wrap_response(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid request" ,exc.errors())
 
 if __name__ == "__main__":
     configs = {
