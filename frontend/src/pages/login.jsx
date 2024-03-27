@@ -117,8 +117,7 @@ function Login() {
   
         {isAlert && (      
         <Alert
-          message= "Thông tin không hợp lệ. Vui lòng điền lại."
-          type={alertMessage}
+          message= {alertMessage}
           isAlert={isAlert}
           closeAlert={closeAlert}
           icon_type="error"
