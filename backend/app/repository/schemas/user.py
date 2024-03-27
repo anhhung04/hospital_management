@@ -1,6 +1,5 @@
-from sqlalchemy import String, Integer, Date
+from sqlalchemy import String
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
 from repository.schemas import Base
 
 class User(Base):
