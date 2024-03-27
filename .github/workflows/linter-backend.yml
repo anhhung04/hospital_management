@@ -1,0 +1,15 @@
+name: Linter Backend
+on:
+  pull_request:
+    branches: "backend*"
+    types: 
+      - opened
+      - synchronize
+jobs:
+  lint:
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+      - uses: chartboost/ruff-action@v1
+        with:
+          src: "./backend"
