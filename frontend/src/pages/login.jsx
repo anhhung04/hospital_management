@@ -118,7 +118,7 @@ function Login() {
         {isAlert && (      
         <Alert
           message= "Thông tin không hợp lệ. Vui lòng điền lại."
-          type={alertMessage} // Assuming your Alert component accepts a "type" prop
+          type={alertMessage}
           isAlert={isAlert}
           closeAlert={closeAlert}
           icon_type="error"
