@@ -1,4 +1,10 @@
+<<<<<<< Updated upstream
 from sqlalchemy import Column, String
+=======
+from sqlalchemy import String, Integer, Date
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
+>>>>>>> Stashed changes
 from repository.schemas import Base
 
 class User(Base):
