@@ -48,7 +48,7 @@ async def http_exception_handler(request, exc):
     return wrap_response(exc.status_code, exc.detail, {})
 
 @app.exception_handler(RequestValidationError)
-async def http_exception_handler(request, exc):
+async def request_validate_handler(request, exc):
     return wrap_response(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid request" ,exc.errors())
 
 if __name__ == "__main__":
