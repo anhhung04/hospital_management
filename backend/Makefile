@@ -51,6 +51,8 @@ up: db redis
 down: clean_db clean_redis
 	docker rm -f hospital_management_backend
 
+rebuild: down up
+
 dev: deps db redis
 
 up-migrate: up migrate-all
