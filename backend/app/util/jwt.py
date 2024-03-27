@@ -14,7 +14,7 @@ def create_access_token(redis_client: Redis, data: dict, userid: str, expire_min
         redis_client.delete(userid)
         redis_client.set(userid, secret_key, ex=expire_minutes*60)
     except Exception as e:
-        logger.exception("create_access_token error", reason=str(e))
+        logger.error("create_access_token error", reason=str(e))
         return None, e
     expire = datetime.now() + timedelta(minutes=expire_minutes)
     encoded_payload.update({"exp": expire.timestamp()})
@@ -27,9 +27,9 @@ def verify_token(redis_client: Redis, token: str) -> Tuple[str, Exception]:
         userid = jwt.get_unverified_claims(token).get("sub")
         secret_key = redis_client.get(userid)
         if not secret_key:
-            return None, Exception("Token expired")
+            return None, "Token expired!"
         payload = jwt.decode(token, secret_key, algorithms=["HS256"])
         return payload, None
     except JWTError as e:
-        logger.exception("verify_token error", reason=str(e))
-        return None, e
+        logger.error("verify_token error", reason=str(e))
+        return None, "Token invalid!"
