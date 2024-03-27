@@ -4,6 +4,7 @@ import os
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError, HTTPException
 from config import config
+from util.log import logger
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,6 +32,9 @@ async def db_session_middleware(request: Request, call_next):
     try:
         request.state.db = SessionLocal()
         response = await call_next(request)
+    except Exception as e:
+        logger.error("db_session_middleware error", reason=str(e))
+        response = wrap_response(status.HTTP_500_INTERNAL_SERVER_ERROR, "internal server error", {})
     finally:
         request.state.db.close()
     return response

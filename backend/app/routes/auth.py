@@ -1,35 +1,42 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from models.user import UserAuth, UserAuthResponse
-from util.crypto import verify_password
+from models.user import UserAuth, UserAuthResponse, UserToken, VerifyUserReponse
 from util.response import wrap_response
-from util.jwt import create_access_token
-from repository.schemas.user import User as UserInDB
 from repository import get_db, get_redis
+from services.auth import get_access_token
+from util.jwt import verify_token
 
 router = APIRouter()
 
 @router.post("/login", response_model=UserAuthResponse)
 async def login(user_auth: UserAuth, db: Session = Depends(get_db), redis_client=Depends(get_redis)):
-    try: 
-        user: UserInDB = db.query(UserInDB).filter(UserInDB.username == user_auth.username).first()
-    except Exception:
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "query database error")
-    if not user or not verify_password(user.password, user_auth.password, user.username):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Incorrect username or password",
+    access_token, err = await get_access_token(db, redis_client, user_auth)
+    if err:
+        return wrap_response(status.HTTP_401_UNAUTHORIZED, str(err), {})
+    return wrap_response(
+        status.HTTP_200_OK, "login successful", {"access_token": access_token}
+    )
+
+
+@router.post("/verify", response_model=VerifyUserReponse)
+async def verify_user_token(token: UserToken, redis_client=Depends(get_redis)):
+    token_data, err = verify_token(redis_client, token.access_token)
+    if err:
+        return wrap_response(
+            status.HTTP_401_UNAUTHORIZED,
+            str(err),
+            {
+                "is_login": False,
+                "username": "",
+                "user_id": "",
+            },
         )
-    try:
-        access_token, err = create_access_token(redis_client, {
-            "username": user.username,
-        }, str(user.id))
-        if err:
-            raise Exception
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="create access token error",
-        )
-    return wrap_response(status.HTTP_200_OK, "login successful", {"access_token": access_token})
+    return wrap_response(
+        status.HTTP_200_OK,
+        "verify successful",
+        {
+            "is_login": True,
+            "username": token_data["info"]["username"],
+            "user_id": token_data["sub"],
+        },
+    )
