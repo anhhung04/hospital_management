@@ -11,13 +11,8 @@ function DefaultLayout({children}) {
     }
     return (<div className="flex flex-col h-full w-full justify-between mb-0">
         <Header/>
-        <div className="flex h-full">
-            <Sidebar {
-                ...{
-                    handleClick: handleClick,
-                    current_content: current_content
-                }
-            } />
+        <div className="flex flex-row">
+            <Sidebar current_content={current_content} handleClick={handleClick}/>
                 {children}
         </div>
         <Footer/>

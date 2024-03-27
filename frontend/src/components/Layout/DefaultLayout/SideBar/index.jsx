@@ -49,7 +49,7 @@ function Sidebar(props) {
               props.handleClick(contentKey);
             }}
           >
-            <h4 className="text-[#FFF] truncate hover:text-clip font-sans text-[20px] leading-[32px] font-medium">
+            <h4 className="text-[#FFF] truncate hover:text-clip font-sans text-[20px] font-medium leading-[32px]">
               {content_nav[contentKey].name}
             </h4>
           </div>
