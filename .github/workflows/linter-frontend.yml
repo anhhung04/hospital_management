@@ -8,9 +8,7 @@ jobs:
       startsWith(github.event.pull_request.head.ref, 'frontend/')
     steps:
         - uses: actions/checkout@v4
-        - name: Change directory
-          run: cd frontend
         - name: Install dependencies
-          run: npm install
+          run: cd frontend && npm install
         - name: Lint
-          run: npm run lint
+          run: cd frontend && npm run lint
