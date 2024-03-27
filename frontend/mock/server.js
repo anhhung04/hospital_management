@@ -42,6 +42,115 @@ export function makeServer({ environment, namespace } =
                     return JSON.stringify(wrap_response(401, "Invalid credentials", {}));
                 }
             });
+            this.get('/patients/list', (schema, request) => {
+                return [
+                        {
+                            id: 1,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 2,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 3,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 4,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 5,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 6,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 7,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 8,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 9,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 10,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 11,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 12,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        },
+                        {
+                            id: 13,
+                            name: "Nguyễn Văn A",
+                            phone: "0123456789",
+                            date: "01/01/2022",
+                            time: "10:00 AM",
+                            detail: "Hồ sơ ↗",
+                        }
+                    ]
+                
+            });
             
         }
     });

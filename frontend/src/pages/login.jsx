@@ -74,8 +74,6 @@ function Login() {
 
   return ( <div className="w-full h-screen bg-[#EFF7FE] flex justify-center items-center ">
         <div className="bg-[#FFFF] relative flex flex-col justify-center gap-[4px] rounded-[30px] shadow-2xl w-[613px] h-[80.226%] p-[40px]">
-                
-                
             <div className="flex justify-center items-center gap-[10px] p-[10px] self-stretch mb-[24px]">
                 <h3 className="font-sans text-[48px] font-medium leading-[72px]"> Đăng Nhập</h3>
             </div>
@@ -119,10 +117,11 @@ function Login() {
   
         {isAlert && (      
         <Alert
-          message={alertMessage}
-          type="error" // Assuming your Alert component accepts a "type" prop
+          message= "Thông tin không hợp lệ. Vui lòng điền lại."
+          type={alertMessage}
           isAlert={isAlert}
           closeAlert={closeAlert}
+          icon_type="error"
         />
         )}
     </div>);
