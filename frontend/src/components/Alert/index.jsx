@@ -1,4 +1,4 @@
-import { Modal, Button } from "flowbite-react";
+import { Modal } from "flowbite-react";
 
 let icons = {
   error: "/images/Failed.png",
@@ -30,7 +30,6 @@ function  Alert(props) {
     </div>
     </div>
     </div>
-
   );
 }
 
