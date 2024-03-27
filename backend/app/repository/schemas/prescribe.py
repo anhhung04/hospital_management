@@ -1,10 +1,8 @@
-from sqlalchemy import Table, String, Integer, Date, ForeignKey
-from sqlalchemy.orm import Mapped
+from sqlalchemy import Integer, ForeignKey
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import relationship
 from repository.schemas import Base
-#coi lại class ni
+
 class Prescribe(Base): 
     __tablename__ = 'prescribe'
 

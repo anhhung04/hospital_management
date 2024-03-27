@@ -1,9 +1,7 @@
-from sqlalchemy import Table, String, Integer, Date, ForeignKey
+from sqlalchemy import String, Integer, Date, ForeignKey
 from sqlalchemy import Enum as SQLAlchemyEnum
-from sqlalchemy.orm import Mapped
 from enum import Enum
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import relationship
 from repository.schemas import Base
 
