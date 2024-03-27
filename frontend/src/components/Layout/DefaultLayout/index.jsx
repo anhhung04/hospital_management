@@ -12,9 +12,7 @@ function DefaultLayout({children}) {
         <Header/>
         <div className="flex flex-row">
             <Sidebar current_content={current_content} handleClick={handleClick}/>
-            <div className="flex-1 p-10">
                 {children}
-            </div>
         </div>
         <Footer/>
     </div> );
