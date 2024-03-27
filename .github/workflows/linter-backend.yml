@@ -1,13 +1,12 @@
 name: Linter Backend
 on:
   pull_request:
-    branches: "backend*"
-    types: 
-      - opened
-      - synchronize
+
 jobs:
   lint:
     runs-on: ubuntu-latest 
+    if:
+      startsWith(github.event.pull_request.head.ref, 'backend/')
     steps:
       - uses: actions/checkout@v4
       - uses: chartboost/ruff-action@v1

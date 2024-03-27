@@ -1,13 +1,11 @@
 name: Linter Frontend
 on:
   pull_request:
-    branches: "frontend*"
-    types: 
-      - opened
-      - synchronize
 jobs:
   lint:
     runs-on: ubuntu-latest 
+    if:
+      startsWith(github.event.pull_request.head.ref, 'frontend/')
     steps:
         - uses: actions/checkout@v4
         - name: Change directory
