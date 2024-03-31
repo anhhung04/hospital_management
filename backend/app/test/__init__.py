@@ -1,13 +1,16 @@
 import random
 import string
+from util.crypto import PasswordContext
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from repository.schemas import Base
-from repository import get_db, get_redis
+from repository.schemas.user import User
+from repository import Storage, RedisStorage
+from permissions.user import UserRole
+from uuid import uuid4
 from app import app
-
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -21,22 +24,19 @@ TestingSessionLocal = sessionmaker(
 
 Base.metadata.create_all(bind=engine)
 
+redis_cache = {}
+
 
 class RedisLocal:
-    cache: dict
-
-    def __init__(self):
-        self.cache = {}
-
     def set(self, key, value, ex):
-        self.cache[key] = value
+        print(key, value)
+        redis_cache[key] = value
 
     def delete(self, key):
-        if key in self.cache:
-            del self.cache[key]
-
+        if key in redis_cache:
+            redis_cache.pop(key)
     def get(self, key):
-        return self.cache.get(key)
+        return redis_cache.get(key, None)
 
 
 def override_get_db():
@@ -54,8 +54,8 @@ def override_get_redis():
         pass
 
 
-app.dependency_overrides[get_redis] = override_get_redis
-app.dependency_overrides[get_db] = override_get_db
+app.dependency_overrides[RedisStorage.get] = override_get_redis
+app.dependency_overrides[Storage.get] = override_get_db
 
 client = TestClient(app)
 
@@ -67,3 +67,8 @@ def gen_username():
 def gen_password():
     return ''.join(random.choices(string.ascii_lowercase, k=10))
 
+
+def create_user():
+    username = gen_username()
+    password = gen_password()
+    return User(id=str(uuid4()), username=username, password=PasswordContext(password, username).hash(), role=UserRole.EMPLOYEE), password

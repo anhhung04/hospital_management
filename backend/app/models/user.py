@@ -6,7 +6,8 @@ class UserAuth(BaseModel):
     username: str
     password: str
     
-class UserToken(BaseModel):
+
+class VerifyTokenRequest(BaseModel):
     access_token: str
     
 class AccessResponse(BaseModel):
@@ -19,5 +20,7 @@ class VerifyUserReponseData(BaseModel):
     is_login: bool
     username: str
     user_id: str
-class VerifyUserReponse(BaseResponse):
+
+
+class VerifyTokenReponse(BaseResponse):
     data: VerifyUserReponseData
