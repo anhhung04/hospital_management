@@ -1,16 +1,14 @@
 import uvicorn
 import os
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError, HTTPException
 from config import config
 from util.log import logger
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from util.response import wrap_response
-
-from repository import SessionLocal
+from util.response import APIResponse
 
 app = FastAPI(docs_url='/api/docs', redoc_url='/api/redoc',
               openapi_url='/api/openapi.json')
@@ -24,22 +22,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.middleware("http")
-async def db_session_middleware(request: Request, call_next):
-    response = wrap_response(
-        status.HTTP_500_INTERNAL_SERVER_ERROR, "internal server error", {})
-    try:
-        request.state.db = SessionLocal()
-        response = await call_next(request)
-    except Exception as e:
-        logger.error("db_session_middleware error", reason=str(e))
-        response = wrap_response(status.HTTP_500_INTERNAL_SERVER_ERROR, "internal server error", {})
-    finally:
-        request.state.db.close()
-    return response
-
-
 for route in os.listdir('./routes'):
     if route.startswith('_') or not route.endswith('.py'):
         continue
@@ -49,11 +31,13 @@ for route in os.listdir('./routes'):
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
-    return wrap_response(exc.status_code, exc.detail, {})
+    logger.error(f"HTTPException", status_code=exc.status_code,
+                 detail=exc.detail)
+    return APIResponse.as_json(exc.status_code, exc.detail, {})
 
 @app.exception_handler(RequestValidationError)
 async def request_validate_handler(request, exc):
-    return wrap_response(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid request" ,exc.errors())
+    return APIResponse.as_json(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid request", exc.errors())
 
 if __name__ == "__main__":
     configs = {

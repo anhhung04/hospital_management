@@ -1,28 +1,28 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from models.user import UserAuth, UserAuthResponse, UserToken, VerifyUserReponse
-from util.response import wrap_response
-from repository import get_db, get_redis
-from services.auth import get_access_token
-from util.jwt import verify_token
+from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse
+from util.response import APIResponse
+from repository import Storage, RedisStorage
+from services.auth import AuthService
+from util.jwt import JWTHandler
 
 router = APIRouter()
 
 @router.post("/login", response_model=UserAuthResponse)
-async def login(user_auth: UserAuth, db: Session = Depends(get_db), redis_client=Depends(get_redis)):
-    access_token, err = await get_access_token(db, redis_client, user_auth)
+async def login(auth_req: UserAuth, db_sess: Session = Depends(Storage.get), redis_client=Depends(RedisStorage.get)):
+    token, err = await AuthService(db_sess, redis_client).gen_token(auth_req)
     if err:
-        return wrap_response(status.HTTP_401_UNAUTHORIZED, str(err), {})
-    return wrap_response(
-        status.HTTP_200_OK, "login successful", {"access_token": access_token}
+        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {})
+    return APIResponse.as_json(
+        status.HTTP_200_OK, "login successful", {"access_token": token}
     )
 
 
-@router.post("/verify", response_model=VerifyUserReponse)
-async def verify_user_token(token: UserToken, redis_client=Depends(get_redis)):
-    token_data, err = verify_token(redis_client, token.access_token)
+@router.post("/verify", response_model=VerifyTokenReponse)
+async def verify_user_token(verify_req: VerifyTokenRequest, redis_client=Depends(RedisStorage.get)):
+    token_data, err = JWTHandler(redis_client).verify(verify_req.access_token)
     if err:
-        return wrap_response(
+        return APIResponse.as_json(
             status.HTTP_401_UNAUTHORIZED,
             str(err),
             {
@@ -31,7 +31,7 @@ async def verify_user_token(token: UserToken, redis_client=Depends(get_redis)):
                 "user_id": "",
             },
         )
-    return wrap_response(
+    return APIResponse.as_json(
         status.HTTP_200_OK,
         "verify successful",
         {
