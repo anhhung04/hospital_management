@@ -2,7 +2,6 @@ import random
 import string
 import uuid
 import json
-import os
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -92,17 +91,17 @@ def insert_user(db, username=None, password=None, user_type=None, gender=None):
     p = password or gen_password()
     ut = user_type or random.choice(['EMPLOYEE', 'PATIENT'])
     id = gen_id()
-    f, l = gen_name()
+    first_name, last_name = gen_name()
     user = User(
         id=id,
         ssn=gen_ssn(),
         username=u,
         password=p,
         phone_number=gen_phone_number(),
-        user_type=user_type,
+        user_type=ut,
         gender=gender or 'male',
-        last_name=l,
-        first_name=f,
+        last_name=last_name,
+        first_name=first_name,
         nation='Vietnam',
         province=random.choice(['Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Huế', 'Cần Thơ', 'Quảng Ninh', 'Hải Dương', 'Hưng Yên', 'Nam Định', 'Ninh Bình', 'Thái Bình', 'Vĩnh Phúc', 'Bắc Ninh', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Giang', 'Lào Cai', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Bắc Ninh', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Vĩnh Phúc', 'Hà Giang', 'Quảng Ninh', 'Bắc Ninh', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Nội', 'Hải Dương', 'Hưng Yên', 'Nam Định', 'Ninh Bình', 'Thái Bình', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Giang', 'Lào Cai', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Vĩnh Phúc', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Bắc Ninh', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Lai Châu',]),
         district=random.choice([
