@@ -20,6 +20,5 @@ class TestDemo(TestCase):
     def test_login_fail(self):
         res = client.post("/api/auth/login",
                           json={"username": gen_username(), "password": gen_password()})
-        self.assertEqual(res.status_code, 403)
-        self.assertEqual(res.json()['message'],
-                         "Incorrect username or password")
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.json()['message'], "Nonexistent user")
