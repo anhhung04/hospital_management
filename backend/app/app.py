@@ -31,8 +31,7 @@ for route in os.listdir('./routes'):
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
-    logger.error(f"HTTPException", status_code=exc.status_code,
-                 detail=exc.detail)
+    logger.error("HTTPException", status_code=exc.status_code,detail=exc.detail)
     return APIResponse.as_json(exc.status_code, exc.detail, {})
 
 @app.exception_handler(RequestValidationError)

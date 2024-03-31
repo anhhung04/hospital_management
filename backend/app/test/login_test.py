@@ -1,6 +1,5 @@
 from unittest import TestCase
 from test import override_get_db, client, gen_username, gen_password, create_user
-from repository.schemas.user import User
 
 
 def login(db):

@@ -2,7 +2,6 @@ from repository.schemas.user import User
 from util.log import logger
 from repository import IRepo
 from sqlalchemy.orm import Session
-from repository.schemas.user import User
 from collections import namedtuple
 
 GetUserQuery = namedtuple('GetUserQuery', ['id', 'username'])
