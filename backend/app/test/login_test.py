@@ -1,7 +1,6 @@
 from unittest import TestCase
-from test import override_get_db, gen_password, gen_username, client
+from test import override_get_db, gen_password, gen_username, client, gen_id
 from util.crypto import hash_password
-from uuid import uuid4
 from repository.schemas.user import User
 
 class TestDemo(TestCase):
@@ -9,7 +8,7 @@ class TestDemo(TestCase):
         db = next(override_get_db())
         u = gen_username()
         p = gen_password()
-        db.add(User(id=str(uuid4()), username=u, password=hash_password(p, u)))
+        db.add(User(id=gen_id(), username=u, password=hash_password(p, u)))
         db.commit()
         db.close()
         res = client.post("/api/auth/login",
