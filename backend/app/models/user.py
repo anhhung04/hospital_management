@@ -1,19 +1,20 @@
 from pydantic import BaseModel
-from models.response import BaseResponse
+from models.response import BaseResponseModel
 
 
 class UserAuth(BaseModel):
     username: str
     password: str
-    
 
 class VerifyTokenRequest(BaseModel):
     access_token: str
     
-class AccessResponse(BaseModel):
+
+class AccessResponse(BaseResponseModel):
     access_token: str    
     
-class UserAuthResponse(BaseResponse):
+
+class UserAuthResponse(BaseResponseModel):
     data: AccessResponse
     
 class VerifyUserReponseData(BaseModel):
@@ -22,5 +23,13 @@ class VerifyUserReponseData(BaseModel):
     user_id: str
 
 
-class VerifyTokenReponse(BaseResponse):
+class VerifyTokenReponse(BaseResponseModel):
     data: VerifyUserReponseData
+
+
+class LogoutData(BaseModel):
+    success: bool
+
+
+class LogoutResponseModel(BaseResponseModel):
+    data: LogoutData

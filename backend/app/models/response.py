@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
-class BaseResponse(BaseModel):
+
+class BaseResponseModel(BaseModel):
     status: int
     message: str
     data: dict
