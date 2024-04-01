@@ -29,7 +29,6 @@ redis_cache = {}
 
 class RedisLocal:
     def set(self, key, value, ex):
-        print(key, value)
         redis_cache[key] = value
 
     def delete(self, key):
