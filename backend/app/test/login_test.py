@@ -37,3 +37,18 @@ class TestDemo(TestCase):
             str(user.id), res_json['data']['user_id'], 'invalid id')
         self.assertEqual(
             user.username, res_json['data']['username'], 'invalid username')
+
+    def test_logout(self):
+        res, _ = login(next(override_get_db()))
+        res = client.post(
+            "/api/auth/logout", headers={"Authorization": f"Bearer {res.json()['data']['access_token']}"})
+        print(res.json())
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.json()['data']['success'])
+
+    def test_unverify_user_logout(self):
+        res = client.post("/api/auth/logout",
+                          headers={"Authorization": "Bearer aaa"})
+        self.assertTrue(res.status_code, 401)
+        self.assertIn("message", res.json())
+        self.assertEqual(res.json()['message'], "Token invalid!")

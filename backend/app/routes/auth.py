@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse, LogoutResponseModel
-from models.request import TokenHeader
 from util.response import APIResponse
 from repository import Storage, RedisStorage
 from services.auth import AuthService
 from util.jwt import JWTHandler
+from models.request import TokenHeader
 
 router = APIRouter()
 
@@ -43,13 +43,13 @@ async def verify_user_token(verify_req: VerifyTokenRequest, redis_client=Depends
     )
 
 
-@router.post('/logout', response_model=LogoutResponseModel)
+@router.post('/logout', response_model=LogoutResponseModel, dependencies=[Depends(JWTHandler.verify_auth_header)])
 async def log_out(
     token: TokenHeader,
-    db_sess: Session = Depends(Storage.get),
     redis_client=Depends(RedisStorage.get)
 ):
-    err = await AuthService(db_sess, redis_client).logout(token)
+    jwt_data = JWTHandler.unverify_decode(token.split(" ")[1])
+    err = await AuthService(None, redis_client).logout(jwt_data['sub'])
     if err:
         return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {"success": False})
     return APIResponse.as_json(status.HTTP_200_OK, "logout successful", {"success": True})

@@ -30,9 +30,6 @@ class AuthService:
             return None, err
         return token, None
 
-    async def logout(self, token: str) -> str:
-        token_data, err = JWTHandler(redis_client=self._rc).verify(token)
-        if err:
-            return err
-        self._rc.delete(token_data["sub"])
+    async def logout(self, user_id: str) -> str:
+        self._rc.delete(user_id)
         return None
