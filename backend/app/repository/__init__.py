@@ -2,7 +2,7 @@ import redis
 from config import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 
 
 class IRepo:

@@ -1,4 +1,6 @@
 from typing import Annotated
 from fastapi import Header
 
-TokenHeader = Annotated[str, Header(alias="Authorization")]
+AUTH_HEADER = "Authorization"
+
+TokenHeader = Annotated[str, Header(alias=AUTH_HEADER)]
