@@ -42,7 +42,6 @@ class TestDemo(TestCase):
         res, _ = login(next(override_get_db()))
         res = client.post(
             "/api/auth/logout", headers={"Authorization": f"Bearer {res.json()['data']['access_token']}"})
-        print(res.json())
         self.assertEqual(res.status_code, 200)
         self.assertTrue(res.json()['data']['success'])
 

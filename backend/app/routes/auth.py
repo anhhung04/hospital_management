@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse, LogoutResponseModel
 from util.response import APIResponse
 from repository import Storage, RedisStorage
 from services.auth import AuthService
 from util.jwt import JWTHandler
-from models.request import TokenHeader
 
 router = APIRouter()
 
@@ -43,13 +42,11 @@ async def verify_user_token(verify_req: VerifyTokenRequest, redis_client=Depends
     )
 
 
-@router.post('/logout', response_model=LogoutResponseModel, dependencies=[Depends(JWTHandler.verify_auth_header)])
-async def log_out(
-    token: TokenHeader,
-    redis_client=Depends(RedisStorage.get)
-):
-    jwt_data = JWTHandler.unverify_decode(token.split(" ")[1])
-    err = await AuthService(None, redis_client).logout(jwt_data['sub'])
+@router.post('/logout', response_model=LogoutResponseModel)
+async def log_out(request: Request, redis_client=Depends(RedisStorage.get)):
+    if not request.state.user:
+        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, "Token invalid!", {"success": False})
+    err = await AuthService(None, redis_client).logout(request.state.user.get('sub'))
     if err:
         return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {"success": False})
     return APIResponse.as_json(status.HTTP_200_OK, "logout successful", {"success": True})
