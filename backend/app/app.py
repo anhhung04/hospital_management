@@ -1,7 +1,7 @@
 import uvicorn
 import os
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Depends
 from fastapi.exceptions import RequestValidationError, HTTPException
 from config import config
 from util.log import logger
@@ -9,9 +9,10 @@ from util.log import logger
 from fastapi.middleware.cors import CORSMiddleware
 
 from util.response import APIResponse
+from middleware.user_ctx import auth_middleware
 
 app = FastAPI(docs_url='/api/docs', redoc_url='/api/redoc',
-              openapi_url='/api/openapi.json')
+              openapi_url='/api/openapi.json', dependencies=[Depends(auth_middleware)])
 
 
 app.add_middleware(
@@ -21,6 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 for route in os.listdir('./routes'):
     if route.startswith('_') or not route.endswith('.py'):
