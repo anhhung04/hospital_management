@@ -10,11 +10,11 @@ from repository.schemas.user import User
 
 class AuthService:
     def __init__(self, session: Session, redis_client: Redis):
-        self._sess = session
+        self._user_repo = UserRepo(session)
         self._rc = redis_client
 
     async def gen_token(self, auth_request: UserAuth) -> Tuple[str, str]:
-        user: User = UserRepo(self._sess).get(
+        user: User = self._user_repo.get(
             query=GetUserQuery(None, auth_request.username)
         )
         if not user:
