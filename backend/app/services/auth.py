@@ -6,12 +6,12 @@ from util.jwt import JWTHandler, JWTPayload
 from util.crypto import PasswordContext
 from repository.user import UserRepo, GetUserQuery
 from repository.schemas.user import User
+from services import IService
 
 
-class AuthService:
-    def __init__(self, session: Session, redis_client: Redis):
-        self._sess = session
-        self._rc = redis_client
+class AuthService(IService):
+    def __init__(self, session: Session, redis_client: Redis, user: dict):
+        super().__init__(session, redis_client, user)
 
     async def gen_token(self, auth_request: UserAuth) -> Tuple[str, str]:
         user: User = UserRepo(self._sess).get(
