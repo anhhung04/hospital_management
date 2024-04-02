@@ -1,7 +1,6 @@
 from repository import IRepo
 from collections import namedtuple
 from repository.schemas.patient import Patient
-from util.log import logger
 
 GetPatientQuery = namedtuple("GetPatientQuery", ["id", "name"])
 
