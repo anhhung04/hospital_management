@@ -1,18 +1,21 @@
 import random
 import string
-import uuid
 import json
+from uuid import uuid4
+from util.crypto import PasswordContext
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from repository.schemas import Base
-from repository import get_db, get_redis
+from repository.schemas.user import User
+from repository import Storage, RedisStorage
+from permissions.user import UserRole
+from uuid import uuid4
 from app import app
 from repository.schemas.user import User
 
 USER_DB = json.loads(open('./test/data.json').read())
-
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -26,22 +29,18 @@ TestingSessionLocal = sessionmaker(
 
 Base.metadata.create_all(bind=engine)
 
+redis_cache = {}
+
 
 class RedisLocal:
-    cache: dict
-
-    def __init__(self):
-        self.cache = {}
-
     def set(self, key, value, ex):
-        self.cache[key] = value
+        redis_cache[key] = value
 
     def delete(self, key):
-        if key in self.cache:
-            del self.cache[key]
-
+        if key in redis_cache:
+            redis_cache.pop(key)
     def get(self, key):
-        return self.cache.get(key)
+        return redis_cache.get(key, None)
 
 
 def override_get_db():
@@ -59,8 +58,8 @@ def override_get_redis():
         pass
 
 
-app.dependency_overrides[get_redis] = override_get_redis
-app.dependency_overrides[get_db] = override_get_db
+app.dependency_overrides[RedisStorage.get] = override_get_redis
+app.dependency_overrides[Storage.get] = override_get_db
 
 client = TestClient(app)
 
@@ -72,7 +71,7 @@ def gen_password():
     return ''.join(random.choices(string.ascii_lowercase, k=10))
 
 def gen_id():
-    return str(uuid.uuid4())
+    return str(uuid4())
 
 def gen_ssn():
     return str(random.randint(1000000000, 9999999999))
