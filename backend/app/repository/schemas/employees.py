@@ -1,31 +1,25 @@
 from sqlalchemy import String, Integer, Date, ForeignKey
-from sqlalchemy import Enum as SQLAlchemyEnum
+from sqlalchemy import Enum as DBEnum
 from sqlalchemy.orm import mapped_column, relationship
-from repository.schemas import Base
+from repository.schemas import Base, ObjectID
 from enum import Enum
-
-class Role(Enum):
-    DOCTOR = 1
-    NURSE = 2
-    PATIENT = 3
-    MANAGER = 4
+from permissions.user import EmployeeType
 
 class Level(Enum):
-    BACHELOR = 1
-    MASTER = 2
-    DOCTOR = 3
-    UNDERGRADUATE = 4
-    UNKNOWN = 5
+    BACHELOR = 'bachelor'
+    MASTER = 'master'
+    DOCTOR = 'doctor'
+    UNDERGRADUATE = 'undergraduate'
+    UNKNOWN = 'unknown'
 
 class Employee(Base):
     __tablename__ = 'employees'
 
-    employee_id = mapped_column(Integer, primary_key=True, index=True, unique=True)
-    user_id = mapped_column(String, ForeignKey('users.id'), unique=True)
+    employee_id = mapped_column(ObjectID, ForeignKey('users.id'), primary_key=True, unique=True)
     position = mapped_column(String)
-    employee_type = mapped_column(SQLAlchemyEnum(Role))
-    education_level = mapped_column(SQLAlchemyEnum(Level))
+    employee_type = mapped_column(DBEnum(EmployeeType))
+    education_level = mapped_column(DBEnum(Level))
     begin = mapped_column(Date)
     end = mapped_column(Date)
     faculty = mapped_column(String)
-    user = relationship("User", back_populates="employees", uselist=False)
+    personal_info = relationship("User", back_populates="employees", uselist=False)
