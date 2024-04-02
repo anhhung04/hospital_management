@@ -18,10 +18,9 @@ class Employee(Base):
 
     user_id = mapped_column(ObjectID, ForeignKey(
         'users.id'), primary_key=True, unique=True)
-    position = mapped_column(String)
     employee_type = mapped_column(DBEnum(EmployeeType))
     education_level = mapped_column(DBEnum(EducateLevel))
-    begin = mapped_column(Date)
-    end = mapped_column(Date)
+    begin_date = mapped_column(Date)
+    end_date = mapped_column(Date)
     faculty = mapped_column(String)
     personal_info = relationship("User", back_populates="employees", uselist=False)

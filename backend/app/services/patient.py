@@ -16,8 +16,7 @@ class PatientService(IService):
         patients = list(map(
             lambda p: PatientResponseMode(
                 id=p.user_id,
-                full_name=f"{p.personal_info.first_name} {
-                    p.personal_info.last_name}",
+                full_name=" ".join([p.personal_info.last_name, p.personal_info.last_name]),
                 phone_number=p.personal_info.phone_number,
                 medical_record=p.medical_record.id
             ),
