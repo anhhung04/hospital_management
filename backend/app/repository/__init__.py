@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi import HTTPException
 
-
 class IRepo:
     def create(self, item: object) -> object:
         pass
@@ -32,9 +31,9 @@ class Storage:
         db = SessionLocal()
         try:
             yield db
-        except Exception:
+        except Exception as e:
             raise HTTPException(
-                status_code=500, detail=str("Database had error"))
+                status_code=500, detail=str(e))
         finally:
             db.close()
 
@@ -45,8 +44,7 @@ class RedisStorage:
         r = redis.Redis(connection_pool=redis_pool)
         try:
             yield r
-        except Exception:
-            raise HTTPException(
-                status_code=500, detail=str("Redis had error"))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
         finally:
             pass

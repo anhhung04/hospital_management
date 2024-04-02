@@ -1,11 +1,9 @@
 from sqlalchemy import (
     String,
     Date,
-    Enum as DBEnum
 )
 from sqlalchemy.orm import mapped_column
 from repository.schemas import Base, ObjectID
-from permissions.user import UserRole
 import re
 
 class Email(String):
@@ -43,4 +41,4 @@ class User(Base):
     email = mapped_column(Email, unique=True)
     username = mapped_column(String, unique=True, index=True)
     password = mapped_column(String)
-    role = mapped_column(DBEnum(UserRole))
+    role = mapped_column(String)

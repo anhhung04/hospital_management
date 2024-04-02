@@ -1,23 +1,28 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from services.patient import PatientService
 from repository import Storage
-from fastapi import Query, status
+from fastapi import Query, status, HTTPException
 from typing import Annotated
-from middleware.user_ctx import get_current_user
 from util.response import APIResponse
+from models.patient import ListPatientsModel
 
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/list", response_model=ListPatientsModel, tags=["patient"])
 async def list_patients(
-    page=Annotated[int, Query(gt=0, default=1)],
-    patient_per_page=Annotated[int, Query(gt=0, default=10)],
+    request: Request,
+    page: Annotated[int, Query(gt=0)] = 1,
+    patient_per_page: Annotated[int, Query(gt=0)] = 10,
     db_sess=Depends(Storage.get),
-    user=Depends(get_current_user)
 ):
-    patients = PatientService(db_sess, user).get_patients(
-        page, patient_per_page, user)
+    try:
+        patients = PatientService(db_sess, request.state.user).get_patients(
+            page, patient_per_page)
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
     return APIResponse.as_json(
         code=status.HTTP_200_OK, data=patients, message="Patients fetched successfully"
     )

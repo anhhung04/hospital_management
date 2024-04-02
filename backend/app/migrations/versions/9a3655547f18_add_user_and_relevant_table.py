@@ -51,7 +51,7 @@ def upgrade() -> None:
     sa.Column('email', sa.VARCHAR(), autoincrement=False, nullable=True),
     sa.Column('username', sa.VARCHAR(), autoincrement=False, nullable=True),
     sa.Column('password', sa.VARCHAR(), autoincrement=False, nullable=True),
-    sa.Column('role', postgresql.ENUM('PATIENT', 'EMPLOYEE', 'ADMIN', name='userrole'), autoincrement=False, nullable=True),
+        sa.Column('role', sa.VARCHAR(), autoincrement=False, nullable=True),
     sa.PrimaryKeyConstraint('id', name='users_pkey'),
     sa.UniqueConstraint('email', name='users_email_key'),
     postgresql_ignore_search_path=False

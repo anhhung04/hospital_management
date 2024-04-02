@@ -21,6 +21,11 @@ ENV POSTGRES_USER=dev_user
 ENV POSTGRES_PASSWORD=secret
 ENV POSTGRES_DB=dev_hospital_management
 
+ENV REDIS_HOST=redis
+ENV REDIS_PORT=6379
+ENV POSTGRES_HOST=database
+ENV POSTGRES_PORT=5432
+
 COPY ./app .
 
 COPY dev-entrypoint.sh ./entrypoint.sh
