@@ -2,18 +2,18 @@ import random
 import string
 import json
 from uuid import uuid4
-from util.crypto import PasswordContext
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from repository.schemas import Base
 from repository.schemas.user import User
+from repository.schemas.patient import Patient
 from repository import Storage, RedisStorage
-from permissions.user import UserRole
 from uuid import uuid4
 from app import app
 from repository.schemas.user import User
+from util.crypto import PasswordContext
 
 USER_DB = json.loads(open('./test/data.json').read())
 
@@ -85,7 +85,8 @@ def gen_name():
     l = user_data['last_name']
     return f, l
 
-def insert_user(db, username=None, password=None, user_type=None, gender=None):
+
+def create_user(username=None, password=None, user_type=None, gender=None):
     u = username or gen_username()
     p = password or gen_password()
     ut = user_type or random.choice(['EMPLOYEE', 'PATIENT'])
@@ -95,23 +96,28 @@ def insert_user(db, username=None, password=None, user_type=None, gender=None):
         id=id,
         ssn=gen_ssn(),
         username=u,
-        password=p,
+        password=PasswordContext(p, u).hash(),
         phone_number=gen_phone_number(),
-        user_type=ut,
+        role=ut,
         gender=gender or 'male',
         last_name=last_name,
         first_name=first_name,
         nation='Vietnam',
         province=random.choice(['Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Huế', 'Cần Thơ', 'Quảng Ninh', 'Hải Dương', 'Hưng Yên', 'Nam Định', 'Ninh Bình', 'Thái Bình', 'Vĩnh Phúc', 'Bắc Ninh', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Giang', 'Lào Cai', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Bắc Ninh', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Vĩnh Phúc', 'Hà Giang', 'Quảng Ninh', 'Bắc Ninh', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Nội', 'Hải Dương', 'Hưng Yên', 'Nam Định', 'Ninh Bình', 'Thái Bình', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Giang', 'Lào Cai', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Vĩnh Phúc', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Bắc Ninh', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Lai Châu',]),
-        district=random.choice([
-            'Quận 1', 'Quận 2', 'Quận 3', 'Quận 4', 'Quận 5', 'Quận 6', 'Quận 7', 'Quận 8', 'Quận 9', 'Quận 10', 'Quận 11', 'Quận 12', 'Quận Bình Tân', 'Quận Bình Thạnh', 'Quận Gò Vấp', 'Quận Phú Nhuận', 'Quận Tân Bình', 'Quận Tân Phú', 'Quận Thủ Đức', 'Huyện Bình Chánh', 'Huyện Cần Giờ', 'Huyện Củ Chi', 'Huyện Hóc Môn', 'Huyện Nhà Bè'
-        ]),
-        ward=random.choice([
-            'Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5'
-        ]),address = 'Số 268, Lý Thường Kiệt'
+        address='Số 268, Lý Thường Kiệt'
     )
+    return user
+
+
+def insert_user(db, username=None, password=None, user_type=None, gender=None):
+    user = create_user(username, password, user_type, gender)
     db.add(user)
     db.commit()
     return user
 
 
+def insert_patient(db, id=None, username=None, password=None):
+    patient = Patient(user_id=id, weight=50, height=170, note='test')
+    db.add(patient)
+    db.commit()
+    return patient

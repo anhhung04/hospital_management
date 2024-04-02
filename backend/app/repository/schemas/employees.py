@@ -1,11 +1,12 @@
 from sqlalchemy import String, Date, ForeignKey
 from sqlalchemy import Enum as DBEnum
 from sqlalchemy.orm import mapped_column, relationship
-from repository.schemas import Base, ObjectID
 from enum import Enum
 from permissions.user import EmployeeType
+from repository.schemas import Base, ObjectID
 
-class Level(Enum):
+
+class EducateLevel(Enum):
     BACHELOR = 'bachelor'
     MASTER = 'master'
     DOCTOR = 'doctor'
@@ -15,10 +16,11 @@ class Level(Enum):
 class Employee(Base):
     __tablename__ = 'employees'
 
-    employee_id = mapped_column(ObjectID, ForeignKey('users.id'), primary_key=True, unique=True)
+    user_id = mapped_column(ObjectID, ForeignKey(
+        'users.id'), primary_key=True, unique=True)
     position = mapped_column(String)
     employee_type = mapped_column(DBEnum(EmployeeType))
-    education_level = mapped_column(DBEnum(Level))
+    education_level = mapped_column(DBEnum(EducateLevel))
     begin = mapped_column(Date)
     end = mapped_column(Date)
     faculty = mapped_column(String)

@@ -1,13 +1,11 @@
 from pydantic import BaseModel
 from models.response import BaseResponseModel
-from repository.schemas.user import ObjectID
-
 
 class PatientResponseMode(BaseModel):
-    id: ObjectID
+    id: str
     full_name: str
     phone_number: str
-    medical_record: ObjectID
+    medical_record: str
 
 class ListPatientsModel(BaseResponseModel):
     data: list[PatientResponseMode]
