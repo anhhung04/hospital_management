@@ -1,7 +1,6 @@
 import random
 import string
 import json
-from uuid import uuid4
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -12,7 +11,6 @@ from repository.schemas.patient import Patient
 from repository import Storage, RedisStorage
 from uuid import uuid4
 from app import app
-from repository.schemas.user import User
 from util.crypto import PasswordContext
 
 USER_DB = json.loads(open('./test/data.json').read())
@@ -81,9 +79,9 @@ def gen_phone_number():
 
 def gen_name():
     user_data = random.choice(USER_DB)
-    f = user_data['first_name']
-    l = user_data['last_name']
-    return f, l
+    firstname = user_data['first_name']
+    lastname = user_data['last_name']
+    return firstname, lastname
 
 
 def create_user(username=None, password=None, user_type=None, gender=None):
