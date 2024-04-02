@@ -10,8 +10,9 @@ from services import IService
 
 
 class AuthService(IService):
-    def __init__(self, session: Session, redis_client: Redis, user: dict):
-        super().__init__(session, redis_client, user)
+    def __init__(self, session: Session, redis_client: Redis):
+        self._user_repo = UserRepo(session)
+        self._rc = redis_client
 
     async def gen_token(self, auth_request: UserAuth) -> Tuple[str, str]:
         user: User = self._user_repo.get(

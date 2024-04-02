@@ -18,3 +18,7 @@ async def auth_middleware(request: Request, rc=Depends(RedisStorage.get)):
             request.state.user.update({'sub': token_data.get('sub')})
     except Exception:
         request.state.user = None
+
+
+async def get_current_user(request: Request):
+    return request.state.user

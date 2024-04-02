@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
 from repository.patient import PatientRepo
 from models.patient import PatientResponseMode
+from services import IService
 
-class PatientService:
-    def __init__(self, session: Session):
-        self._repo = PatientRepo(session)
-
+class PatientService(IService):
+    def __init__(self, session: Session, user: dict = None):
+        self._repo = PatientRepo(session, None, user)
+        
     def get_patients(self, page: int = 1, patient_per_page: int = 10) -> PatientResponseMode:
         if page < 1:
             page = 1

@@ -1,22 +1,20 @@
-from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi import APIRouter, Depends
 from services.patient import PatientService
 from repository import Storage
 from fastapi import Query
 from typing import Annotated
+from middleware.user_ctx import get_current_user
 
 router = APIRouter()
 
 
 @router.get("/patient")
 async def list_patients(
-    request: Request,
     page=Annotated[int, Query(gt=0)],
     patient_per_page=Annotated[int, Query(gt=0)],
-    db_sess=Depends(Storage.get)
+    db_sess=Depends(Storage.get),
+    user=Depends(get_current_user)
 ):
-    if not request.state.user:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    if request.state.user.role == 'EMPLOYEE':
-        raise HTTPException(status_code=403, detail="Forbidden")    
-    patients = PatientService(db_sess).get_patients(page, patient_per_page)
+    patients = PatientService(db_sess, user).get_patients(
+        page, patient_per_page, user)
     return patients
