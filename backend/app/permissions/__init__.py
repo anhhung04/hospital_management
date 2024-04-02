@@ -26,6 +26,14 @@ class Permission:
             return wrapper
         return decorator
 
+    @staticmethod
+    def has_role(role, user):
+        uc = [str(c).lower() for c in user.get("role", None).split(":")]
+        for ac in role:
+            if str(ac).lower() in uc:
+                return True
+        return False
+
     def add(self, role):
         self._role.append(role)
 

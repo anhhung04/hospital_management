@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from services.patient import PatientService
 from repository import Storage
-from fastapi import Query, status, HTTPException
+from fastapi import Query, status, HTTPException, Path
 from typing import Annotated
 from util.response import APIResponse
 from models.patient import ListPatientsModel
@@ -25,4 +25,21 @@ async def list_patients(
         )
     return APIResponse.as_json(
         code=status.HTTP_200_OK, data=patients, message="Patients fetched successfully"
+    )
+
+
+@router.get("/{patient_id}", tags=["patient"])
+async def get_patient(
+    request: Request,
+    patient_id: Annotated[str, Path(regex=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")],
+    db_sess=Depends(Storage.get),
+):
+    try:
+        patient = PatientService(db_sess, request.state.user).get(patient_id)
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, data=patient, message="Patient fetched successfully"
     )
