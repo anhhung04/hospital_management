@@ -4,7 +4,6 @@ import os
 from fastapi import FastAPI, status, Depends
 from fastapi.exceptions import RequestValidationError, HTTPException
 from config import config
-from util.log import logger
 
 from fastapi.middleware.cors import CORSMiddleware
 
