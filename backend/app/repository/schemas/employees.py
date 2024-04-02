@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, Date, ForeignKey
+from sqlalchemy import String, Date, ForeignKey
 from sqlalchemy import Enum as DBEnum
 from sqlalchemy.orm import mapped_column, relationship
 from repository.schemas import Base, ObjectID

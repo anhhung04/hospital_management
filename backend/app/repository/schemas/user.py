@@ -1,6 +1,5 @@
 from sqlalchemy import (
     String,
-    Integer,
     Date,
     Enum as DBEnum
 )
