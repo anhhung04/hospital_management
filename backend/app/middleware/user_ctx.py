@@ -15,5 +15,6 @@ async def auth_middleware(request: Request, rc=Depends(RedisStorage.get)):
             if err:
                 raise HTTPException(status_code=401, detail=str(err))
             request.state.user = token_data.get('info', None)
+            request.state.user.update({'sub': token_data.get('sub')})
     except Exception:
         request.state.user = None
