@@ -4,7 +4,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import mapped_column
 from repository.schemas import Base, ObjectID
-from uuid import UUID
 from permissions.user import UserRole
 
 
