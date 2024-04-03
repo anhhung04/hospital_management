@@ -18,12 +18,12 @@ function AddResult(props) {
     const [timeResult, setTimeResult] = useState("");
 
 
-    console.log(typeCheck);
-    console.log(result);
-    console.log(date);
-    console.log(time);
-    console.log(dateResult);
-    console.log(timeResult);
+    // console.log(typeCheck);
+    // console.log(result);
+    // console.log(date);
+    // console.log(time);
+    // console.log(dateResult);
+    // console.log(timeResult);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center">
       <div className="bg-white w-[769px] h-[484px] flex flex-col  ml-[11%] p-[24px] gap-[24px] rounded-[32px] ">

@@ -11,7 +11,7 @@ function Homepage() {
             .then((response) => response.json())
             .then((data) => {
                 setGeneralinfo(data);
-                console.log(data);
+                // console.log(data);
             });
     }, []);  
 
