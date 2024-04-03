@@ -63,10 +63,10 @@ class PatientService(IService):
 
     @Permission.permit([UserRole.EMPLOYEE])
     def create(self, user_info: dict):
-        new_user, _ = self._patient_repo.create(user_info)
+        new_user, _, raw_password = self._patient_repo.create(user_info)
         return NewPatientModel(
             username=new_user.username,
-            password=user_info['password'],
+            password=raw_password,
             user_id=new_user.id
         ).model_dump()
 

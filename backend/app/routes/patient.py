@@ -52,7 +52,7 @@ async def create_patient(
     db_sess=Depends(Storage.get)
 ):
     try:
-        patient = PatientService(db_sess, request.state.user).create(user_info)
+        patient = PatientService(db_sess, request.state.user).create(user_info.model_dump())
     except HTTPException as e:
         return APIResponse.as_json(
             code=e.status_code, message=str(e.detail), data={}

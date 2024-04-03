@@ -3,6 +3,7 @@ from util.log import logger
 from repository import IRepo
 from sqlalchemy.orm import Session
 from collections import namedtuple
+from uuid import uuid4
 
 GetUserQuery = namedtuple('GetUserQuery', ['id', 'username'])
 
@@ -34,10 +35,11 @@ class UserRepo(IRepo):
 
     def create(self, item: dict) -> User:
         try:
+            item.update({'id': str(uuid4())})
             new_user = User(**item)
             self._session.add(new_user)
             self._session.commit()
-            return item
+            return new_user
         except Exception as e:
             logger.error(e)
             return None
