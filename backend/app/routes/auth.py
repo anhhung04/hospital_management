@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, Request
+from fastapi import APIRouter, Depends, status, Request, HTTPException
 from sqlalchemy.orm import Session
 from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse, LogoutResponseModel, UserDetailResponse, ChangePasswordModel, ChangePasswordResponse
 from util.response import APIResponse
@@ -54,12 +54,15 @@ async def changge_password(
     db_sess: Session = Depends(Storage.get),
     redis_client=Depends(RedisStorage.get)
 ):
-    err = await AuthService(db_sess, request.state.user, redis_client).change_password(
-        change_pass_request.old_password,
-        change_pass_request.new_password
-    )
-    if err:
-        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {"success": False})
+    try:
+        err = await AuthService(db_sess, request.state.user, redis_client).change_password(
+            change_pass_request.old_password,
+            change_pass_request.new_password
+        )
+        if err:
+            return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {"success": False})
+    except HTTPException as e:
+        return APIResponse.as_json(e.status_code, str(e.detail), {"success": False})
     return APIResponse.as_json(status.HTTP_200_OK, "change password successful", {"success": True})
 
 
