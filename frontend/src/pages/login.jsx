@@ -11,6 +11,8 @@ function Login() {
   const [isAlert, setAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [isLoginFailed, setLoginFailed] = useState(false);
+  const [isForget, setIsForget] = useState(false);
+  const [isHidden, setIsHidden] = useState(true);
 
 
   const handleData = (data) => {
@@ -77,7 +79,16 @@ function Login() {
     setAlert(false);
   }
 
-  return ( <div className="w-full h-screen bg-[#EFF7FE] flex justify-center items-center ">
+  function closeForget() {
+    setIsForget(false);
+  }
+  
+  function toggleHidden() {
+    setIsHidden(pre => !pre);
+  }
+
+  return ( <>
+  <div className="w-full h-screen bg-[#EFF7FE] flex justify-center items-center ">
         <div className="bg-[#FFFF] relative flex flex-col justify-center gap-[4px] rounded-[30px] shadow-2xl w-[613px] h-[80.226%] p-[40px]">
             <div className="flex justify-center items-center gap-[10px] p-[10px] self-stretch mb-[24px]">
                 <h3 className="font-sans text-[48px] font-medium leading-[72px]"> Đăng Nhập</h3>
@@ -95,12 +106,18 @@ function Login() {
                     <h6 className="font-sans text-[20px] font-medium leading-[32px] text-[#000]">Mật khẩu</h6>
                     <h6 className="inline-block text-[#f00] font-sans text-[20px] font-medium leading-[32px]">*</h6>
                 </div>
-                <input type="password" className="flex py-[12px] px-[8px] gap-[8px] self-stretch rounded-[5px] border-solid border-[1px] mt-[4px] mb-[20px]" placeholder="************" 
+                <div class="w-full h-[48px] flex justify-end items-center relative">
+                <input type={isHidden? "password" : "text"} className="w-full flex gap-[8px] self-stretch rounded-[5px] border-solid border-[1px] " placeholder="************" 
                 onChange={e=>{setPassword(e.target.value); resetLoginFailed();}}
                 onKeyDown={handleKeyDown}
                 disabled={isDisabled}
                 />
-                <div className="flex flex-row items-end w-[200px] h-[16px]">
+                <button  class="absolute mr-[10px]" onClick={toggleHidden}> 
+                {isHidden ? (<img src="/images/Login_HiddenPassword.png"  alt="Search Icon" />) : (<img src="/images/Login_SeePassword.png"  alt="Search Icon" />)}
+                </button>
+                </div>
+
+                <div className="flex flex-row mt-[20px] items-end w-[200px] h-[16px]">
                     <input type="checkbox" className="bg-[#DBEEFC] mr-[5px]" />
                     <h6 className="font-sans text-[13px] font-medium align-text-bottom text-[#000]">Ghi nhớ tài khoản</h6>
                 </div>
@@ -114,7 +131,7 @@ function Login() {
                     </div>
                     <div className="flex justify-center items-center p-[10px] gap-[10px] self-stretch ">
                         <span className="font-sans text-[20px] leading-[32px] font-medium text-[#000]">Quên </span>
-                        <span className="font-sans text-[20px] leading-[32px] font-medium text-[#0544E4] hover:text-[#6E7F94]">Tên đăng nhập | mật khẩu</span>
+                        <button onClick={()=>setIsForget(true)}><span className="font-sans text-[20px] leading-[32px] font-medium text-[#0544E4] hover:text-[#6E7F94]">Tên đăng nhập | mật khẩu</span></button>
                     </div>
                 </div>
             </div>
@@ -128,7 +145,16 @@ function Login() {
           icon_type="error"
         />
         )}
-    </div>);
+        {isForget && (      
+        <Alert
+          message= "Vui lòng liên hệ quản trị viên để biết tên đăng nhập hoặc mật khẩu."
+          isAlert={isForget}
+          closeAlert={closeForget}
+          icon_type="warning"
+        />
+        )}
+    </div>
+  </>);
 }
 
 export { isLogin }
