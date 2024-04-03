@@ -33,6 +33,8 @@ class PatientRepo:
             "password": PasswordContext(gen_password, username).hash()
         })
         new_user = await self._user_repo.create(patient_info)
+        if not new_user:
+            return None, None, None
         new_patient = Patient(
             user_id=new_user.id
         )
