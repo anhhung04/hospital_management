@@ -22,7 +22,7 @@ class VerifyTokenRequest(BaseModel):
     access_token: str
 
 
-class AccessResponse(BaseResponseModel):
+class AccessResponse(BaseModel):
     access_token: str
 
 
