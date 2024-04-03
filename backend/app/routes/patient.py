@@ -4,7 +4,7 @@ from repository import Storage
 from fastapi import Query, status, HTTPException, Path
 from typing import Annotated
 from util.response import APIResponse
-from models.patient import ListPatientsModel, AddPatientRequestModel, NewPatientReponseModel, PatientResponseModel, NewPatientRequestModel, PatientDetailResponseModel
+from models.patient import ListPatientsModel, AddPatientRequestModel, NewPatientReponseModel, NewPatientRequestModel, PatientDetailResponseModel
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ async def list_patients(
     db_sess=Depends(Storage.get),
 ):
     try:
-        patients = PatientService(db_sess, request.state.user).get_patients(
+        patients = await PatientService(db_sess, request.state.user).get_patients(
             page, patient_per_page)
     except HTTPException as e:
         return APIResponse.as_json(
@@ -35,7 +35,7 @@ async def get_patient(
     db_sess=Depends(Storage.get),
 ):
     try:
-        patient = PatientService(db_sess, request.state.user).get(patient_id)
+        patient = await PatientService(db_sess, request.state.user).get(patient_id)
     except HTTPException as e:
         return APIResponse.as_json(
             code=e.status_code, message=str(e.detail), data={}
@@ -52,7 +52,7 @@ async def create_patient(
     db_sess=Depends(Storage.get)
 ):
     try:
-        patient = PatientService(db_sess, request.state.user).create(user_info.model_dump())
+        patient = await PatientService(db_sess, request.state.user).create(user_info.model_dump())
     except HTTPException as e:
         return APIResponse.as_json(
             code=e.status_code, message=str(e.detail), data={}
@@ -70,8 +70,8 @@ async def patch_patient(
     db_sess=Depends(Storage.get),
 ):
     try:
-        patient = PatientService(
-            db_sess, request.state.user).update(patient_id, patient_update)
+        patient = await PatientService(db_sess, request.state.user).update(
+            patient_id, patient_update)
     except HTTPException as e:
         return APIResponse.as_json(
             code=e.status_code, message=str(e.detail), data={}

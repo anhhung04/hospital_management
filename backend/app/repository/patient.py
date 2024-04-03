@@ -16,7 +16,7 @@ class PatientRepo(IRepo):
         self._sess = session
         self._user_repo = UserRepo(session)
 
-    def get(self, patient_id: str):
+    async def get(self, patient_id: str):
         try:
             patient = self._sess.query(Patient).filter(
                 Patient.user_id == patient_id).first()
@@ -24,7 +24,7 @@ class PatientRepo(IRepo):
             return None
         return patient
 
-    def create(self, patient_info: dict):
+    async def create(self, patient_info: dict):
         gen_password = PasswordContext.rand_key()
         username = f"patient_{patient_info['ssn']}"
         patient_info.update({
@@ -32,7 +32,7 @@ class PatientRepo(IRepo):
             "username": username,
             "password": PasswordContext(gen_password, username).hash()
         })
-        new_user = self._user_repo.create(patient_info)
+        new_user = await self._user_repo.create(patient_info)
         new_patient = Patient(
             user_id=new_user.id,
             weight=0,
@@ -42,7 +42,7 @@ class PatientRepo(IRepo):
         self._sess.commit()
         return new_user, new_patient, gen_password
 
-    def update(self, query: GetPatientQuery, patient_update: dict):
+    async def update(self, query: GetPatientQuery, patient_update: dict):
         try:
             patient = self._sess.query(Patient).filter(
                 Patient.user_id == query['user_id']).first()
@@ -53,11 +53,11 @@ class PatientRepo(IRepo):
             self._sess.add(patient)
             self._sess.commit()
             self._sess.refresh(patient)
-        except Exception:
-            return None
-        return patient
+        except Exception as e:
+            return None, e
+        return patient, None
 
-    def list_patient(self, page: int, patient_per_page: int):
+    async def list_patient(self, page: int, patient_per_page: int):
         try:
             patients = self._sess.query(Patient).limit(
                 patient_per_page).offset((page - 1) * patient_per_page).all()

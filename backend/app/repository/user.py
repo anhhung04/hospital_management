@@ -12,28 +12,34 @@ class UserRepo(IRepo):
     def __init__(self, session: Session):
         self._session: Session = session
 
-    def get(self, query: GetUserQuery) -> User:
+    async def get(self, query: GetUserQuery):
         try:
+            if query.username:
+                user = self._session.query(User).filter(
+                    User.username == query.username).first()
             if query.id:
-                return self._session.query(User).filter(User.id == query.id).first()
-            return self._session.query(User).filter(User.username == query.username).first()
-        except Exception as e:
-            logger.error(e)
-            return None
-
-    def update(self, query: GetUserQuery, update_item: User) -> User:
-        try:
-            user: User = self.get(query)
-            if user:
-                for key, value in update_item.dict().items():
-                    setattr(user, key, value)
-                self._session.commit()
+                user = self._session.query(User).filter(
+                    User.id == query.id).first()
             return user
         except Exception as e:
             logger.error(e)
             return None
 
-    def create(self, item: dict) -> User:
+    async def update(self, query: GetUserQuery, update_item: dict) -> User:
+        try:
+            user: User = await self.get(query)
+            if user:
+                for attr in update_item.keys():
+                    setattr(user, attr, update_item[attr])
+                self._session.add(user)
+                self._session.commit()
+                self._session.refresh(user)
+            return user
+        except Exception as e:
+            logger.error(e)
+            return None
+
+    async def create(self, item: dict) -> User:
         try:
             item.update({'id': str(uuid4())})
             new_user = User(**item)
@@ -44,9 +50,9 @@ class UserRepo(IRepo):
             logger.error(e)
             return None
 
-    def delete(self, query: GetUserQuery) -> User:
+    async def delete(self, query: GetUserQuery) -> User:
         try:
-            user: User = self.get(query)
+            user: User = await self.get(query)
             if user:
                 self._session.delete(user)
                 self._session.commit()

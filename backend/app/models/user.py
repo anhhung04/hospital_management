@@ -7,6 +7,13 @@ class UserAuth(BaseModel):
     password: str
 
 
+class ChangePasswordModel(BaseModel):
+    old_password: str
+    new_password: str
+    
+class ChangePasswordResponse(BaseResponseModel):
+    success: bool
+
 class VerifyTokenRequest(BaseModel):
     access_token: str
 

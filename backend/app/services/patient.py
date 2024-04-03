@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from repository.patient import PatientRepo
 from services import IService
 from util.log import logger
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from models.patient import PatientModel, PatientDetailModel, NewPatientModel
 from permissions import Permission
 from permissions.user import UserRole
@@ -14,12 +14,12 @@ class PatientService(IService):
         self._patient_repo = PatientRepo(session)
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
-    def get_patients(self, page: int = 1, patient_per_page: int = 10):
+    async def get_patients(self, page: int = 1, patient_per_page: int = 10):
         if page < 1:
             page = 1
         if patient_per_page < 1:
             patient_per_page = 10
-        patients = self._patient_repo.list_patient(page, patient_per_page)
+        patients = await self._patient_repo.list_patient(page, patient_per_page)
         try:
             patients = [PatientModel(
                 id=p.user_id,
@@ -35,11 +35,11 @@ class PatientService(IService):
         return patients
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
-    def get(self, patient_id: str):
+    async def get(self, patient_id: str):
         if Permission.has_role([UserRole.PATIENT], self._current_user):
             if self._current_user['sub'] != patient_id:
                 raise HTTPException(status_code=403, detail='Permission denied')
-        patient = self._patient_repo.get(patient_id)
+        patient = await self._patient_repo.get(patient_id)
         if not patient:
             raise HTTPException(status_code=404, detail='Patient not found')
         return PatientDetailModel(
@@ -62,8 +62,8 @@ class PatientService(IService):
         ).model_dump()
 
     @Permission.permit([UserRole.EMPLOYEE])
-    def create(self, user_info: dict):
-        new_user, _, raw_password = self._patient_repo.create(user_info)
+    async def create(self, user_info: dict):
+        new_user, _, raw_password = await self._patient_repo.create(user_info)
         return NewPatientModel(
             username=new_user.username,
             password=raw_password,
@@ -71,11 +71,12 @@ class PatientService(IService):
         ).model_dump()
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
-    def update(self, user_id: str, patient_update: dict):
-        patient = self._patient_repo.update(query=GetPatientQuery(
+    async def update(self, user_id: str, patient_update: dict):
+        patient, err = await self._patient_repo.update(query=GetPatientQuery(
             user_id, None), patient_update=patient_update)
-        if not patient:
-            raise HTTPException(status_code=404, detail='Patient not found')
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error in update patient infomation')
         return PatientDetailModel(
             id=patient.user_id,
             ssn=patient.personal_info.ssn,
