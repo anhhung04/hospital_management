@@ -1,4 +1,3 @@
-from repository import IRepo
 from collections import namedtuple
 from repository.schemas.patient import Patient
 from repository.user import UserRepo
@@ -12,7 +11,7 @@ from typing import Tuple
 GetPatientQuery = namedtuple("GetPatientQuery", ["id", "username"])
 
 
-class PatientRepo(IRepo):
+class PatientRepo:
     def __init__(self, session):
         self._sess = session
         self._user_repo = UserRepo(session)
@@ -35,9 +34,7 @@ class PatientRepo(IRepo):
         })
         new_user = await self._user_repo.create(patient_info)
         new_patient = Patient(
-            user_id=new_user.id,
-            weight=0,
-            height=0,
+            user_id=new_user.id
         )
         self._sess.add(new_patient)
         self._sess.commit()

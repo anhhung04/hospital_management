@@ -26,7 +26,8 @@ class PatientService(IService):
                 full_name=" ".join(
                     [p.personal_info.last_name, p.personal_info.first_name]),
                 phone_number=p.personal_info.phone_number,
-                medical_record=str(p.medical_record.id)
+                medical_record=str(
+                    p.medical_record.id) if p.medical_record else None,
             ).model_dump() for p in patients]
         except Exception as e:
             logger.error('Error in convert patients list', reason=e)
@@ -57,7 +58,7 @@ class PatientService(IService):
             first_name=patient.personal_info.first_name,
             last_name=patient.personal_info.last_name,
             birth_date=str(patient.personal_info.birth_date),
-            medical_record=patient.medical_record.id,
+            medical_record=patient.medical_record.id if patient.medical_record else None,
             gender=patient.personal_info.gender
         ).model_dump()
 

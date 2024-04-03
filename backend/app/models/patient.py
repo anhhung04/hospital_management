@@ -8,7 +8,7 @@ class PatientModel(BaseModel):
     id: str
     full_name: str
     phone_number: str
-    medical_record: str
+    medical_record: Optional[str]
 
 
 class PatientResponseModel(BaseResponseModel):
@@ -44,10 +44,7 @@ class NewPatientReponseModel(BaseResponseModel):
 
 
 class PatientDetailModel(UserDetail):
-    weight: float
-    height: float
-    note: str
-    medical_record: int
+    medical_record: Optional[int]
 
 
 class PatientDetailResponseModel(BaseResponseModel):
@@ -63,5 +60,3 @@ class NewPatientRequestModel(BaseModel):
     address: Optional[str]
     email: Optional[str]
     health_insurance: Optional[str]
-    weight: Optional[float]
-    height: Optional[float]

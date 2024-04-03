@@ -1,6 +1,5 @@
 from repository.schemas.user import User
 from util.log import logger
-from repository import IRepo
 from sqlalchemy.orm import Session
 from collections import namedtuple
 from uuid import uuid4
@@ -8,7 +7,7 @@ from uuid import uuid4
 GetUserQuery = namedtuple('GetUserQuery', ['id', 'username'])
 
 
-class UserRepo(IRepo):
+class UserRepo:
     def __init__(self, session: Session):
         self._session: Session = session
 

@@ -4,20 +4,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi import HTTPException
 
-class IRepo:
-    def create(self, item: object) -> object:
-        pass
-
-    def get(self, query: dict) -> object:
-        pass
-
-    def update(self, query: dict, update_item: object) -> object:
-        pass
-
-    def delete(self, query: dict) -> object:
-        pass
-
-
 engine = create_engine(config['POSTGRES_SQL_URL'])
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
