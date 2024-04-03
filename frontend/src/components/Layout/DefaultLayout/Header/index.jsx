@@ -23,11 +23,7 @@ function Header(props) {
           </h5>):(<div className="w-[200px] h-[56px] flex items-center gap-[30px]">
               <div className="w-[32px] h-[32px] flex justify-center items-center"><img src="/images/header_ring.png" alt="ring ring ring" className="hover:size-8"/></div>
               <div className="w-[42px] h-[42px] flex justify-center items-center"><img src="/images/header_button.png" alt="ring ring ring" className="hover:size-[40px]" /></div>
-              <div className="w-[60px] h-[60px] flex justify-center items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56" fill="none" className="hover:size-[60px]">
-                  <circle cx="28" cy="28" r="28" fill="#9AA6B4"/>
-                </svg>
-          </div>
+              <div className="w-[35px] h-[35px]"><img src="/images/People_Icon.png" alt="People" /></div>
           </div>)}
            
       </div>
