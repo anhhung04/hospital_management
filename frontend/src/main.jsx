@@ -7,11 +7,11 @@ import {publicRoutes} from "./routes";
 import './index.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-if (process.env.NODE_ENV === 'development' &&
-  typeof makeServer === 'function'
-) {
+
+if (import.meta.env.MODE === 'development' && typeof makeServer === 'function') {
   makeServer();
 }
+
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(

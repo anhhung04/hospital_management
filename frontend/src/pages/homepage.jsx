@@ -1,31 +1,19 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-const general_info = [
-    {
-        title: "Bệnh nhân",
-        value: "100",
-        path: "/patient",
-    },
-    {
-        title: "Nhân viên",
-        value: "50",
-        path: "/patient",
-    },
-    {
-        title: "Y tá",
-        value: "200",
-        path: "/patient",
-    },
-    {
-        title: "Bác sĩ",
-        value: "300",
-        path: "/patient",
-    },
-];  
-
+import { useEffect, useState } from "react";
 
 
 function Homepage() {
+
+    const [general_info, setGeneralinfo] = useState([]);
+
+    useEffect(() => {
+        fetch("/api/generalinfo")
+            .then((response) => response.json())
+            .then((data) => {
+                setGeneralinfo(data);
+                console.log(data);
+            });
+    }, []);  
 
     const navigate = useNavigate();
  

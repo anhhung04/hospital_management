@@ -2,6 +2,11 @@ import Header from "./Header";
 import Footer from "./Footer";
 import Sidebar from "./SideBar";
 import { useState } from "react";
+import PropTypes from 'prop-types';
+
+DefaultLayout.propTypes = {
+    children: PropTypes.node,
+};
 
 function DefaultLayout({children}) {
 

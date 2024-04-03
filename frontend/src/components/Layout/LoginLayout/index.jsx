@@ -1,6 +1,10 @@
 import Header from "../DefaultLayout/Header";
 import Footer from "../DefaultLayout/Footer";
+import PropTypes from 'prop-types';
 
+LoginLayout.propTypes = {
+    children: PropTypes.node,
+};
 
 function LoginLayout({children}) {
 

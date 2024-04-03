@@ -60,7 +60,7 @@ export function makeServer({ environment, namespace } =
                     return JSON.stringify(wrap_response(401, "Invalid credentials", {}));
                 }
             });
-            this.get('/patients/list', (schema, request) => {
+            this.get('/patients/list', () => {
                 return [
                         {
                             id: 1,
@@ -168,6 +168,32 @@ export function makeServer({ environment, namespace } =
                         }
                     ]
                 
+            });
+            this.get('/generalinfo', () => {
+                const general_info = [
+                    {
+                        title: "Bệnh nhân",
+                        value: "1000",
+                        path: "/patient",
+                    },
+                    {
+                        title: "Nhân viên",
+                        value: "50",
+                        path: "/patient",
+                    },
+                    {
+                        title: "Y tá",
+                        value: "200",
+                        path: "/patient",
+                    },
+                    {
+                        title: "Bác sĩ",
+                        value: "300",
+                        path: "/patient",
+                    },
+                ];
+
+                return general_info;
             });
             
         }

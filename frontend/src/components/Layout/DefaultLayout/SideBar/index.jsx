@@ -1,6 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import Alert from "../../../Alert";
 import { useState } from "react";
+import PropTypes from 'prop-types';
+
+Sidebar.propTypes = {
+  current_content: PropTypes.string,
+  handleClick: PropTypes.func,
+  isLogin: PropTypes.bool,
+};
 
 const content_nav = {
   general: {

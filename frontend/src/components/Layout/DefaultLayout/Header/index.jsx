@@ -1,4 +1,9 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import PropTypes from 'prop-types';
+
+Header.propTypes = {
+  isLogin: PropTypes.bool,
+};
 
 function Header(props) {
   const navigate = useNavigate();
