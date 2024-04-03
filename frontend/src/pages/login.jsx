@@ -106,13 +106,13 @@ function Login() {
                     <h6 className="font-sans text-[20px] font-medium leading-[32px] text-[#000]">Mật khẩu</h6>
                     <h6 className="inline-block text-[#f00] font-sans text-[20px] font-medium leading-[32px]">*</h6>
                 </div>
-                <div class="w-full h-[48px] flex justify-end items-center relative">
+                <div className="w-full h-[48px] flex justify-end items-center relative">
                 <input type={isHidden? "password" : "text"} className="w-full flex gap-[8px] self-stretch rounded-[5px] border-solid border-[1px] " placeholder="************" 
                 onChange={e=>{setPassword(e.target.value); resetLoginFailed();}}
                 onKeyDown={handleKeyDown}
                 disabled={isDisabled}
                 />
-                <button  class="absolute mr-[10px]" onClick={toggleHidden}> 
+                <button  className="absolute mr-[10px]" onClick={toggleHidden}> 
                 {isHidden ? (<img src="/images/Login_HiddenPassword.png"  alt="Search Icon" />) : (<img src="/images/Login_SeePassword.png"  alt="Search Icon" />)}
                 </button>
                 </div>
