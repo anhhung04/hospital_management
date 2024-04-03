@@ -1,35 +1,52 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
-from models.user import UserAuth, UserAuthResponse
-from util.crypto import verify_password
-from util.response import wrap_response
-from util.jwt import create_access_token
-from repository.schemas.user import User as UserInDB
-from repository import get_db, get_redis
+from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse, LogoutResponseModel
+from util.response import APIResponse
+from repository import Storage, RedisStorage
+from services.auth import AuthService
+from util.jwt import JWTHandler
 
 router = APIRouter()
 
 @router.post("/login", response_model=UserAuthResponse)
-async def login(user_auth: UserAuth, db: Session = Depends(get_db), redis_client=Depends(get_redis)):
-    try: 
-        user: UserInDB = db.query(UserInDB).filter(UserInDB.username == user_auth.username).first()
-    except Exception:
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "query database error")
-    if not user or not verify_password(user.password, user_auth.password, user.username):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Incorrect username or password",
+async def login(auth_req: UserAuth, db_sess: Session = Depends(Storage.get), redis_client=Depends(RedisStorage.get)):
+    token, err = await AuthService(db_sess, redis_client).gen_token(auth_req)
+    if err:
+        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {})
+    return APIResponse.as_json(
+        status.HTTP_200_OK, "login successful", {"access_token": token}
+    )
+
+
+@router.post("/verify", response_model=VerifyTokenReponse)
+async def verify_user_token(verify_req: VerifyTokenRequest, redis_client=Depends(RedisStorage.get)):
+    token_data, err = JWTHandler(redis_client).verify(verify_req.access_token)
+    if err:
+        return APIResponse.as_json(
+            status.HTTP_401_UNAUTHORIZED,
+            str(err),
+            {
+                "is_login": False,
+                "username": "",
+                "user_id": "",
+            },
         )
-    try:
-        access_token, err = create_access_token(redis_client, {
-            "username": user.username,
-        }, str(user.id))
-        if err:
-            raise Exception
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="create access token error",
-        )
-    return wrap_response(status.HTTP_200_OK, "login successful", {"access_token": access_token})
+    return APIResponse.as_json(
+        status.HTTP_200_OK,
+        "verify successful",
+        {
+            "is_login": True,
+            "username": token_data["info"]["username"],
+            "user_id": token_data["sub"],
+        },
+    )
+
+
+@router.post('/logout', response_model=LogoutResponseModel)
+async def log_out(request: Request, redis_client=Depends(RedisStorage.get)):
+    if not request.state.user:
+        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, "Token invalid!", {"success": False})
+    err = await AuthService(None, redis_client).logout(request.state.user.get('sub'))
+    if err:
+        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {"success": False})
+    return APIResponse.as_json(status.HTTP_200_OK, "logout successful", {"success": True})

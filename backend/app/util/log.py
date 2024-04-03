@@ -1,23 +1,20 @@
-import json
-import logging
-import time
-from logging import Formatter
+import structlog
+from config import config
+processors: list = [
+    structlog.processors.add_log_level,
+    structlog.processors.TimeStamper(fmt="iso"),
+    structlog.processors.dict_tracebacks,
+]
 
+if config["PROD"]:
+    processors.append(structlog.processors.JSONRenderer())
+else:
+    processors.append(structlog.dev.ConsoleRenderer())
 
-class JsonFormatter(Formatter):
-    def __init__(self):
-        super(JsonFormatter, self).__init__()
+structlog.configure(
+    processors=processors,
+)
 
-    def format(self, record):
-        json_record = {}
-        json_record["timestamp"] = time.time()
-        json_record["level"] = record.levelname
-        json_record["message"] = record.getMessage()
-        return json.dumps(json_record)
+logger = structlog.get_logger()
 
-
-logger = logging.root
-handler = logging.StreamHandler()
-handler.setFormatter(JsonFormatter())
-logger.handlers = [handler]
-logger.setLevel(logging.INFO)
+__all__ = ["logger"]

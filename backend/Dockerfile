@@ -14,6 +14,8 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY ./app .
 
+ENV PROD=1
+
 COPY ./entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 

@@ -2,23 +2,51 @@ import redis
 from config import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi import Request
+from fastapi import HTTPException
+
+
+class IRepo:
+    def create(self, item: object) -> object:
+        pass
+
+    def get(self, query: dict) -> object:
+        pass
+
+    def update(self, query: dict, update_item: object) -> object:
+        pass
+
+    def delete(self, query: dict) -> object:
+        pass
+
 
 engine = create_engine(config['POSTGRES_SQL_URL'])
-
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-redis_client = redis.Redis(
-    host=config['REDIS_HOST'], port=config['REDIS_PORT'], db=0)
+redis_pool: redis.ConnectionPool = redis.ConnectionPool(host=config["REDIS_HOST"], port=int(
+    config["REDIS_PORT"]), max_connections=config["MAX_CONNECTIONS_REDIS"], db=0)
 
 
-def get_db(request: Request):
-    return request.state.db
+class Storage:
+    @staticmethod
+    def get():
+        db = SessionLocal()
+        try:
+            yield db
+        except Exception:
+            raise HTTPException(
+                status_code=500, detail=str("Database had error"))
+        finally:
+            db.close()
 
 
-def get_redis():
-    r = redis_client
-    try:
-        yield r
-    finally:
-        pass
+class RedisStorage:
+    @staticmethod
+    def get():
+        r = redis.Redis(connection_pool=redis_pool)
+        try:
+            yield r
+        except Exception:
+            raise HTTPException(
+                status_code=500, detail=str("Redis had error"))
+        finally:
+            pass
