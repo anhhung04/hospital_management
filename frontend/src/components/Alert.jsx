@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
-let icons = {
-  error: "/images/Failed.png",
-  success: "/images/Success.png",
-  warning: "/images/Warning.png",
-};
 
-function Alert(props) {
+export default function Alert(props) {
+  let icons = {
+    error: "/images/Failed.png",
+    success: "/images/Success.png",
+    warning: "/images/Warning.png",
+  };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center">
       <div className="w-[623px] h-[312px] bg-[#FFF] flex flex-col items-start gap-[24px] rounded-3xl p-[35px] shadow-xl">
@@ -35,5 +35,3 @@ Alert.propTypes = {
   message: PropTypes.string,
   closeAlert: PropTypes.func,
 };
-
-export default Alert;

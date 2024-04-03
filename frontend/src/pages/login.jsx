@@ -15,21 +15,21 @@ function Login() {
 
 
   const handleData = (data) => {
-    console.log("success", data);
+    // console.log("success", data);
     if (data.status_code === 200) {
-      console.log("accessToken", data.data.access_token);
+      // console.log("accessToken", data.data.access_token);
       document.cookie = `access_token=${data.data.access_token};max-age=0.5;path=/`;
       navigate("/");
     } else {
       setDisabled(false);
       // alert("Sai tên đăng nhập hoặc mật khẩu");
-      console.log(data.message);
+      // console.log(data.message);
       setAlertMessage(data.message);
       setAlert(true);
       setLoginFailed(true);
-      console.log(data.status_code);
-      console.log(isAlert);
-      console.log(alertMessage);
+      // console.log(data.status_code);
+      // console.log(isAlert);
+      // console.log(alertMessage);
       // console.log("isDisabled",isDisabled)
     }
   };
@@ -49,13 +49,13 @@ function Login() {
 
     PostData(data);
 
-    console.log("username", username);
-    console.log("password", password);
+    // console.log("username", username);
+    // console.log("password", password);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      console.log("Enter key pressed!");
+      // console.log("Enter key pressed!");
       submitForm();
     }
   };

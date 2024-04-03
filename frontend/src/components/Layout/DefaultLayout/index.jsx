@@ -34,10 +34,10 @@ function DefaultLayout({children}) {
     function verifyToken() {
         const access_token = getCookie('access_token');
         if (!access_token) {
-          console.log('No access token found');
+          // console.log('No access token found');
           return;
         }
-        console.log('Access token found:', access_token);
+        // console.log('Access token found:', access_token);
         fetch('/api/auth/verify', {
           method: 'POST',
           headers: {
@@ -55,7 +55,7 @@ function DefaultLayout({children}) {
             }else{
                 setIsLogin(false);
             }
-            console.log('isLogin:', isLogin);
+            // console.log('isLogin:', isLogin);
         })
         .catch((error) => {
           console.error('Error:', error);

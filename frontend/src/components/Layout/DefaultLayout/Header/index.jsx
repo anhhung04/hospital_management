@@ -11,7 +11,7 @@ function Header(props) {
 
   const isLoginRoute = location.pathname === "/login";
 
-  console.log("isLogin1111", props.isLogin);
+  // console.log("isLogin1111", props.isLogin);
   return (
     <header className="flex w-full px-[49px] py-[35px]  items-center justify-center bg-[#FBFBFC] border-solid  border-[2px] shadow-md h-[130px]">
       <div className="flex items-center justify-between gap-[60em] w-full h-[56px] ">

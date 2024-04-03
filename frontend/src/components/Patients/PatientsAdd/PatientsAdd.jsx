@@ -42,7 +42,7 @@ function PatientAdd(props) {
   }
 
   function handleNumMedicineAdded() {
-    console.log("click");
+    // console.log("click");
     setNumMedicineAdded((pre) => pre + 1);
   }
 

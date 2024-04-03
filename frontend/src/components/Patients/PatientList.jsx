@@ -5,9 +5,6 @@ import PatientAdd from "./PatientsAdd/PatientsAdd";
 
 import { useEffect, useState } from "react";
 
-
-
-
 function PatientsList() {
 
   const [checkedState, setCheckedState] = useState([]);

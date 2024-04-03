@@ -1,6 +1,3 @@
-
-function GolobalStyle({children}) {
+export default function GlobalStyle({children}) {
     return ( children );
 }
-
-export default GolobalStyle;
