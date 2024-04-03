@@ -20,7 +20,7 @@ class MedicalRecordService(IService):
                 status_code=status.HTTP_404_NOT_FOUND, detail="Medical record not found")
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
-        })
+        }).model_dump()
 
     @Permission.permit([UserRole.PATIENT])
     async def get_me(self) -> MedicalRecordModel:
@@ -30,7 +30,7 @@ class MedicalRecordService(IService):
                 status_code=status.HTTP_404_NOT_FOUND, detail="Medical record not found")
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
-        })
+        }).model_dump()
 
     @Permission.permit([UserRole.EMPLOYEE, UserRole.ADMIN])
     async def create(self, medical_record: dict) -> MedicalRecordModel:
@@ -40,7 +40,7 @@ class MedicalRecordService(IService):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Existing medical record")
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
-        })
+        }).model_dump()
 
     @Permission.permit([UserRole.EMPLOYEE, UserRole.ADMIN])
     async def delete(self, medical_record_id: str) -> MedicalRecordModel:
@@ -50,4 +50,4 @@ class MedicalRecordService(IService):
                 status_code=status.HTTP_404_NOT_FOUND, detail="Medical record not found")
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
-        })
+        }).model_dump()

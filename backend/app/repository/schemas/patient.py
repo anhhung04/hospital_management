@@ -1,8 +1,17 @@
-from sqlalchemy import String, Integer, ForeignKey, Float, DateTime, func
+from sqlalchemy import (
+    String, Integer, ForeignKey, Float, DateTime, func, Table, Column,
+    Enum as DBEnum
+)
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from repository.schemas import Base, ObjectID
 from typing import List
+from enum import Enum
 
+
+class ProgressType(Enum):
+    SCHEDULING = 0
+    PROCESS = 1
+    FINISHED = 2
 
 class Patient(Base):
     __tablename__ = 'patients'
@@ -30,6 +39,14 @@ class MedicalRecord(Base):
         back_populates='medical_record')
 
 
+employee_handle_progress = Table(
+    "in_charge",
+    Base.metadata,
+    Column("employee_id", ForeignKey("employees.user_id")),
+    Column("patient_id", ForeignKey("patient_progresses.id")),
+    Column("action", String)
+)
+
 class PatientProgress(Base):
     __tablename__ = 'patient_progresses'
 
@@ -37,11 +54,11 @@ class PatientProgress(Base):
                        index=True, autoincrement=True)
     created_at = mapped_column(DateTime, default=func.now())
     treatment_schedule = mapped_column(String)
+    duration = mapped_column(Integer)
     treatment_type = mapped_column(String)
     patient_condition = mapped_column(String)
     patient_id = mapped_column(ForeignKey('patients.user_id'))
-    patient: Mapped["Patient"] = relationship(
-        primaryjoin="PatientProgress.patient_id == Patient.user_id"
-    )
+    status = mapped_column(DBEnum(ProgressType),
+                           default=ProgressType.SCHEDULING)
     medical_record_id = mapped_column(ForeignKey('medical_records.id'))
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="progress")

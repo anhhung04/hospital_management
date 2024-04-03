@@ -33,7 +33,6 @@ class PatientService(IService):
                     p.medical_record.id) if p.medical_record else None,
             ).model_dump() for p in patients]
         except Exception as e:
-            logger.error('Error in convert patients list', reason=e)
             raise HTTPException(
                 status_code=500, detail='Error in convert patients list')
         return patients
@@ -86,7 +85,7 @@ class PatientService(IService):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error in create patient')
         return NewPatientModel.model_validate({
             c.name: str(getattr(patient_in_db, c.name)) for c in patient_in_db.__table__.columns
-        })
+        }).model_dump()
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def update(self, user_id: str, patient_update: dict):

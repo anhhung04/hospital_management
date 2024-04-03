@@ -8,6 +8,7 @@ class PatientModel(BaseModel):
     id: str
     full_name: str
     phone_number: str
+    appointment_date: Optional[str]
     medical_record: Optional[str]
 
 
@@ -44,6 +45,7 @@ class NewPatientReponseModel(BaseResponseModel):
 
 
 class PatientDetailModel(UserDetail):
+    appointment_date: Optional[str]
     medical_record: Optional[int]
 
 

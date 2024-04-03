@@ -14,12 +14,12 @@ async def get_medicalrecord(
     db=Depends(Storage.get),
 ):
     try:
-        medical_record: MedicalRecordModel = await MedicalRecordService(db, request.state.user).get(patient_id)
+        medical_record = await MedicalRecordService(db, request.state.user).get(patient_id)
     except HTTPException as e:
         return APIResponse.as_json(code=e.status_code, message=str(e.detail))
     return APIResponse.as_json(
         code=status.HTTP_200_OK,
-        data=medical_record.model_dump(),
+        data=medical_record,
         message="Medical record fetched successfully"
     )
 
@@ -35,7 +35,7 @@ async def get_my_medicalrecord(
         return APIResponse.as_json(code=e.status_code, message=str(e.detail))
     return APIResponse.as_json(
         code=status.HTTP_200_OK,
-        data=medical_record.model_dump(),
+        data=medical_record,
         message="Medical record fetched successfully"
     )
 
@@ -52,7 +52,7 @@ async def create_new_medical_record(
         return APIResponse.as_json(code=e.status_code, message=str(e.detail))
     return APIResponse.as_json(
         code=status.HTTP_201_CREATED,
-        data=medical_record.model_dump(),
+        data=medical_record,
         message="Medical record created successfully"
     )
 
@@ -69,6 +69,6 @@ async def delete_medical_record(
         return APIResponse.as_json(code=e.status_code, message=str(e.detail))
     return APIResponse.as_json(
         code=status.HTTP_200_OK,
-        data=medical_record.model_dump(),
+        data=medical_record,
         message="Medical record deleted successfully"
     )
