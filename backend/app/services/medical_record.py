@@ -12,7 +12,7 @@ class MedicalRecordService(IService):
         super().__init__(db, user)
         self._medical_record_repo = MedicalRecordRepo(db)
 
-    @Permission.check(role=[UserRole.EMPLOYEE, UserRole.ADMIN])
+    @Permission.permit([UserRole.EMPLOYEE, UserRole.ADMIN])
     async def get(self, patient_id: str) -> MedicalRecordModel:
         medical_record: MedicalRecord = await self._medical_record_repo.get(patient_id)
         if medical_record is None:
@@ -22,7 +22,7 @@ class MedicalRecordService(IService):
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
         })
 
-    @Permission.check(role=[UserRole.PATIENT])
+    @Permission.permit([UserRole.PATIENT])
     async def get_me(self) -> MedicalRecordModel:
         medical_record: MedicalRecord = await self._medical_record_repo.get(self._current_user.get('sub'))
         if medical_record is None:
@@ -32,7 +32,7 @@ class MedicalRecordService(IService):
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
         })
 
-    @Permission.check(role=[UserRole.EMPLOYEE, UserRole.ADMIN])
+    @Permission.permit([UserRole.EMPLOYEE, UserRole.ADMIN])
     async def create(self, medical_record: dict) -> MedicalRecordModel:
         exist_medical_record: MedicalRecord = await self._medical_record_repo.get(medical_record.get('patient_id'))
         if exist_medical_record is not None:
