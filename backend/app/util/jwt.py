@@ -20,7 +20,7 @@ class JWTHandler:
         try:
             self._rc.delete(str(payload.id))
             self._rc.set(str(payload.id),
-                         secret_key,
+                         str(secret_key),
                          ex=self._expire_minutes*60)
         except Exception as e:
             logger.error("create_access_token error", reason=str(e))
@@ -49,6 +49,7 @@ class JWTHandler:
             secret_key = self._rc.get(user_id)
             if not secret_key:
                 return None, "Token expired!"
+
             payload: dict = jwt.decode(token, secret_key, algorithms=["HS256"])
             return payload, None
         except JWTError as e:

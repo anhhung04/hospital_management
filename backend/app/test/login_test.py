@@ -3,7 +3,8 @@ from test import override_get_db, client, gen_username, gen_password, create_use
 
 
 def login(db):
-    user, raw_password = create_user()
+    raw_password = gen_password()
+    user = create_user(None, raw_password, None, None)
     db.add(user)
     db.commit()
     res = client.post(
