@@ -3,6 +3,7 @@ import { Modal } from "flowbite-react";
 let icons = {
   error: "/images/Failed.png",
   success: "/images/Success.png",
+  warning: "/images/Warning.png",
 };
 
 function Alert(props) {

@@ -1,32 +1,40 @@
-
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 const general_info = [
     {
         title: "Bệnh nhân",
         value: "100",
+        path: "/patient",
     },
     {
         title: "Nhân viên",
         value: "50",
+        path: "/patient",
     },
     {
         title: "Y tá",
         value: "200",
+        path: "/patient",
     },
     {
         title: "Bác sĩ",
         value: "300",
+        path: "/patient",
     },
 ];  
 
 
 
 function Homepage() {
+
+    const navigate = useNavigate();
+ 
     return ( <div className="w-full bg-[#EFF7FE] flex justify-center items-center">
         <div className="w-[1080px] h-[1116px] flex flex-col gap-[45px]">
             <div className="w-[1080px] h-[98px] inline-flex flex-between gap-[40px]">
                 {general_info.map((info, index) => (
                     <div key={index} className="w-[240px] h-[98px] bg-[#FFFF] rounded-full shadow-2xl gap-[7px] inline-flex flex-start justify-center items-center">
-                        <div className="w-[50px] h-[50px] flex justify-center items-center"><img src="/images/image 6.png" alt="logo" className="hover:size-[50px]" /></div>
+                        <div className="w-[50px] h-[50px] flex justify-center items-center" onClick={()=>navigate(info.path)} ><img src="/images/image 6.png" alt="logo" className="hover:size-[50px]" /></div>
                         <div className="flex p-[10px] flex-col flex-start w-[115px] h-[68px]">
                             <h3 className="font-sans text-[18px] font-medium text-left leading-[24px]">{info.value}</h3>
                             <h3>{info.title}</h3>

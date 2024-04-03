@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Alert from "../components/Alert";
 
+var isLogin = false;
 function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -11,9 +12,13 @@ function Login() {
   const [alertMessage, setAlertMessage] = useState("");
   const [isLoginFailed, setLoginFailed] = useState(false);
 
+
   const handleData = (data) => {
     console.log("success", data);
     if (data.status_code === 200) {
+      isLogin = true;
+      console.log("accessToken", data.data.access_token);
+      document.cookie = `access_token=${data.data.access_token};max-age=0.5;path=/`;
       navigate("/");
     } else {
       setDisabled(false);
@@ -126,6 +131,7 @@ function Login() {
     </div>);
 }
 
+export { isLogin }
 export default Login;
 
 

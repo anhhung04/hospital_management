@@ -32,6 +32,24 @@ export function makeServer({ environment, namespace } =
                 let attrs = JSON.parse(request.requestBody);
                 return schema.todos.create(attrs);
             });
+            this.post('/auth/verify', (schema, request) => {
+                let jsonData = JSON.parse(request.requestBody);
+                if (jsonData.access_token === '1234567890') {
+                    return JSON.stringify(
+                        {
+                            "status_code": 200,
+                            "message": "Login successful",
+                            "data": {
+                                "isLogin": true,
+                                "username": "guest1",
+                                "user_id": 1,
+                            }
+                        }
+                    );
+                }else{
+                    return JSON.stringify(wrap_response(401, "Invalid credentials", {}));
+                }
+            });
             this.post('/auth/login', (schema, request) => {
                 let jsonData = JSON.parse(request.requestBody);
                 if (jsonData.username === 'guest1' && jsonData.password === 'guest1') {
