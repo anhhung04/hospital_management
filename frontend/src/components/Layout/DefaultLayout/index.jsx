@@ -15,15 +15,15 @@ function DefaultLayout({children}) {
         if (parts.length === 2) return parts.pop().split(';').shift();
       }
 
-    function setCookie(name, value, seconds) {
-      let expires = "";
-      if (seconds) {
-          const date = new Date();
-          date.setTime(date.getTime() + (seconds* 1000));
-          expires = "; expires=" + date.toUTCString();
-      }
-      document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    }
+    // function setCookie(name, value, seconds) {
+    //   let expires = "";
+    //   if (seconds) {
+    //       const date = new Date();
+    //       date.setTime(date.getTime() + (seconds* 1000));
+    //       expires = "; expires=" + date.toUTCString();
+    //   }
+    //   document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    // }
       
 
     function verifyToken() {
@@ -44,9 +44,9 @@ function DefaultLayout({children}) {
         .then(data => {
             if(data.data.isLogin === true){
                 setIsLogin(true);
-                const newToken = "" 
-                const SecondsToRefresh = 30; 
-                setCookie('access_token', newToken, SecondsToRefresh);
+                // const newToken = "" 
+                // const SecondsToRefresh = 30; 
+                // setCookie('access_token', newToken, SecondsToRefresh);
             }else{
                 setIsLogin(false);
             }
