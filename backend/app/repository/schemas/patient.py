@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, Date, ForeignKey
+from sqlalchemy import String, Integer, Date, ForeignKey, Float
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from repository.schemas import Base, ObjectID
 from typing import List
@@ -7,8 +7,8 @@ from typing import List
 class Patient(Base):
     __tablename__ = 'patients'
     user_id = mapped_column(ObjectID, ForeignKey('users.id'), primary_key=True)
-    weight = mapped_column(Integer)
-    height = mapped_column(Integer)
+    weight = mapped_column(Float)
+    height = mapped_column(Float)
     note = mapped_column(String)
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="patient")
     personal_info = relationship("User", primaryjoin="Patient.user_id == User.id", uselist=False)

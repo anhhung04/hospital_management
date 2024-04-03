@@ -32,9 +32,10 @@ class UserRepo(IRepo):
             logger.error(e)
             return None
 
-    def create(self, item: User) -> User:
+    def create(self, item: dict) -> User:
         try:
-            self._session.add(item)
+            new_user = User(**item)
+            self._session.add(new_user)
             self._session.commit()
             return item
         except Exception as e:

@@ -46,9 +46,6 @@ class UserDetail(BaseModel):
     health_insurance: str
     last_name: str
     first_name: str
-    nation: str
-    province: str
-    city: str
     address: str
     email: str
     username: str

@@ -13,6 +13,14 @@ class EducateLevel(Enum):
     UNDERGRADUATE = 'undergraduate'
     UNKNOWN = 'unknown'
 
+
+class EmployeeStatus(Enum):
+    ACTIVE = 'active'
+    INACTIVE = 'inactive'
+    PENDING = 'pending'
+    SUSPENDED = 'suspended'
+    WIP = 'work in progress'
+
 class Employee(Base):
     __tablename__ = 'employees'
 
@@ -23,4 +31,5 @@ class Employee(Base):
     begin_date = mapped_column(Date)
     end_date = mapped_column(Date)
     faculty = mapped_column(String)
+    status = mapped_column(DBEnum(EmployeeStatus))
     personal_info = relationship("User", back_populates="employees", uselist=False)

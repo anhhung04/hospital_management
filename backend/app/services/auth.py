@@ -21,8 +21,6 @@ class AuthService(IService):
         )
         if not user:
             return None, "Nonexistent user"
-        if self._rc.get(str(user.id)):
-            return None, "User already logged in"
         if not PasswordContext(auth_request.password, auth_request.username).verify(user.password):
             return None, "Invalid username or password"
         token, err = JWTHandler(redis_client=self._rc).create(
