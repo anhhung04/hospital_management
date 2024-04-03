@@ -11,8 +11,12 @@ class ChangePasswordModel(BaseModel):
     old_password: str
     new_password: str
     
-class ChangePasswordResponse(BaseResponseModel):
+
+class ChangePasswordStateModel(BaseModel):
     success: bool
+
+class ChangePasswordResponse(BaseResponseModel):
+    data: ChangePasswordStateModel
 
 class VerifyTokenRequest(BaseModel):
     access_token: str
