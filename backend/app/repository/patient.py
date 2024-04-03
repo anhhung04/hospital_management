@@ -6,6 +6,7 @@ from repository.schemas.user import User
 from util.crypto import PasswordContext
 from permissions.user import UserRole
 from permissions import Permission
+from typing import Tuple
 
 
 GetPatientQuery = namedtuple("GetPatientQuery", ["id", "username"])
@@ -16,7 +17,7 @@ class PatientRepo(IRepo):
         self._sess = session
         self._user_repo = UserRepo(session)
 
-    async def get(self, patient_id: str):
+    async def get(self, patient_id: str) -> User:
         try:
             patient = self._sess.query(Patient).filter(
                 Patient.user_id == patient_id).first()
@@ -24,7 +25,7 @@ class PatientRepo(IRepo):
             return None
         return patient
 
-    async def create(self, patient_info: dict):
+    async def create(self, patient_info: dict) -> Tuple[User, Patient, str]:
         gen_password = PasswordContext.rand_key()
         username = f"patient_{patient_info['ssn']}"
         patient_info.update({
@@ -42,7 +43,7 @@ class PatientRepo(IRepo):
         self._sess.commit()
         return new_user, new_patient, gen_password
 
-    async def update(self, query: GetPatientQuery, patient_update: dict):
+    async def update(self, query: GetPatientQuery, patient_update: dict) -> Tuple[Patient, str]:
         try:
             patient = self._sess.query(Patient).filter(
                 Patient.user_id == query['user_id']).first()
@@ -57,7 +58,7 @@ class PatientRepo(IRepo):
             return None, e
         return patient, None
 
-    async def list_patient(self, page: int, patient_per_page: int):
+    async def list_patient(self, page: int, patient_per_page: int) -> list[Patient]:
         try:
             patients = self._sess.query(Patient).limit(
                 patient_per_page).offset((page - 1) * patient_per_page).all()
