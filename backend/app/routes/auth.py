@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
-from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse, LogoutResponseModel
+from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse, LogoutResponseModel, UserDetailResponse
 from util.response import APIResponse
 from repository import Storage, RedisStorage
 from services.auth import AuthService
@@ -12,7 +12,7 @@ router = APIRouter()
 async def login(auth_req: UserAuth, db_sess: Session = Depends(Storage.get), redis_client=Depends(RedisStorage.get)):
     token, err = await AuthService(db_sess, redis_client).gen_token(auth_req)
     if err:
-        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {})
+        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err))
     return APIResponse.as_json(
         status.HTTP_200_OK, "login successful", {"access_token": token}
     )
@@ -50,3 +50,17 @@ async def log_out(request: Request, redis_client=Depends(RedisStorage.get)):
     if err:
         return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {"success": False})
     return APIResponse.as_json(status.HTTP_200_OK, "logout successful", {"success": True})
+
+
+@router.get('/me', response_model=UserDetailResponse)
+async def get_detail(
+    request: Request,
+    db_sess: Session = Depends(Storage.get),
+    redis_client=Depends(RedisStorage.get)
+):
+    if not request.state.user:
+        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, "Token invalid!")
+    user_detail, err = await AuthService(db_sess, redis_client).get_user(request.state.user.get('sub'))
+    if err:
+        return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err))
+    return APIResponse.as_json(status.HTTP_200_OK, "get user detail successful", user_detail.model_dump())

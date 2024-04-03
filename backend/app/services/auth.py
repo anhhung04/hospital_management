@@ -6,6 +6,7 @@ from util.jwt import JWTHandler, JWTPayload
 from util.crypto import PasswordContext
 from repository.user import UserRepo, GetUserQuery
 from repository.schemas.user import User
+from models.user import UserDetail
 from services import IService
 
 
@@ -30,6 +31,14 @@ class AuthService(IService):
         if err:
             return None, err
         return token, None
+
+    async def get_user(self, user_id: str) -> User:
+        user = self._user_repo.get(query=GetUserQuery(user_id, None))
+        if not user:
+            return None, "Nonexistent user"
+        user = UserDetail.model_validate(
+            {c.name: str(getattr(user, c.name)) for c in user.__table__.columns})
+        return user, None
 
     async def logout(self, user_id: str) -> str:
         self._rc.delete(user_id)
