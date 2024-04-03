@@ -5,10 +5,11 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from repository.schemas import Base
-from repository.schemas.user import User
-from repository.schemas.patient import Patient, MedicalRecord, PatientProgress
-from repository.schemas.employees import Employee
+# Ignore F841
+from repository.schemas import Base # noqa F841
+from repository.schemas.user import User # noqa F841
+from repository.schemas.patient import Patient, MedicalRecord, PatientProgress # noqa F841
+from repository.schemas.employees import Employee # noqa F841
 
 import os
 from dotenv import load_dotenv
