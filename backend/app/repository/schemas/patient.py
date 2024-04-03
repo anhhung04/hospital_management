@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, ForeignKey, Float, DateTime, func
+from sqlalchemy import String, Integer, ForeignKey, Float, DateTime, func, Date
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from repository.schemas import Base, ObjectID
 from typing import List
@@ -15,7 +15,7 @@ class MedicalRecord(Base):
 
     id = mapped_column(Integer, primary_key=True,
                        index=True, autoincrement=True)
-    created_at = mapped_column(DateTime(timezone=True), default=func.now())
+    created_at = mapped_column(DateTime, default=func.now())
     weight = mapped_column(Float)
     height = mapped_column(Float)
     note = mapped_column(String)
@@ -35,8 +35,8 @@ class PatientProgress(Base):
 
     id = mapped_column(Integer, primary_key=True,
                        index=True, autoincrement=True)
-    created_at = mapped_column(DateTime(timezone=True), default=func.now())
-    treatment_schedule = mapped_column(DateTime(timezone=True))
+    created_at = mapped_column(DateTime, default=func.now())
+    treatment_schedule = mapped_column(String)
     treatment_type = mapped_column(String)
     patient_condition = mapped_column(String)
     patient_id = mapped_column(ForeignKey('patients.user_id'))

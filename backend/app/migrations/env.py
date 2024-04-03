@@ -6,6 +6,10 @@ from sqlalchemy import pool
 from alembic import context
 
 from repository.schemas import Base
+from repository.schemas.user import User
+from repository.schemas.patient import Patient, MedicalRecord, PatientProgress
+from repository.schemas.employees import Employee
+
 import os
 from dotenv import load_dotenv
 
