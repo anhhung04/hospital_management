@@ -65,6 +65,8 @@ class PatientService(IService):
     @Permission.permit([UserRole.EMPLOYEE])
     async def create(self, user_info: dict):
         new_user, _, raw_password = await self._patient_repo.create(user_info)
+        if not new_user:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Existed patient')
         return NewPatientModel(
             username=new_user.username,
             password=raw_password,
