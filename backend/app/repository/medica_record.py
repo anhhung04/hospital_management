@@ -13,9 +13,12 @@ class MedicalRecordRepo:
             return None
 
     async def create(self, medical_record: dict):
-        new_medical_record = MedicalRecord(**medical_record)
-        self.__sess.add(new_medical_record)
-        self.__sess.commit()
+        try:
+            new_medical_record = MedicalRecord(**medical_record)
+            self.__sess.add(new_medical_record)
+            self.__sess.commit()
+        except Exception:
+            return None
         return new_medical_record
 
     async def delete(self, medical_record_id: str):

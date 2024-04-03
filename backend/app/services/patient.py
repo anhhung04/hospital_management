@@ -7,11 +7,14 @@ from models.patient import PatientModel, PatientDetailModel, NewPatientModel
 from permissions import Permission
 from permissions.user import UserRole
 from repository.patient import GetPatientQuery
+from repository.user import UserRepo
+from util.crypto import PasswordContext
 
 class PatientService(IService):
     def __init__(self, session: Session, user: dict = None):
         super().__init__(session, user, None)
         self._patient_repo = PatientRepo(session)
+        self._user_repo = UserRepo(session)
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def get_patients(self, page: int = 1, patient_per_page: int = 10):
@@ -64,14 +67,26 @@ class PatientService(IService):
 
     @Permission.permit([UserRole.EMPLOYEE])
     async def create(self, user_info: dict):
-        new_user, _, raw_password = await self._patient_repo.create(user_info)
-        if not new_user:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Existed patient')
-        return NewPatientModel(
-            username=new_user.username,
-            password=raw_password,
-            user_id=new_user.id
-        ).model_dump()
+        raw_password = PasswordContext.rand_key()
+        user_info.update({
+            "password": PasswordContext(raw_password, user_info['username']).hash(),
+            "username": f"patient_{user_info['ssn']}",
+            "role": Permission(UserRole.PATIENT).get(),
+        })
+        user_in_db = await self._user_repo.create(user_info)
+        if not user_in_db:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='User is already existed')
+        patient_info = {
+            "user_id": user_in_db.id,
+        }
+        patient_in_db = await self._patient_repo.create(patient_info)
+        if not patient_in_db:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error in create patient')
+        return NewPatientModel.model_validate({
+            c.name: str(getattr(patient_in_db, c.name)) for c in patient_in_db.__table__.columns
+        })
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def update(self, user_id: str, patient_update: dict):

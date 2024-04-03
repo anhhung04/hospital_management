@@ -2,9 +2,6 @@ from collections import namedtuple
 from repository.schemas.patient import Patient
 from repository.user import UserRepo
 from repository.schemas.user import User
-from util.crypto import PasswordContext
-from permissions.user import UserRole
-from permissions import Permission
 from typing import Tuple
 
 
@@ -24,23 +21,14 @@ class PatientRepo:
             return None
         return patient
 
-    async def create(self, patient_info: dict) -> Tuple[User, Patient, str]:
-        gen_password = PasswordContext.rand_key()
-        username = f"patient_{patient_info['ssn']}"
-        patient_info.update({
-            "role": Permission(str(UserRole.PATIENT)).get(),
-            "username": username,
-            "password": PasswordContext(gen_password, username).hash()
-        })
-        new_user = await self._user_repo.create(patient_info)
-        if not new_user:
-            return None, None, None
-        new_patient = Patient(
-            user_id=new_user.id
-        )
-        self._sess.add(new_patient)
-        self._sess.commit()
-        return new_user, new_patient, gen_password
+    async def create(self, patient_info: dict) -> Tuple[Patient]:
+        new_patient = Patient(**patient_info)
+        try:
+            self._sess.add(new_patient)
+            self._sess.commit()
+        except Exception:
+            return None
+        return new_patient
 
     async def update(self, query: GetPatientQuery, patient_update: dict) -> Tuple[Patient, str]:
         try:

@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 
 class Permission:
     def __init__(self, current_role="user"):
-        self._role = current_role.split(":")
+        self._role = str(current_role).split(":")
 
     @staticmethod
     def permit(acl):
