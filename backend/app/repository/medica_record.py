@@ -17,3 +17,12 @@ class MedicalRecordRepo:
         self.__sess.add(new_medical_record)
         self.__sess.commit()
         return new_medical_record
+
+    async def delete(self, medical_record_id: str):
+        medical_record = self.__sess.query(MedicalRecord).filter(
+            MedicalRecord.id == medical_record_id).first()
+        if medical_record is None:
+            return None
+        self.__sess.delete(medical_record)
+        self.__sess.commit()
+        return medical_record

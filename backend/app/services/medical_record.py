@@ -41,3 +41,13 @@ class MedicalRecordService(IService):
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
         })
+
+    @Permission.permit([UserRole.EMPLOYEE, UserRole.ADMIN])
+    async def delete(self, medical_record_id: str) -> MedicalRecordModel:
+        medical_record: MedicalRecord = await self._medical_record_repo.delete(medical_record_id)
+        if medical_record is None:
+            raise HTTPException(
+                status_code=404, detail="Medical record not found")
+        return MedicalRecordModel.model_validate({
+            c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
+        })

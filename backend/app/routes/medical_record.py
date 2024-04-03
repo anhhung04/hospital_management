@@ -55,3 +55,20 @@ async def create_new_medical_record(
         data=medical_record.model_dump(),
         message="Medical record created successfully"
     )
+
+
+@router.delete("/{medical_record_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
+async def delete_medical_record(
+    request: Request,
+    medical_record_id: str,
+    db=Depends(Storage.get),
+):
+    try:
+        medical_record: MedicalRecordModel = await MedicalRecordService(db, request.state.user).delete(medical_record_id)
+    except HTTPException as e:
+        return APIResponse.as_json(code=e.status_code, message=str(e.detail))
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=medical_record.model_dump(),
+        message="Medical record deleted successfully"
+    )
