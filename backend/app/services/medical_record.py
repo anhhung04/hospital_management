@@ -4,7 +4,7 @@ from permissions.user import UserRole
 from models.medical_record import MedicalRecordModel
 from repository.medica_record import MedicalRecordRepo
 from repository.schemas.patient import MedicalRecord
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 
 class MedicalRecordService(IService):
@@ -17,7 +17,7 @@ class MedicalRecordService(IService):
         medical_record: MedicalRecord = await self._medical_record_repo.get(patient_id)
         if medical_record is None:
             raise HTTPException(
-                status_code=404, detail="Medical record not found")
+                status_code=status.HTTP_404_NOT_FOUND, detail="Medical record not found")
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
         })
@@ -27,17 +27,17 @@ class MedicalRecordService(IService):
         medical_record: MedicalRecord = await self._medical_record_repo.get(self._current_user.get('sub'))
         if medical_record is None:
             raise HTTPException(
-                status_code=404, detail="Medical record not found")
+                status_code=status.HTTP_404_NOT_FOUND, detail="Medical record not found")
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
         })
 
     @Permission.permit([UserRole.EMPLOYEE, UserRole.ADMIN])
     async def create(self, medical_record: dict) -> MedicalRecordModel:
-        exist_medical_record: MedicalRecord = await self._medical_record_repo.get(medical_record.get('patient_id'))
-        if exist_medical_record is not None:
-            raise HTTPException(status_code=400, detail="Medical record already exist")
         medical_record: MedicalRecord = await self._medical_record_repo.create(medical_record)
+        if medical_record is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Existing medical record")
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
         })
@@ -47,7 +47,7 @@ class MedicalRecordService(IService):
         medical_record: MedicalRecord = await self._medical_record_repo.delete(medical_record_id)
         if medical_record is None:
             raise HTTPException(
-                status_code=404, detail="Medical record not found")
+                status_code=status.HTTP_404_NOT_FOUND, detail="Medical record not found")
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
         })
