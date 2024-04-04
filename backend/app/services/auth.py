@@ -18,7 +18,10 @@ class AuthService(IService):
 
     async def gen_token(self, auth_request: UserAuth) -> str:
         user, err = await self._user_repo.get(
-            QueryUserModel(username=auth_request.username)
+            QueryUserModel(
+                username=auth_request.username,
+                email=auth_request.email
+            )
         )
         if err:
             raise HTTPException(
