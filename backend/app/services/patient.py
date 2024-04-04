@@ -85,23 +85,27 @@ class PatientService(IService):
             "role": Permission(UserRole.PATIENT).get(),
         })
         user_in_db = await self._user_repo.create(user_info)
-        if not user_in_db:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='User is already existed')
         patient_info = {
             "user_id": user_in_db.id,
         }
         patient_in_db = await self._patient_repo.create(patient_info)
+        if user_in_db and patient_in_db:
+            return_patient = {
+                "username": patient_in_db.personal_info.username,
+                "password": raw_password,
+                "user_id": patient_in_db.user_id,
+            }
+            return NewPatientModel.model_validate(return_patient).model_dump()
+        if not user_in_db:
+            raise HTTPException(
+                status_code=500,
+                detail='Error in create user'
+            )
         if not patient_in_db:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error in create patient')
-        patient_in_db = {
-            c.name: str(getattr(patient_in_db, c.name)) for c in patient_in_db.__table__.columns
-        }
-        patient_in_db.update({
-            "password": raw_password
-        })
-        return NewPatientModel.model_validate(patient_in_db).model_dump()
+                status_code=500,
+                detail='Error in create patient'
+            )
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def update(self, user_id: str, patient_update: dict):
