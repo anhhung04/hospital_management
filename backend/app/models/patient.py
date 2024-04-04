@@ -8,9 +8,8 @@ class PatientModel(BaseModel):
     id: str
     full_name: str
     phone_number: str
-    appointment_date: Optional[str] = None
-    medical_record: Optional[int] = None
-
+    appointment_date: Optional[str | None] = None
+    medical_record: Optional[int | None] = None
 
 class PatientResponseModel(BaseResponseModel):
     data: PatientModel
@@ -40,8 +39,8 @@ class NewPatientReponseModel(BaseResponseModel):
 
 
 class PatientDetailModel(BaseModel):
-    appointment_date: Optional[str] = None
-    medical_record: Optional[int] = None
+    appointment_date: Optional[str | None] = None
+    medical_record: Optional[int | None] = None
     personal_info: UserDetail
 
 
@@ -54,4 +53,4 @@ class PatchPatientModel(PatchUserDetailModel):
 
 
 class QueryPatientModel(BaseModel):
-    user_id: Optional[str] = None
+    user_id: Optional[str | None] = None

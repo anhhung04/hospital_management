@@ -33,7 +33,8 @@ class UserRepo:
         try:
             user: User = await self.get(query)
             for attr in update_item.model_dump_json().keys():
-                setattr(user, attr, update_item[attr])
+                if update_item.get(attr) is not None:
+                    setattr(user, attr, update_item.get(attr))
             self._session.add(user)
             self._session.commit()
             self._session.refresh(user)

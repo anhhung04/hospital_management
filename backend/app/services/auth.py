@@ -51,7 +51,7 @@ class AuthService(IService):
                 detail="User is not logged in"
             )
         user, err = await self._user_repo.get(
-            QueryUserModel(user_id=self._current_user.get('sub'))
+            QueryUserModel(id=self._current_user.get('sub'))
         )
         if err:
             raise HTTPException(

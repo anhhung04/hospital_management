@@ -3,8 +3,8 @@ from models.response import BaseResponseModel
 from typing import Optional
 
 class UserAuth(BaseModel):
-    email: Optional[str] = None
-    username: Optional[str] = None
+    email: Optional[str | None] = None
+    username: Optional[str | None] = None
     password: str
 
 
@@ -80,24 +80,24 @@ class AddUserModel(BaseModel):
 
 
 class PatchUserDetailModel(BaseModel):
-    phone_number: Optional[str]
-    birth_date: Optional[str]
-    gender: Optional[str]
-    health_insurance: Optional[str]
-    last_name: Optional[str]
-    first_name: Optional[str]
-    address: Optional[str]
+    phone_number: Optional[str | None] = None
+    birth_date: Optional[str | None] = None
+    gender: Optional[str | None] = None
+    health_insurance: Optional[str | None] = None
+    last_name: Optional[str | None] = None
+    first_name: Optional[str | None] = None
+    address: Optional[str | None] = None
 
 class UserDetailResponse(BaseResponseModel):
     data: UserDetail
 
 
 class PatchUserPrivateInfoModel(PatchUserDetailModel):
-    password: Optional[str]
-    username: Optional[str]
+    password: Optional[str | None] = None
+    username: Optional[str | None] = None
 
 class QueryUserModel(BaseModel):
-    username: Optional[str] = None
-    id: Optional[str] = None
-    ssn: Optional[str] = None
-    email: Optional[str] = None
+    username: Optional[str | None] = None
+    id: Optional[str | None] = None
+    ssn: Optional[str | None] = None
+    email: Optional[str | None] = None

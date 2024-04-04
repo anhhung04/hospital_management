@@ -40,7 +40,8 @@ class PatientRepo:
                 Patient.user_id == query.user_id
             ).first()
             for attr in patient_update.keys():
-                setattr(patient, attr, patient_update[attr])
+                if patient_update.get(attr) is not None:
+                    setattr(patient, attr, patient_update.get(attr))
             self._sess.add(patient)
             self._sess.commit()
             self._sess.refresh(patient)
