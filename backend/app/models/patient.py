@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from models.response import BaseResponseModel
-from models.user import PatchUserDetailModel, UserDetail
+from models.user import PatchUserDetailModel, UserDetail, AddUserModel
 from typing import Optional
 
 
@@ -21,6 +21,10 @@ class ListPatientsModel(BaseResponseModel):
 
 class AddPatientModel(BaseModel):
     patient_id: str
+
+
+class AddPatientRequestModel(AddUserModel):
+    pass
 
 class AddPatientResponseModel(BaseResponseModel):
     data: PatientResponseModel
