@@ -56,7 +56,8 @@ async def create_new_medical_record(
         message="Medical record created successfully"
     )
 
-@router("/update/{patient_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
+
+@router.patch("/update/{patient_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
 async def update_medical_record(
     request: Request,
     patient_id: str,
