@@ -9,9 +9,9 @@ from typing import List
 from enum import Enum
 
 class ProgressType(Enum):
-    SCHEDULING = 0
-    PROCESS = 1
-    FINISHED = 2
+    SCHEDULING = 'scheduling'
+    PROCESSINT = 'processing'
+    FINISHED = 'finished'
 
 class Patient(Base):
     __tablename__ = 'patients'
@@ -46,7 +46,7 @@ class MedicalRecord(Base):
 employee_handle_patient = Table(
     "in_charge_of_patients", Base.metadata,
     Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
-    Column("progress_id", ObjectID, ForeignKey("patient_progresses.id")),
+    Column("progress_id", Integer, ForeignKey("patient_progresses.id")),
     Column("action", String, default=""),
     extend_existing=True
 )
