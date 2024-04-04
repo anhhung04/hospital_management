@@ -1,9 +1,9 @@
 from repository.schemas.user import User
-from util.log import logger
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from collections import namedtuple
 from uuid import uuid4
+from typing import Tuple, Optional
 
 GetUserQuery = namedtuple('GetUserQuery', ['id', 'username'])
 
@@ -12,7 +12,7 @@ class UserRepo:
     def __init__(self, session: Session):
         self._session: Session = session
 
-    async def get(self, query: GetUserQuery):
+    async def get(self, query: GetUserQuery) -> Tuple[User, Exception]:
         try:
             if query.username:
                 user = self._session.query(User).filter(
@@ -24,7 +24,7 @@ class UserRepo:
         except Exception as err:
             return None, err
 
-    async def update(self, query: GetUserQuery, update_item: dict) -> User:
+    async def update(self, query: GetUserQuery, update_item: dict) -> Tuple[User, Exception]:
         try:
             user: User = await self.get(query)
             if user:
@@ -37,7 +37,7 @@ class UserRepo:
         except Exception as err:
             return None, err
 
-    async def create(self, item: dict) -> User:
+    async def create(self, item: dict) -> Tuple[User, Optional[Exception | IntegrityError]]:
         try:
             item.update({'id': str(uuid4())})
             new_user = User(**item)
@@ -46,8 +46,10 @@ class UserRepo:
             return new_user, None
         except IntegrityError as err:
             return None, err
+        except Exception as err:
+            return None, err
 
-    async def delete(self, query: GetUserQuery) -> User:
+    async def delete(self, query: GetUserQuery) -> Tuple[User, Exception]:
         try:
             user: User = await self.get(query)
             if user:
