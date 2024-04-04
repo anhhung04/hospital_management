@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from repository.schemas.patient import MedicalRecord
-from models.medical_record import NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel, QueryMedicalRecordModel
-from models.medical_record import MedicalRecord
+from models.medical_record import NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel
 from typing import Tuple, Optional
 
 class MedicalRecordRepo:

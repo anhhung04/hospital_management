@@ -2,11 +2,6 @@ from pydantic import BaseModel
 from models.response import BaseResponseModel
 from typing import Optional
 
-
-class QueryMedicalRecordModel(BaseModel):
-    patient_id: Optional[str]
-    id: Optional[str]
-
 class ProgressRecordModel(BaseModel):
     id: str
     created_at: int

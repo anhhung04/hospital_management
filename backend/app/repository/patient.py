@@ -1,4 +1,3 @@
-from collections import namedtuple
 from repository.schemas.patient import Patient
 from repository.user import UserRepo
 from sqlalchemy.orm import Session

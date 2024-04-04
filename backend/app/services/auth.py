@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from redis import Redis
 from models.user import UserAuth
-from typing import Tuple
 from util.jwt import JWTHandler, JWTPayload
 from util.crypto import PasswordContext
 from repository.user import UserRepo

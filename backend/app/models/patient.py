@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from models.response import BaseResponseModel
-from models.user import UserDetail, PatchUserDetailModel, AddUserModel, UserDetailResponse
+from models.user import PatchUserDetailModel, UserDetailResponse
 from typing import Optional
 
 
