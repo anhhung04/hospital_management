@@ -27,18 +27,19 @@ class PatientService(IService):
         def process_patient(patient: Patient):
             appointment_date = None
             progress = patient.medical_record.progress if patient.medical_record else None
-            if progress:
-                latest_progress = progress.sort(
-                    lambda x: x.created_at, reverse=True
-                )[0]
-                appointment_date = latest_progress.created_at if latest_progress.status == ProgressType.SCHEDULING else None
+            if progress and len(progress) > 0:
+                latest_progress = progress[-1]
+                appointment_date = str(
+                    latest_progress.created_at) if latest_progress and latest_progress.status == ProgressType.SCHEDULING else None
             return PatientModel(
                 id=patient.user_id,
-                full_name=f"{patient.personal_info.first_name} {
-                    patient.personal_info.last_name}",
+                full_name=" ".join(
+                    [patient.personal_info.first_name,
+                        patient.personal_info.last_name]
+                ),
                 phone_number=patient.personal_info.phone_number,
                 medical_record=patient.medical_record.id if patient.medical_record else None,
-                appointment_date=str(appointment_date),
+                appointment_date=appointment_date,
             ).model_dump()
         try:
             patients = [process_patient(p) for p in patients]
