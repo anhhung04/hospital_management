@@ -32,5 +32,17 @@ class Employee(Base):
     faculty = mapped_column(String)
     status = mapped_column(DBEnum(EmployeeStatus))
     personal_info = relationship("User", primaryjoin="Employee.user_id == User.id", uselist=False)
+    schedule = relationship("SchedulePerDay", primaryjoin="Patient.user_id == SchedulePerDay.employee_id")
     
     __table_args__ = {"extend_existing": True}
+
+class SchedulePerDay(Base):
+    __tablename__ = 'schedules_per_day'
+
+    id = mapped_column(ObjectID, primary_key=True, index=True)
+    employee_id = mapped_column(ForeignKey('employees.user_id'))
+    date = mapped_column(Date)
+    begin = mapped_column(Date)
+    end = mapped_column(Date)
+
+    
