@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from models.response import BaseResponseModel
-from models.user import PatchUserDetailModel, UserDetailResponse
+from models.user import PatchUserDetailModel, UserDetail
 from typing import Optional
 
 
@@ -38,7 +38,7 @@ class NewPatientReponseModel(BaseResponseModel):
 class PatientDetailModel(BaseModel):
     appointment_date: Optional[str] = None
     medical_record: Optional[int] = None
-    personal_info: UserDetailResponse
+    personal_info: UserDetail
 
 
 class PatientDetailResponseModel(BaseResponseModel):
