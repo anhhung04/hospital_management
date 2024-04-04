@@ -32,7 +32,7 @@ class UserRepo:
     ) -> Tuple[User, Exception]:
         try:
             user: User = await self.get(query)
-            for attr in update_item.model_dump().keys():
+            for attr in update_item.model_dump_json().keys():
                 setattr(user, attr, update_item[attr])
             self._session.add(user)
             self._session.commit()
@@ -46,7 +46,7 @@ class UserRepo:
         user: AddUserDetailModel
     ) -> Tuple[User, Optional[Exception | IntegrityError]]:
         try:
-            new_user = user.model_dump()
+            new_user = user.model_dump_json()
             new_user.update({"id": str(uuid4())})
             new_user = User(**new_user)
             self._session.add(new_user)

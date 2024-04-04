@@ -58,7 +58,7 @@ class MedicalRecordRepo:
             medical_record = self.__sess.query(MedicalRecord).filter(
                 MedicalRecord.id == query.id or MedicalRecord.patient_id == query.patient_id
             ).first()
-            for attr in update_medical_record.keys():
+            for attr in update_medical_record.model_dump_json().keys():
                 setattr(medical_record, attr, update_medical_record.get(attr))
             self.__sess.add(medical_record)
             self.__sess.commit()

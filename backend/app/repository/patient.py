@@ -22,7 +22,7 @@ class PatientRepo:
 
     async def create(self, patient_info: AddPatientModel) -> Tuple[Patient]:
         try:
-            new_patient = Patient(**patient_info.model_dump())
+            new_patient = Patient(**patient_info.model_dump_json())
             self._sess.add(new_patient)
             self._sess.commit()
         except IntegrityError as err:

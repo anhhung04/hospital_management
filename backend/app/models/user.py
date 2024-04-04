@@ -91,6 +91,10 @@ class UserDetailResponse(BaseResponseModel):
     data: UserDetail
 
 
+class PatchUserPrivateInfoModel(PatchUserDetailModel):
+    password: Optional[str]
+    username: Optional[str]
+
 class QueryUserModel(BaseModel):
     username: Optional[str] = None
     id: Optional[str] = None
