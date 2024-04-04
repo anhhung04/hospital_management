@@ -95,9 +95,13 @@ class PatientService(IService):
         if not patient_in_db:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error in create patient')
-        return NewPatientModel.model_validate({
+        patient_in_db = {
             c.name: str(getattr(patient_in_db, c.name)) for c in patient_in_db.__table__.columns
-        }).model_dump()
+        }
+        patient_in_db.update({
+            "password": raw_password
+        })
+        return NewPatientModel.model_validate(patient_in_db).model_dump()
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def update(self, user_id: str, patient_update: dict):
