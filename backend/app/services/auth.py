@@ -75,7 +75,7 @@ class AuthService(IService):
         self,
         old_password: str,
         new_password: str
-    ) -> str:
+    ) -> dict:
         user, err = await self._user_repo.get(
             QueryUserModel(id=self._current_user.get('sub'))
         )

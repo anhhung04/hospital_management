@@ -16,9 +16,7 @@ async def login(
     redis_client=Depends(RedisStorage.get)
 ):
     try:
-        token, err = await AuthService(db_sess, None, redis_client).gen_token(auth_req)
-        if err:
-            return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err))
+        token = await AuthService(db_sess, None, redis_client).gen_token(auth_req)
     except HTTPException as e:
         return APIResponse.as_json(e.status_code, str(e.detail))
     return APIResponse.as_json(
@@ -29,18 +27,9 @@ async def login(
 @router.post("/verify", response_model=VerifyTokenReponse, tags=["auth"])
 async def verify_user_token(verify_req: VerifyTokenRequest, redis_client=Depends(RedisStorage.get)):
     try:
-        token_data, err = JWTHandler(
-            redis_client).verify(verify_req.access_token)
+        token_data = JWTHandler(redis_client).verify(verify_req.access_token)
     except HTTPException as e:
         return APIResponse.as_json(e.status_code, str(e.detail), {"is_login": False})
-    if err:
-        return APIResponse.as_json(
-            status.HTTP_401_UNAUTHORIZED,
-            str(err),
-            {
-                "is_login": False
-            },
-        )
     return APIResponse.as_json(
         status.HTTP_200_OK,
         "verify successful",
@@ -60,12 +49,10 @@ async def changge_password(
     redis_client=Depends(RedisStorage.get)
 ):
     try:
-        err = await AuthService(db_sess, request.state.user, redis_client).change_password(
+        await AuthService(db_sess, request.state.user, redis_client).change_password(
             change_pass_request.old_password,
             change_pass_request.new_password
         )
-        if err:
-            return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {"success": False})
     except HTTPException as e:
         return APIResponse.as_json(e.status_code, str(e.detail), {"success": False})
     return APIResponse.as_json(status.HTTP_200_OK, "change password successful", {"success": True})
@@ -74,9 +61,7 @@ async def changge_password(
 @router.post('/logout', response_model=LogoutResponseModel, tags=["auth"])
 async def log_out(request: Request, redis_client=Depends(RedisStorage.get)):
     try:
-        err = await AuthService(None, request.state.user, redis_client).logout()
-        if err:
-            return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err), {"success": False})
+        await AuthService(None, request.state.user, redis_client).logout()
     except HTTPException as e:
         return APIResponse.as_json(e.status_code, str(e.detail), {"success": False})
     return APIResponse.as_json(status.HTTP_200_OK, "logout successful", {"success": True})
@@ -89,9 +74,11 @@ async def get_detail(
     redis_client=Depends(RedisStorage.get)
 ):
     try:
-        user_detail, err = await AuthService(db_sess, request.state.user, redis_client).get_user()
-        if err:
-            return APIResponse.as_json(status.HTTP_401_UNAUTHORIZED, str(err))
+        user_detail = await AuthService(db_sess, request.state.user, redis_client).get_user()
     except HTTPException as e:
         return APIResponse.as_json(e.status_code, str(e.detail))
-    return APIResponse.as_json(status.HTTP_200_OK, "get user detail successful", user_detail.model_dump())
+    return APIResponse.as_json(
+        status.HTTP_200_OK,
+        "get user detail successful",
+        user_detail.model_dump()
+    )

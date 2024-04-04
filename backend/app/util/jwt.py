@@ -6,6 +6,7 @@ from util.log import logger
 from redis import Redis
 from collections import namedtuple
 from repository.schemas.user import ObjectID
+from fastapi import HTTPException, status
 
 JWTPayload = namedtuple("JWTPayload", ["username", "id", "role"])
 
@@ -37,7 +38,7 @@ class JWTHandler:
         token: str = jwt.encode(jwt_payload, secret_key, algorithm="HS256")
         return token, None
 
-    def verify(self, token: str) -> Tuple[dict, Exception]:
+    def verify(self, token: str) -> dict:
         try:
             jwt_payload: dict = jwt.get_unverified_claims(token)
             user_id: ObjectID = jwt_payload.get('sub', None)
@@ -45,16 +46,23 @@ class JWTHandler:
                 float(jwt_payload.get('exp', 0))
             )
             if exp_time.__le__(datetime.now()):
-                return None, "Token expired!"
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token expired!"
+                )
             secret_key = self._rc.get(user_id)
             if not secret_key:
-                return None, "Token expired!"
-
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token invalid!"
+                )
             payload: dict = jwt.decode(token, secret_key, algorithms=["HS256"])
             return payload, None
         except JWTError as e:
-            logger.error("verify_access_token error", reason=str(e))
-            return None, "Token invalid!"
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=e
+            )
 
     @staticmethod
     def unverify_decode(token: str) -> dict:
