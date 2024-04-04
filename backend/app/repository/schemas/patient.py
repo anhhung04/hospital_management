@@ -5,7 +5,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from repository.schemas import Base, ObjectID
 from repository.schemas.employees import Employee
-from sqlalchemy import Enum as DBEnum
 from repository.schemas.warehouse import Medicine, medical_instruction
 from typing import List
 from enum import Enum
