@@ -6,7 +6,6 @@ from models.medical_record import (
     NewMedicalRecordModel, PatchMedicalRecordModel
 )
 from repository.medical_record import MedicalRecordRepo
-from repository.schemas.patient import MedicalRecord
 from fastapi import HTTPException, status
 
 
