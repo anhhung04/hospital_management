@@ -35,7 +35,6 @@ class UserRepo:
                 self._session.refresh(user)
             return user
         except Exception as e:
-            logger.error(e)
             return None
 
     async def create(self, item: dict) -> User:
@@ -46,7 +45,6 @@ class UserRepo:
             self._session.commit()
             return new_user
         except Exception as e:
-            logger.error(e)
             return None
 
     async def delete(self, query: GetUserQuery) -> User:
@@ -57,5 +55,4 @@ class UserRepo:
                 self._session.commit()
             return user
         except Exception as e:
-            logger.error(e)
             return None
