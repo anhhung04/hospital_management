@@ -78,9 +78,10 @@ class PatientService(IService):
     @Permission.permit([UserRole.EMPLOYEE])
     async def create(self, user_info: dict):
         raw_password = PasswordContext.rand_key()
+        username = f"patient_{user_info['ssn']}"
         user_info.update({
-            "password": PasswordContext(raw_password, user_info['username']).hash(),
-            "username": f"patient_{user_info['ssn']}",
+            "password": PasswordContext(raw_password, username).hash(),
+            "username": username,
             "role": Permission(UserRole.PATIENT).get(),
         })
         user_in_db = await self._user_repo.create(user_info)
