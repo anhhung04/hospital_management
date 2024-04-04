@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from repository import Storage
 from models.medical_record import (
-    MedicalRecordResponseModel, MedicalRecordModel, NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel
+    MedicalRecordResponseModel, NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel
 )
 from services.medical_record import MedicalRecordService
 from util.response import APIResponse
