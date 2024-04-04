@@ -42,8 +42,8 @@ class PatientService(IService):
                 return PatientModel(
                     id=patient.user_id,
                     full_name=" ".join(
-                        [patient.personal_info.first_name,
-                            patient.personal_info.last_name]
+                        [patient.personal_info.last_name,
+                            patient.personal_info.first_name]
                     ),
                     phone_number=patient.personal_info.phone_number,
                     medical_record=medical_record,
