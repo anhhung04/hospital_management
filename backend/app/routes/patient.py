@@ -40,7 +40,7 @@ async def get_patient(
 ):
     try:
         patient = await PatientService(db_sess, request.state.user).get(
-            QueryPatientModel(patient_id=patient_id)
+            QueryPatientModel(user_id=patient_id)
         )
     except HTTPException as e:
         return APIResponse.as_json(
