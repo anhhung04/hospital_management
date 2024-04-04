@@ -22,6 +22,11 @@ class MedicalRecordService(IService):
         medical_record, err = await self._medical_record_repo.get(query)
         if err:
             raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(err)
+            )
+        if not medical_record:
+            raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Medical record not found"
             )
@@ -35,6 +40,11 @@ class MedicalRecordService(IService):
             QueryMedicalRecordModel(patient_id=self._current_user["sub"])
         )
         if err:
+            raise HTTPException(
+                status_code=status.Hin,
+                detail=str(err)
+            )
+        if not medical_record:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Medical record not found"

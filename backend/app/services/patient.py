@@ -34,9 +34,11 @@ class PatientService(IService):
         try:
             def process_patient(patient: Patient):
                 medical_record = patient.medical_record.id if patient.medical_record else None
-                appointment_date = PatientService.find_appointment_date(
-                    patient.progress
-                )
+                appointment_date = None
+                if medical_record:
+                    appointment_date = PatientService.find_appointment_date(
+                        patient.medical_record.progress
+                    )
                 return PatientModel(
                     id=patient.user_id,
                     full_name=" ".join(
@@ -65,6 +67,11 @@ class PatientService(IService):
                 )
         patient, err = await self._patient_repo.get(query)
         if err:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='Error in get patient infomation'
+            )
+        if not patient:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail='Patient not found'

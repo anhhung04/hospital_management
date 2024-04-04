@@ -58,6 +58,11 @@ class AuthService(IService):
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=str(err)
             )
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
         return UserDetail.model_validate({
             c.name: str(getattr(user, c.name)) for c in user.__table__.columns
         })
