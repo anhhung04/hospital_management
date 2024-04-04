@@ -14,8 +14,8 @@ class MedicalRecordRepo:
     ) -> Tuple[MedicalRecord, Exception]:
         try:
             return self.__sess.query(MedicalRecord).filter(
-                MedicalRecord.patient_id == query.patient_id
-                or MedicalRecord.id == query.id
+                MedicalRecord.patient_id == query.patient_id if query.patient_id else None
+                or MedicalRecord.id == query.id if query.id else None
             ).first(), None
         except Exception as err:
             return None, err

@@ -16,10 +16,10 @@ class UserRepo:
     ) -> Tuple[User, Exception]:
         try:
             user = self._session.query(User).filter(
-                User.id == query.id
-                or User.username == query.username
-                or User.email == query.email
-                or User.ssn == query.ssn
+                User.id == query.id if query.id else None
+                or User.username == query.username if query.username else None
+                or User.email == query.email if query.email else None
+                or User.ssn == query.ssn if query.ssn else None
             ).first()
             return user, None
         except Exception as err:
