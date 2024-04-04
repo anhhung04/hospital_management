@@ -7,6 +7,7 @@ from permissions import Permission
 from permissions.user import UserRole
 from repository.patient import GetPatientQuery
 from repository.user import UserRepo
+from repository.schemas.patient import Patient, ProgressType
 from util.crypto import PasswordContext
 
 class PatientService(IService):
@@ -22,15 +23,25 @@ class PatientService(IService):
         if patient_per_page < 1:
             patient_per_page = 10
         patients = await self._patient_repo.list_patient(page, patient_per_page)
+
+        def process_patient(patient: Patient):
+            appointment_date = None
+            progress = patient.medical_record.progress if patient.medical_record else None
+            if progress:
+                latest_progress = progress.sort(
+                    lambda x: x.created_at, reverse=True
+                )[0]
+                appointment_date = latest_progress.created_at if latest_progress.status == ProgressType.SCHEDULING else None
+            return PatientModel(
+                id=patient.user_id,
+                full_name=f"{patient.personal_info.first_name} {
+                    patient.personal_info.last_name}",
+                phone_number=patient.personal_info.phone_number,
+                medical_record=patient.medical_record.id if patient.medical_record else None,
+                appointment_date=str(appointment_date),
+            ).model_dump()
         try:
-            patients = [PatientModel(
-                id=p.user_id,
-                full_name=" ".join(
-                    [p.personal_info.last_name, p.personal_info.first_name]),
-                phone_number=p.personal_info.phone_number,
-                medical_record=str(
-                    p.medical_record.id) if p.medical_record else None,
-            ).model_dump() for p in patients]
+            patients = [process_patient(p) for p in patients]
         except Exception:
             raise HTTPException(
                 status_code=500, detail='Error in convert patients list')

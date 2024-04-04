@@ -9,7 +9,7 @@ class PatientModel(BaseModel):
     full_name: str
     phone_number: str
     appointment_date: Optional[str]
-    medical_record: Optional[str]
+    medical_record: Optional[int]
 
 
 class PatientResponseModel(BaseResponseModel):

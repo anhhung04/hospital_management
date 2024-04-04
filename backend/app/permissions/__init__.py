@@ -36,9 +36,11 @@ class Permission:
 
     def add(self, role):
         self._role.append(role)
+        return self
 
     def get(self):
         return ":".join(self._role)
 
     def delete(self, role):
         self._role.pop(role)
+        return self
