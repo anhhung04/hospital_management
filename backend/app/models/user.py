@@ -3,8 +3,8 @@ from models.response import BaseResponseModel
 from typing import Optional
 
 class UserAuth(BaseModel):
-    email: Optional[str]
-    username: Optional[str]
+    email: Optional[str] = None
+    username: Optional[str] = None
     password: str
 
 
