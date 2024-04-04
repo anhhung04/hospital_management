@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from repository import Storage
-from models.medical_record import MedicalRecordResponseModel, MedicalRecordModel, NewMedicalRecordModel
+from models.medical_record import MedicalRecordResponseModel, MedicalRecordModel, NewMedicalRecordModel, PatchMedicalRecordModel
 from services.medical_record import MedicalRecordService
 from util.response import APIResponse
 
@@ -56,6 +56,21 @@ async def create_new_medical_record(
         message="Medical record created successfully"
     )
 
+@router("/update/{patient_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
+async def update_medical_record(
+    request: Request,
+    patient_id: str,
+    db=Depends(Storage.get),
+):
+    try:
+        new_medical_record: MedicalRecordModel = await MedicalRecordService(db, request.state.user).update(patient_id)
+    except HTTPException as e:
+        return APIResponse.as_json(code=e.status_code, message=str(e.detail))
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=new_medical_record,
+        message="Medical record updated successfully"
+    )
 
 @router.delete("/{medical_record_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
 async def delete_medical_record(

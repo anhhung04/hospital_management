@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from repository.patient import PatientRepo
 from services import IService
-from util.log import logger
 from fastapi import HTTPException, status
 from models.patient import PatientModel, PatientDetailModel, NewPatientModel
 from permissions import Permission
@@ -32,7 +31,7 @@ class PatientService(IService):
                 medical_record=str(
                     p.medical_record.id) if p.medical_record else None,
             ).model_dump() for p in patients]
-        except Exception as e:
+        except Exception:
             raise HTTPException(
                 status_code=500, detail='Error in convert patients list')
         return patients

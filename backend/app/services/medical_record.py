@@ -51,3 +51,15 @@ class MedicalRecordService(IService):
         return MedicalRecordModel.model_validate({
             c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
         }).model_dump()
+
+    @Permission.permit([UserRole.PATIENT, UserRole.EMPLOYEE, UserRole.ADMIN])
+    async def update(self, patient_id: str, medical_record: dict) -> MedicalRecordModel:
+        medical_record: MedicalRecord = await self._medical_record_repo.update({
+            "patient_id": patient_id
+        }, medical_record)
+        if medical_record is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Medical record not found")
+        return MedicalRecordModel.model_validate({
+            c.name: str(getattr(medical_record, c.name)) for c in medical_record.__table__.columns
+        }).model_dump()

@@ -29,3 +29,15 @@ class MedicalRecordRepo:
         self.__sess.delete(medical_record)
         self.__sess.commit()
         return medical_record
+
+    async def update(self, query: dict, update_medical_record: dict):
+        medical_record = self.__sess.query(MedicalRecord).filter(
+            MedicalRecord.patient_id == query.get('patient_id')).first()
+        if medical_record is None:
+            return None
+        for attr in update_medical_record.keys():
+            setattr(medical_record, attr, update_medical_record.get(attr))
+        self.__sess.add(medical_record)
+        self.__sess.commit()
+        self.__sess.refresh(medical_record)
+        return medical_record

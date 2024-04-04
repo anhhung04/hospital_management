@@ -33,6 +33,15 @@ class NewMedicalRecordModel(BaseModel):
     drug_allergies: Optional[str]
     food_allergies: Optional[str]
     medical_history: Optional[str]
+    
+class PatchMedicalRecordModel(BaseModel):
+    weight: Optional[float]
+    height: Optional[float]
+    note: Optional[str]
+    current_treatment: Optional[str]
+    drug_allergies: Optional[str]
+    food_allergies: Optional[str]
+    medical_history: Optional[str]
 
 
 class MedicalRecordResponseModel(BaseResponseModel):
