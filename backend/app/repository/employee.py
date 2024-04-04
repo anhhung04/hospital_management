@@ -20,4 +20,12 @@ class EmployeeRepo:
         except Exception:
           return []
         return employees
+    
+    async def get(self, employee_id: str) -> Employee:
+        try:
+          employee = self._sess.query(Employee).filter(
+              Employee.user_id == employee_id).first()
+        except Exception as e:
+          return None
+        return employee
 
