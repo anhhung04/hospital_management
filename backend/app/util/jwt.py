@@ -4,15 +4,20 @@ from datetime import datetime, timedelta
 from util.crypto import PasswordContext
 from util.log import logger
 from redis import Redis
+from repository import RedisStorage
 from collections import namedtuple
 from repository.schemas.user import ObjectID
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
 
 JWTPayload = namedtuple("JWTPayload", ["username", "id", "role"])
 
 
 class JWTHandler:
-    def __init__(self, redis_client: Redis, expire_minutes: int = 1440):
+    def __init__(
+        self,
+        expire_minutes: int = 1440,
+        redis_client: Redis = Depends(RedisStorage.get)
+    ):
         self._rc = redis_client
         self._expire_minutes = expire_minutes
 
@@ -57,7 +62,7 @@ class JWTHandler:
                     detail="Token invalid!"
                 )
             payload: dict = jwt.decode(token, secret_key, algorithms=["HS256"])
-            return payload, None
+            return payload
         except JWTError as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

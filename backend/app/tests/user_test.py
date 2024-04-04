@@ -1,5 +1,5 @@
 from unittest import TestCase
-from test import override_get_db, insert_user, gen_password, gen_username, insert_patient
+from tests import override_get_db, insert_user, gen_password, gen_username, insert_patient
 from util.crypto import PasswordContext
 from repository.schemas.user import User
 from repository.schemas.patient import Patient

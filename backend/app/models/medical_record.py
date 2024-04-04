@@ -4,23 +4,23 @@ from typing import Optional
 
 class ProgressRecordModel(BaseModel):
     id: str
-    created_at: int
-    treatment_schedule: int
+    created_at: str
+    treatment_schedule: str
     treatment_type: str
     patient_condition: str
 
 
 class MedicalRecordModel(BaseModel):
-    id: str
+    id: int
     patient_id: str
-    weight: float
-    height: float
+    weight: Optional[float | None]
+    height: Optional[float | None]
     note: Optional[str]
     current_treatment: Optional[str | None]
     drug_allergies: Optional[str | None]
     food_allergies: Optional[str | None]
     medical_history: Optional[str | None]
-    progress: Optional[list[Optional[ProgressRecordModel]]]
+    progress: Optional[list[Optional[ProgressRecordModel | None]] | None] = None
 
 
 class NewMedicalRecordModel(BaseModel):
@@ -44,7 +44,7 @@ class PatchMedicalRecordModel(BaseModel):
 
 
 class DeleteMedicalRecordModel(BaseModel):
-    id: Optional[str | None] = None
+    id: Optional[int | None] = None
     patient_id: Optional[str | None] = None
 
 class MedicalRecordResponseModel(BaseResponseModel):

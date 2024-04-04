@@ -1,20 +1,27 @@
-from sqlalchemy.orm import Session
+from typing import Any
 from redis import Redis
 from models.user import UserAuth
 from util.jwt import JWTHandler, JWTPayload
 from util.crypto import PasswordContext
 from repository.user import UserRepo
 from models.user import UserDetail, QueryUserModel, PatchUserPrivateInfoModel
-from services import IService
 from permissions.user import UserRole
 from permissions import Permission
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
+from repository import RedisStorage
+from middleware.user_ctx import UserContext
 
 
-class AuthService(IService):
-    def __init__(self, session: Session, user: dict, redis_client: Redis):
-        super().__init__(session, user, redis_client)
-        self._user_repo = UserRepo(session)
+class AuthService:
+    def __init__(
+        self,
+        user: UserContext = Depends(UserContext),
+        redis_client: Redis = Depends(RedisStorage.get),
+        user_repo: UserRepo = Depends(UserRepo)
+    ):
+        self._user_repo = user_repo
+        self._current_user = user
+        self._rc = redis_client
 
     async def gen_token(self, auth_request: UserAuth) -> str:
         user, err = await self._user_repo.get(
@@ -27,6 +34,11 @@ class AuthService(IService):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Nonexistent user"
+            )
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
             )
         if not PasswordContext(auth_request.password, auth_request.username).verify(user.password):
             raise HTTPException(
@@ -51,7 +63,7 @@ class AuthService(IService):
                 detail="User is not logged in"
             )
         user, err = await self._user_repo.get(
-            QueryUserModel(id=self._current_user.get('sub'))
+            QueryUserModel(id=self._current_user.id())
         )
         if err:
             raise HTTPException(
@@ -69,7 +81,13 @@ class AuthService(IService):
 
     async def logout(self) -> str:
         try:
-            self._rc.delete(self._current_user.get('sub'))
+            user_id = self._current_user.id()
+            if not user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="User is not logged in"
+                )
+            self._rc.delete(user_id)
             return None
         except Exception:
             raise HTTPException(
@@ -84,7 +102,7 @@ class AuthService(IService):
         new_password: str
     ) -> dict:
         user, err = await self._user_repo.get(
-            QueryUserModel(id=self._current_user.get('sub'))
+            QueryUserModel(id=self._current_user.id())
         )
         if err:
             raise HTTPException(
@@ -97,7 +115,7 @@ class AuthService(IService):
                 detail="Invalid password"
             )
         user_update, err = await self._user_repo.update(
-            QueryUserModel(id=self._current_user.get('sub')),
+            QueryUserModel(id=self._current_user.id()),
             PatchUserPrivateInfoModel(password=new_password)
         )
         if err:

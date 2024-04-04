@@ -17,7 +17,7 @@ class Permission:
                 if not user:
                     raise HTTPException(
                         status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-                uc = [str(c).lower()for c in user.get("role", None).split(":")]
+                uc = [str(c).lower() for c in user.role().split(":")]
                 for ac in acl:
                     if str(ac).lower() in uc:
                         return func(*args, **kwargs)
@@ -28,7 +28,7 @@ class Permission:
 
     @staticmethod
     def has_role(role, user):
-        uc = [str(c).lower() for c in user.get("role", None).split(":")]
+        uc = [str(c).lower() for c in user.role().split(":")]
         for ac in role:
             if str(ac).lower() in uc:
                 return True

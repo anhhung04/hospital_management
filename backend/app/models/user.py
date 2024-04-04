@@ -1,17 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from models.response import BaseResponseModel
 from typing import Optional
+from datetime import datetime
 
 class UserAuth(BaseModel):
     email: Optional[str | None] = None
     username: Optional[str | None] = None
     password: str
-
-
-class ChangePasswordModel(BaseModel):
-    old_password: str
-    new_password: str
-    
 
 class ChangePasswordStateModel(BaseModel):
     success: bool
@@ -62,6 +57,12 @@ class UserDetail(BaseModel):
     email: str
     username: str
     role: str
+
+    @validator('birth_date', pre=True)
+    def validate_birth_date(cls, v):
+        if v and isinstance(v, datetime):
+            return v.strftime("%d-%m-%Y")
+        return str(v)
 
 
 class AddUserDetailModel(UserDetail):

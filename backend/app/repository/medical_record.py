@@ -1,22 +1,33 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from repository.schemas.patient import MedicalRecord
-from models.medical_record import NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel
+from models.medical_record import (
+    NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel
+)
+from fastapi import Depends
+from repository import Storage
 from typing import Tuple, Optional
 
 class MedicalRecordRepo:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session = Depends(Storage.get)):
         self.__sess = db
+
+    @staticmethod
+    async def call():
+        return MedicalRecordRepo()
 
     async def get(
         self,
         query: QueryMedicalRecordModel
     ) -> Tuple[MedicalRecord, Exception]:
         try:
-            return self.__sess.query(MedicalRecord).filter(
+            record = self.__sess.query(MedicalRecord).filter(
                 MedicalRecord.patient_id == query.patient_id if query.patient_id else None
                 or MedicalRecord.id == query.id if query.id else None
-            ).first(), None
+            ).first()
+            if not record:
+                return None, "Medical record not found"
+            return record, None
         except Exception as err:
             return None, err
 

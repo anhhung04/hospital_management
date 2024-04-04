@@ -4,11 +4,21 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import Tuple
 from models.patient import QueryPatientModel, PatchPatientModel, AddPatientModel
+from repository import Storage
+from fastapi import Depends
 
 class PatientRepo:
-    def __init__(self, session: Session):
+    def __init__(
+        self,
+        userRepo: UserRepo = Depends(UserRepo),
+        session: Session = Depends(Storage.get)
+    ):
         self._sess = session
-        self._user_repo = UserRepo(session)
+        self._user_repo = userRepo
+
+    @staticmethod
+    async def call():
+        return PatientRepo()
 
     async def get(self, query: QueryPatientModel) -> Tuple[Patient, Exception]:
         try:
@@ -21,7 +31,7 @@ class PatientRepo:
 
     async def create(self, patient_info: AddPatientModel) -> Tuple[Patient]:
         try:
-            new_patient = Patient(**patient_info.model_dump_json())
+            new_patient = Patient(**patient_info.model_dump())
             self._sess.add(new_patient)
             self._sess.commit()
         except IntegrityError as err:
@@ -36,11 +46,17 @@ class PatientRepo:
         patient_update: PatchPatientModel
     ) -> Tuple[Patient, Exception]:
         try:
-            patient = await self.get(query)
+            patient, err = await self.get(query)
+            if err:
+                return None, err
             dump_update_patient = patient_update.model_dump()
             for attr in dump_update_patient.keys():
                 if dump_update_patient.get(attr) is not None:
-                    setattr(patient, attr, dump_update_patient.get(attr))
+                    setattr(
+                        patient.personal_info,
+                        attr,
+                        dump_update_patient.get(attr)
+                    )
             self._sess.add(patient)
             self._sess.commit()
             self._sess.refresh(patient)

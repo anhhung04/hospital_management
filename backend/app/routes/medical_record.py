@@ -1,22 +1,21 @@
-from fastapi import APIRouter, Request, Depends, HTTPException, status
-from repository import Storage
+from fastapi import APIRouter, Depends, HTTPException, status, Path
 from models.medical_record import (
     MedicalRecordResponseModel, NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel
 )
 from services.medical_record import MedicalRecordService
 from util.response import APIResponse
+from typing import Annotated
 
 router = APIRouter()
 
 
-@router.get("/{patient_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
+@router.get("/patient/{patient_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
 async def get_medicalrecord(
-    request: Request,
-    patient_id: str,
-    db=Depends(Storage.get),
+    patient_id: Annotated[str, Path(regex=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")],
+    service: MedicalRecordService = Depends(MedicalRecordService)
 ):
     try:
-        medical_record = await MedicalRecordService(db, request.state.user).get(
+        medical_record = await service.get(
             QueryMedicalRecordModel(patient_id=patient_id)
         )
     except HTTPException as e:
@@ -30,11 +29,10 @@ async def get_medicalrecord(
 
 @router.get("/me", tags=["medial_record"], response_model=MedicalRecordResponseModel)
 async def get_my_medicalrecord(
-    request: Request,
-    db=Depends(Storage.get),
+    service: MedicalRecordService = Depends(MedicalRecordService)
 ):
     try:
-        medical_record = await MedicalRecordService(db, request.state.user).get_me()
+        medical_record = await service.get_me()
     except HTTPException as e:
         return APIResponse.as_json(code=e.status_code, message=str(e.detail))
     return APIResponse.as_json(
@@ -46,12 +44,11 @@ async def get_my_medicalrecord(
 
 @router.post("/create", tags=["medial_record"], response_model=MedicalRecordResponseModel)
 async def create_new_medical_record(
-    request: Request,
     medical_record: NewMedicalRecordModel,
-    db=Depends(Storage.get),
+    service: MedicalRecordService = Depends(MedicalRecordService)
 ):
     try:
-        medical_record = await MedicalRecordService(db, request.state.user).create(
+        medical_record = await service.create(
             medical_record
         )
     except HTTPException as e:
@@ -65,13 +62,12 @@ async def create_new_medical_record(
 
 @router.patch("/update/{patient_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
 async def update_medical_record(
-    request: Request,
     patient_id: str,
     new_medical_record: PatchMedicalRecordModel,
-    db=Depends(Storage.get),
+    service: MedicalRecordService = Depends(MedicalRecordService)
 ):
     try:
-        new_medical_record = await MedicalRecordService(db, request.state.user).update(
+        new_medical_record = await service.update(
             QueryMedicalRecordModel(patient_id=patient_id),
             new_medical_record
         )
@@ -85,12 +81,11 @@ async def update_medical_record(
 
 @router.delete("/{medical_record_id}", tags=["medial_record"], response_model=MedicalRecordResponseModel)
 async def delete_medical_record(
-    request: Request,
     medical_record_id: int,
-    db=Depends(Storage.get),
+    service: MedicalRecordService = Depends(MedicalRecordService)
 ):
     try:
-        medical_record = await MedicalRecordService(db, request.state.user).delete(
+        medical_record = await service.delete(
             QueryMedicalRecordModel(id=medical_record_id)
         )
     except HTTPException as e:

@@ -2,13 +2,18 @@ from repository.schemas.user import User
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.user import QueryUserModel, PatchUserDetailModel, AddUserDetailModel
-from uuid import uuid4
 from typing import Tuple, Optional
+from fastapi import Depends
+from repository import Storage
 
 
 class UserRepo:
-    def __init__(self, session: Session):
+    def __init__(self, session: Session = Depends(Storage.get)):
         self._session: Session = session
+
+    @staticmethod
+    async def call():
+        return UserRepo()
 
     async def get(
         self,
@@ -50,8 +55,7 @@ class UserRepo:
         user: AddUserDetailModel
     ) -> Tuple[User, Optional[Exception | IntegrityError]]:
         try:
-            new_user = user.model_dump_json()
-            new_user.update({"id": str(uuid4())})
+            new_user = user.model_dump()
             new_user = User(**new_user)
             self._session.add(new_user)
             self._session.commit()

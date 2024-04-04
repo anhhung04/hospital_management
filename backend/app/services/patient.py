@@ -1,25 +1,36 @@
-from sqlalchemy.orm import Session
 from repository.patient import PatientRepo
-from services import IService
 from fastapi import HTTPException, status
 from models.patient import (
     PatientModel, PatientDetailModel,
     QueryPatientModel,
     AddPatientModel,
-    PatchPatientModel
+    PatchPatientModel,
+    AddPatientRequestModel
 )
-from models.user import AddUserDetailModel
+from models.user import AddUserDetailModel, UserDetail
+from models.medical_record import MedicalRecordModel
 from permissions import Permission
 from permissions.user import UserRole
 from repository.user import UserRepo
+from repository.schemas.patient import MedicalRecord
 from repository.schemas.patient import Patient, ProgressType
 from util.crypto import PasswordContext
+from uuid import uuid4
+from fastapi import Depends
+from middleware.user_ctx import UserContext
+from typing import Annotated
 
-class PatientService(IService):
-    def __init__(self, session: Session, user: dict = None):
-        super().__init__(session, user, None)
-        self._patient_repo = PatientRepo(session)
-        self._user_repo = UserRepo(session)
+
+class PatientService:
+    def __init__(
+        self,
+        user: UserContext = Depends(UserContext),
+        patient_repo: PatientRepo = Depends(PatientRepo),
+        user_repo: UserRepo = Depends(UserRepo),
+    ):
+        self._current_user = user
+        self._patient_repo = patient_repo
+        self._user_repo = user_repo
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def get_patients(self, page: int = 1, limit: int = 10):
@@ -33,9 +44,8 @@ class PatientService(IService):
             )
         try:
             def process_patient(patient: Patient):
-                medical_record = patient.medical_record.id if patient.medical_record else None
                 appointment_date = None
-                if medical_record:
+                if patient.medical_record:
                     appointment_date = PatientService.find_appointment_date(
                         patient.medical_record.progress
                     )
@@ -46,8 +56,8 @@ class PatientService(IService):
                             patient.personal_info.first_name]
                     ),
                     phone_number=patient.personal_info.phone_number,
-                    medical_record=medical_record,
-                    appointment_date=appointment_date,
+                    medical_record_id=patient.medical_record.id if patient.medical_record else None,
+                    appointment_date=appointment_date
                 ).model_dump()
             patients = [process_patient(p) for p in patients]
         except Exception:
@@ -60,7 +70,7 @@ class PatientService(IService):
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def get(self, query: QueryPatientModel):
         if Permission.has_role([UserRole.PATIENT], self._current_user):
-            if self._current_user['sub'] != query.user_id:
+            if self._current_user.id() != query.user_id:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail='Permission denied'
@@ -76,34 +86,27 @@ class PatientService(IService):
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail='Patient not found'
             )
+        appointment_date = None
+        if patient.medical_record:
+            appointment_date = PatientService.find_appointment_date(
+                patient.medical_record.progress
+            )
         return PatientDetailModel(
-            id=patient.user_id,
-            ssn=patient.personal_info.ssn,
-            phone_number=patient.personal_info.phone_number,
-            address=patient.personal_info.address,
-            email=patient.personal_info.email,
-            health_insurance=patient.personal_info.health_insurance,
-            weight=patient.weight,
-            height=patient.height,
-            note=patient.note,
-            username=patient.personal_info.username,
-            role=patient.personal_info.role,
-            first_name=patient.personal_info.first_name,
-            last_name=patient.personal_info.last_name,
-            birth_date=str(patient.personal_info.birth_date),
-            gender=patient.personal_info.gender,
-            medical_record=patient.medical_record.id if patient.medical_record else None,
-            appointment_date=PatientService.find_appointment_date(
-                patient.progress
+            appointment_date=appointment_date,
+            medical_record=MedicalRecordModel.model_validate(
+                obj=patient.medical_record, strict=False, from_attributes=True
+            ), personal_info=UserDetail.model_validate(
+                obj=patient.personal_info, strict=False, from_attributes=True
             )
         ).model_dump()
 
     @Permission.permit([UserRole.EMPLOYEE])
-    async def create(self, new_patient: AddPatientModel):
+    async def create(self, new_patient: AddPatientRequestModel):
         raw_password = PasswordContext.rand_key()
         username = f"patient_{new_patient.ssn}"
         user_info = new_patient.model_dump()
         user_info.update({
+            "id": str(uuid4()),
             "password": PasswordContext(raw_password, username).hash(),
             "username": username,
             "role": Permission(UserRole.PATIENT).get(),
@@ -155,31 +158,26 @@ class PatientService(IService):
                 detail='Error in update patient infomation'
             )
         return PatientDetailModel(
-            id=patient.user_id,
-            ssn=patient.personal_info.ssn,
-            phone_number=patient.personal_info.phone_number,
-            address=patient.personal_info.address,
-            email=patient.personal_info.email,
-            health_insurance=patient.personal_info.health_insurance,
-            weight=patient.weight,
-            height=patient.height,
-            note=patient.note,
-            username=patient.personal_info.username,
-            role=patient.personal_info.role,
-            first_name=patient.personal_info.first_name,
-            last_name=patient.personal_info.last_name,
-            birth_date=patient.personal_info.birth_date,
-            medical_record=patient.medical_record.medical_record,
+            personal_info=UserDetail.model_validate(
+                obj=patient.personal_info, strict=False, from_attributes=True
+            ),
+            medical_record=MedicalRecordModel.model_validate(
+                obj=patient.medical_record, strict=False, from_attributes=True
+            ),
             appointment_date=PatientService.find_appointment_date(
-                patient.progress
+                patient.medical_record.progress
             )
         ).model_dump()
 
     @staticmethod
-    def find_appointment_date(progress):
+    def find_appointment_date(media_record: MedicalRecord) -> str:
+        if not media_record:
+            return None
+        progress = media_record.progress
         appointment_date = None
         if progress and len(progress) > 0:
             latest_progress = progress[-1]
             appointment_date = str(
-                latest_progress.created_at) if latest_progress and latest_progress.status == ProgressType.SCHEDULING else None
+                latest_progress.created_at
+            ) if latest_progress and latest_progress.status == ProgressType.SCHEDULING else None
         return appointment_date

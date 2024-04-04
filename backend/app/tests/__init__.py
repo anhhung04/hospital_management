@@ -2,6 +2,7 @@ import random
 import string
 import json
 from fastapi.testclient import TestClient
+from unittest import TestCase
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -12,8 +13,9 @@ from repository import Storage, RedisStorage
 from uuid import uuid4
 from app import app
 from util.crypto import PasswordContext
+import requests
 
-USER_DB = json.loads(open('./test/data.json').read())
+USER_DB = json.loads(open('./tests/data.json').read())
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -37,6 +39,7 @@ class RedisLocal:
     def delete(self, key):
         if key in redis_cache:
             redis_cache.pop(key)
+
     def get(self, key):
         return redis_cache.get(key, None)
 
@@ -62,20 +65,43 @@ app.dependency_overrides[Storage.get] = override_get_db
 client = TestClient(app)
 
 
+class TestIntegration(TestCase):
+    def __init__(self, methodName: str = "runTest") -> None:
+        super().__init__(methodName)
+        self._s = requests.session()
+        self._base = "http://localhost:8000/api"
+        self._route = None
+        self._access_token = self._s.post(self._base + "/auth/login", json={
+            "username": "employee1",
+            "password": "demo"
+        }).json()["data"]["access_token"]
+        self._s.headers = {
+            "Authorization": f"Bearer {self._access_token}"
+        }
+
+    def path(self, path):
+        return self._base + self._route + path
+
+
 def gen_username():
     return ''.join(random.choices(string.ascii_lowercase, k=10))
+
 
 def gen_password():
     return ''.join(random.choices(string.ascii_lowercase, k=10))
 
+
 def gen_id():
     return str(uuid4())
+
 
 def gen_ssn():
     return str(random.randint(1000000000, 9999999999))
 
+
 def gen_phone_number():
     return str(random.randint(1000000000, 9999999999))
+
 
 def gen_name():
     user_data = random.choice(USER_DB)

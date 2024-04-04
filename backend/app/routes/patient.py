@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from services.patient import PatientService
-from repository import Storage
 from fastapi import Query, status, HTTPException, Path
 from typing import Annotated
 from util.response import APIResponse
@@ -14,13 +13,12 @@ router = APIRouter()
 
 @router.get("/list", response_model=ListPatientsModel, tags=["patient"])
 async def list_patients(
-    request: Request,
     page: Annotated[int, Query(gt=0)] = 1,
     limit: Annotated[int, Query(gt=0)] = 10,
-    db_sess=Depends(Storage.get),
+    service: PatientService = Depends(PatientService),
 ):
     try:
-        patients = await PatientService(db_sess, request.state.user).get_patients(
+        patients = await service.get_patients(
             page, limit
         )
     except HTTPException as e:
@@ -34,12 +32,11 @@ async def list_patients(
 
 @router.get("/{patient_id}", tags=["patient"], response_model=PatientDetailResponseModel)
 async def get_patient(
-    request: Request,
     patient_id: Annotated[str, Path(regex=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")],
-    db_sess=Depends(Storage.get),
+    service: PatientService = Depends(PatientService),
 ):
     try:
-        patient = await PatientService(db_sess, request.state.user).get(
+        patient = await service.get(
             QueryPatientModel(user_id=patient_id)
         )
     except HTTPException as e:
@@ -54,11 +51,10 @@ async def get_patient(
 @router.post("/create", tags=["patient"], response_model=NewPatientReponseModel)
 async def create_patient(
     patient: AddPatientRequestModel,
-    request: Request,
-    db_sess=Depends(Storage.get)
+    service: PatientService = Depends(PatientService),
 ):
     try:
-        patient = await PatientService(db_sess, request.state.user).create(patient)
+        patient = await service.create(patient)
     except HTTPException as e:
         return APIResponse.as_json(
             code=e.status_code, message=str(e.detail), data={}
@@ -71,13 +67,12 @@ async def create_patient(
 @router.patch("/update/{patient_id}", tags=["patient"], response_model=PatientDetailResponseModel)
 async def patch_patient(
     patient_id: Annotated[str, Path(regex=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")],
-    request: Request,
     patient_update: PatchPatientModel,
-    db_sess=Depends(Storage.get),
+    service: PatientService = Depends(PatientService),
 ):
     try:
-        patient = await PatientService(db_sess, request.state.user).update(
-            QueryPatientModel(id=patient_id),
+        patient = await service.update(
+            QueryPatientModel(user_id=patient_id),
             patient_update
         )
     except HTTPException as e:
