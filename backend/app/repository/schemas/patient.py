@@ -4,9 +4,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from repository.schemas import Base, ObjectID
+from repository.schemas.employees import Employee
 from typing import List
 from enum import Enum
-
 
 class ProgressType(Enum):
     SCHEDULING = 0
@@ -18,6 +18,8 @@ class Patient(Base):
     user_id = mapped_column(ObjectID, ForeignKey('users.id'), primary_key=True)
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="patient")
     personal_info = relationship("User", primaryjoin="Patient.user_id == User.id", uselist=False)
+
+    __table_args__ = {"extend_existing": True}
 
 class MedicalRecord(Base):
     __tablename__ = 'medical_records'
@@ -38,13 +40,15 @@ class MedicalRecord(Base):
     progress: Mapped[List["PatientProgress"]] = relationship(
         back_populates='medical_record')
 
+    __table_args__ = {"extend_existing": True}
 
-employee_handle_progress = Table(
-    "in_charge",
-    Base.metadata,
-    Column("employee_id", ForeignKey("employees.user_id")),
-    Column("patient_id", ForeignKey("patient_progresses.id")),
-    Column("action", String)
+
+employee_handle_patient = Table(
+    "in_charge_of_patients", Base.metadata,
+    Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
+    Column("progress_id", ObjectID, ForeignKey("patient_progresses.id")),
+    Column("action", String, default=""),
+    extend_existing=True
 )
 
 class PatientProgress(Base):
@@ -62,3 +66,6 @@ class PatientProgress(Base):
                            default=ProgressType.SCHEDULING)
     medical_record_id = mapped_column(ForeignKey('medical_records.id'))
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="progress")
+    lead_employee: Mapped[List["Employee"]] = relationship(secondary=employee_handle_patient)
+
+    __table_args__ = {"extend_existing": True}

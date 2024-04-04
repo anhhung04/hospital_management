@@ -100,8 +100,6 @@ def create_user(username=None, password=None, user_type=None, gender=None):
         gender=gender or 'male',
         last_name=last_name,
         first_name=first_name,
-        nation='Vietnam',
-        province=random.choice(['Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Huế', 'Cần Thơ', 'Quảng Ninh', 'Hải Dương', 'Hưng Yên', 'Nam Định', 'Ninh Bình', 'Thái Bình', 'Vĩnh Phúc', 'Bắc Ninh', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Giang', 'Lào Cai', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Bắc Ninh', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Vĩnh Phúc', 'Hà Giang', 'Quảng Ninh', 'Bắc Ninh', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Nội', 'Hải Dương', 'Hưng Yên', 'Nam Định', 'Ninh Bình', 'Thái Bình', 'Hà Nam', 'Hà Tây', 'Hòa Bình', 'Hà Giang', 'Lào Cai', 'Lai Châu', 'Sơn La', 'Yên Bái', 'Tuyên Quang', 'Thái Nguyên', 'Phú Thọ', 'Vĩnh Phúc', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Bắc Ninh', 'Bắc Giang', 'Bắc Kạn', 'Cao Bằng', 'Điện Biên', 'Lạng Sơn', 'Lai Châu',]),
         address='Số 268, Lý Thường Kiệt'
     )
     return user
@@ -115,7 +113,7 @@ def insert_user(db, username=None, password=None, user_type=None, gender=None):
 
 
 def insert_patient(db, id=None, username=None, password=None):
-    patient = Patient(user_id=id, weight=50, height=170, note='test')
+    patient = Patient(user_id=id)
     db.add(patient)
     db.commit()
     return patient

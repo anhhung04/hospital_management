@@ -47,7 +47,7 @@ class AuthService(IService):
     async def logout(self) -> str:
         try:
             if self._current_user:
-                await self._rc.delete(self._current_user.get('sub'))
+                self._rc.delete(self._current_user.get('sub'))
                 return None
             return "User is not logged in"
         except Exception as e:

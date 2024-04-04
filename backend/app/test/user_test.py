@@ -19,7 +19,6 @@ class UserTest(TestCase):
         self.assertTrue(u_n_db.ssn == u.ssn)
         self.assertTrue(u_n_db.first_name == u.first_name)
         self.assertTrue(u_n_db.last_name == u.last_name)
-        self.assertTrue(u_n_db.nation == u.nation)
         self.assertTrue(u_n_db.address == u.address)
         
     def test_insert_patient(self):

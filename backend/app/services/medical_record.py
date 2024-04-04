@@ -2,7 +2,7 @@ from services import IService
 from permissions import Permission
 from permissions.user import UserRole
 from models.medical_record import MedicalRecordModel
-from repository.medica_record import MedicalRecordRepo
+from repository.medical_record import MedicalRecordRepo
 from repository.schemas.patient import MedicalRecord
 from fastapi import HTTPException, status
 
