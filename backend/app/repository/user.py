@@ -1,7 +1,7 @@
 from repository.schemas.user import User
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from models.user import QueryUserModel, PatchUserDetailModel, AddUserModel
+from models.user import QueryUserModel, PatchUserDetailModel, AddUserDetailModel
 from uuid import uuid4
 from typing import Tuple, Optional
 
@@ -43,7 +43,7 @@ class UserRepo:
 
     async def create(
         self,
-        user: QueryUserModel
+        user: AddUserDetailModel
     ) -> Tuple[User, Optional[Exception | IntegrityError]]:
         try:
             new_user = user.model_dump()

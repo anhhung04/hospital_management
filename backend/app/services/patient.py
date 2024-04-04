@@ -2,10 +2,15 @@ from sqlalchemy.orm import Session
 from repository.patient import PatientRepo
 from services import IService
 from fastapi import HTTPException, status
-from models.patient import PatientModel, PatientDetailModel, NewPatientModel
+from models.patient import (
+    PatientModel, PatientDetailModel,
+    QueryPatientModel,
+    AddPatientModel,
+    PatchPatientModel
+)
+from models.user import AddUserDetailModel
 from permissions import Permission
 from permissions.user import UserRole
-from repository.patient import GetPatientQuery
 from repository.user import UserRepo
 from repository.schemas.patient import Patient, ProgressType
 from util.crypto import PasswordContext
@@ -17,12 +22,9 @@ class PatientService(IService):
         self._user_repo = UserRepo(session)
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
-    async def get_patients(self, page: int = 1, patient_per_page: int = 10):
-        if page < 1:
-            page = 1
-        if patient_per_page < 1:
-            patient_per_page = 10
-        patients, err = await self._patient_repo.list_patient(page, patient_per_page)
+    async def get_patients(self, page: int = 1, limit: int = 10):
+        page, limit = abs(page) if page else 1, abs(limit)
+        patients, err = await self._patient_repo.list_patient(page, limit)
 
         if err:
             raise HTTPException(
@@ -31,6 +33,10 @@ class PatientService(IService):
             )
         try:
             def process_patient(patient: Patient):
+                medical_record = patient.medical_record.id if patient.medical_record else None
+                appointment_date = PatientService.find_appointment_date(
+                    patient.progress
+                )
                 return PatientModel(
                     id=patient.user_id,
                     full_name=" ".join(
@@ -38,27 +44,31 @@ class PatientService(IService):
                             patient.personal_info.last_name]
                     ),
                     phone_number=patient.personal_info.phone_number,
-                    medical_record=patient.medical_record.id if patient.medical_record else None,
-                    appointment_date=PatientService.find_appointment_date(
-                        patient.progress
-                    ),
+                    medical_record=medical_record,
+                    appointment_date=appointment_date,
                 ).model_dump()
             patients = [process_patient(p) for p in patients]
         except Exception:
             raise HTTPException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail='Error in convert patients list'
             )
         return patients
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
-    async def get(self, patient_id: str):
+    async def get(self, query: QueryPatientModel):
         if Permission.has_role([UserRole.PATIENT], self._current_user):
-            if self._current_user['sub'] != patient_id:
-                raise HTTPException(status_code=403, detail='Permission denied')
-        patient, err = await self._patient_repo.get(patient_id)
+            if self._current_user['sub'] != query.user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail='Permission denied'
+                )
+        patient, err = await self._patient_repo.get(query)
         if err:
-            raise HTTPException(status_code=404, detail='Patient not found')
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='Patient not found'
+            )
         return PatientDetailModel(
             id=patient.user_id,
             ssn=patient.personal_info.ssn,
@@ -82,31 +92,35 @@ class PatientService(IService):
         ).model_dump()
 
     @Permission.permit([UserRole.EMPLOYEE])
-    async def create(self, user_info: dict):
+    async def create(self, new_patient: AddPatientModel):
         raw_password = PasswordContext.rand_key()
-        username = f"patient_{user_info['ssn']}"
+        username = f"patient_{new_patient.ssn}"
+        user_info = new_patient.model_dump()
         user_info.update({
             "password": PasswordContext(raw_password, username).hash(),
             "username": username,
             "role": Permission(UserRole.PATIENT).get(),
         })
-        user_in_db, err = await self._user_repo.create(user_info)
+        user_in_db, err = await self._user_repo.create(
+            AddUserDetailModel.model_validate(user_info)
+        )
         if err:
             patient_info = {
-                "user_id": err.params['id'],
+                "user_id": err.params.get("id"),
             }
         else:
             patient_info = {
                 "user_id": user_in_db.id,
             }
-        patient_in_db, _ = await self._patient_repo.create(patient_info)
+        patient_in_db, _ = await self._patient_repo.create(
+            AddPatientModel.model_validate(patient_info)
+        )
         if user_in_db and patient_in_db:
-            return_patient = {
+            return {
                 "username": patient_in_db.personal_info.username,
                 "password": raw_password,
                 "user_id": patient_in_db.user_id,
             }
-            return NewPatientModel.model_validate(return_patient).model_dump()
         if not user_in_db:
             raise HTTPException(
                 status_code=500,
@@ -119,9 +133,15 @@ class PatientService(IService):
             )
 
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
-    async def update(self, user_id: str, patient_update: dict):
-        patient, err = await self._patient_repo.update(query=GetPatientQuery(
-            user_id, None), patient_update=patient_update)
+    async def update(
+        self,
+        query: QueryPatientModel,
+        patient_update: PatchPatientModel
+    ):
+        patient, err = await self._patient_repo.update(
+            QueryPatientModel.model_validate(query),
+            patient_update
+        )
         if err:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

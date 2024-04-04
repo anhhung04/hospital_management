@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from repository.schemas.patient import MedicalRecord
-from models.medical_record import NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel
+from models.medical_record import NewMedicalRecordModel, QueryMedicalRecordModel, PatchMedicalRecordModel, QueryMedicalRecordModel
 from models.medical_record import MedicalRecord
 from typing import Tuple, Optional
 
@@ -11,10 +11,13 @@ class MedicalRecordRepo:
 
     async def get(
         self,
-        patient_id: str
+        query: QueryMedicalRecordModel
     ) -> Tuple[MedicalRecord, Exception]:
         try:
-            return self.__sess.query(MedicalRecord).filter(MedicalRecord.patient_id == patient_id).first(), None
+            return self.__sess.query(MedicalRecord).filter(
+                MedicalRecord.patient_id == query.patient_id
+                or MedicalRecord.id == query.id
+            ).first(), None
         except Exception as err:
             return None, err
 

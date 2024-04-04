@@ -54,3 +54,8 @@ class DeleteMedicalRecordModel(BaseModel):
 
 class MedicalRecordResponseModel(BaseResponseModel):
     data: MedicalRecordModel
+
+
+class QueryMedicalRecordModel(BaseModel):
+    patient_id: Optional[str]
+    id: Optional[str]

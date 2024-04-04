@@ -61,7 +61,10 @@ class UserDetail(BaseModel):
     email: str
     username: str
     role: str
-    
+
+
+class AddUserDetailModel(UserDetail):
+    password: str
 
 class AddUserModel(BaseModel):
     first_name: str
@@ -89,7 +92,7 @@ class UserDetailResponse(BaseResponseModel):
 
 
 class QueryUserModel(BaseModel):
-    username: Optional[str]
-    id: Optional[str]
-    ssn: Optional[str]
-    email: Optional[str]
+    username: Optional[str] = None
+    id: Optional[str] = None
+    ssn: Optional[str] = None
+    email: Optional[str] = None
