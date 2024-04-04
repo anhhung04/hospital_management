@@ -28,13 +28,16 @@ class UserRepo:
     async def update(
         self,
         query: QueryUserModel,
-        update_item: PatchUserDetailModel
+        update_user: PatchUserDetailModel
     ) -> Tuple[User, Exception]:
         try:
-            user: User = await self.get(query)
-            for attr in update_item.model_dump_json().keys():
-                if update_item.get(attr) is not None:
-                    setattr(user, attr, update_item.get(attr))
+            user, err = await self.get(query)
+            if err:
+                return None, err
+            dump_update_user = update_user.model_dump()
+            for attr in dump_update_user.keys():
+                if dump_update_user.get(attr) is not None:
+                    setattr(user, attr, dump_update_user.get(attr))
             self._session.add(user)
             self._session.commit()
             self._session.refresh(user)
@@ -60,7 +63,9 @@ class UserRepo:
 
     async def delete(self, query: QueryUserModel) -> Tuple[User, Exception]:
         try:
-            user: User = await self.get(query)
+            user, err = await self.get(query)
+            if err:
+                return None, err
             self._session.delete(user)
             self._session.commit()
             return user, None

@@ -39,9 +39,9 @@ class MedicalRecordRepo:
         query: QueryMedicalRecordModel
     ) -> Tuple[MedicalRecord, Exception]:
         try:
-            medical_record = self.__sess.query(MedicalRecord).filter(
-                MedicalRecord.id == query.id or MedicalRecord.patient_id == query.patient_id
-            ).first()
+            medical_record, err = await self.get(query)
+            if err:
+                return None, err
             self.__sess.delete(medical_record)
             self.__sess.commit()
         except Exception as err:
@@ -54,14 +54,15 @@ class MedicalRecordRepo:
         update_medical_record: PatchMedicalRecordModel
     ) -> Tuple[MedicalRecord, Exception]:
         try:
-            medical_record = self.__sess.query(MedicalRecord).filter(
-                MedicalRecord.id == query.id or MedicalRecord.patient_id == query.patient_id
-            ).first()
-            for attr in update_medical_record.model_dump_json().keys():
-                if update_medical_record.get(attr) is not None:
+            medical_record, err = await self.get(query)
+            if err:
+                return None, err
+            dump_medical_record = update_medical_record.model_dump()
+            for attr in dump_medical_record.model_dump_json().keys():
+                if dump_medical_record.get(attr) is not None:
                     setattr(
                         medical_record, attr,
-                        update_medical_record.get(attr)
+                        dump_medical_record.get(attr)
                     )
             self.__sess.add(medical_record)
             self.__sess.commit()

@@ -36,12 +36,11 @@ class PatientRepo:
         patient_update: PatchPatientModel
     ) -> Tuple[Patient, Exception]:
         try:
-            patient = self._sess.query(Patient).filter(
-                Patient.user_id == query.user_id
-            ).first()
-            for attr in patient_update.keys():
-                if patient_update.get(attr) is not None:
-                    setattr(patient, attr, patient_update.get(attr))
+            patient = await self.get(query)
+            dump_update_patient = patient_update.model_dump()
+            for attr in dump_update_patient.keys():
+                if dump_update_patient.get(attr) is not None:
+                    setattr(patient, attr, dump_update_patient.get(attr))
             self._sess.add(patient)
             self._sess.commit()
             self._sess.refresh(patient)
