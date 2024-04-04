@@ -58,4 +58,4 @@ class MedicalRecordResponseModel(BaseResponseModel):
 
 class QueryMedicalRecordModel(BaseModel):
     patient_id: Optional[str]
-    id: Optional[str]
+    id: Optional[int]
