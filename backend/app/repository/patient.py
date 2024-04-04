@@ -4,27 +4,25 @@ from repository.user import UserRepo
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import Tuple
-
-
-GetPatientQuery = namedtuple("GetPatientQuery", ["id", "username"])
-
+from models.patient import QueryPatientModel, PatchPatientModel, AddPatientModel
 
 class PatientRepo:
     def __init__(self, session: Session):
         self._sess = session
         self._user_repo = UserRepo(session)
 
-    async def get(self, patient_id: str) -> Tuple[Patient, Exception]:
+    async def get(self, query: QueryPatientModel) -> Tuple[Patient, Exception]:
         try:
             patient = self._sess.query(Patient).filter(
-                Patient.user_id == patient_id).first()
+                Patient.user_id == query.user_id
+            ).first()
         except Exception as err:
             return None, err
         return patient, None
 
-    async def create(self, patient_info: dict) -> Tuple[Patient]:
-        new_patient = Patient(**patient_info)
+    async def create(self, patient_info: AddPatientModel) -> Tuple[Patient]:
         try:
+            new_patient = Patient(**patient_info.model_dump())
             self._sess.add(new_patient)
             self._sess.commit()
         except IntegrityError as err:
@@ -33,12 +31,15 @@ class PatientRepo:
             return None, err
         return new_patient, None
 
-    async def update(self, query: GetPatientQuery, patient_update: dict) -> Tuple[Patient, Exception]:
+    async def update(
+        self,
+        query: QueryPatientModel,
+        patient_update: PatchPatientModel
+    ) -> Tuple[Patient, Exception]:
         try:
             patient = self._sess.query(Patient).filter(
-                Patient.user_id == query['user_id']).first()
-            if not patient:
-                return None
+                Patient.user_id == query.user_id
+            ).first()
             for attr in patient_update.keys():
                 setattr(patient, attr, patient_update[attr])
             self._sess.add(patient)
@@ -48,10 +49,17 @@ class PatientRepo:
             return None, err
         return patient, None
 
-    async def list_patient(self, page: int, patient_per_page: int) -> Tuple[list[Patient], Exception]:
+    async def list_patient(
+        self,
+        page: int,
+        limit: int
+    ) -> Tuple[list[Patient], Exception]:
         try:
             patients = self._sess.query(Patient).limit(
-                patient_per_page).offset((page - 1) * patient_per_page).all()
+                limit
+            ).offset(
+                (page - 1) * limit
+            ).all()
         except Exception as err:
             return [], err
         return patients, None

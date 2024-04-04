@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from models.response import BaseResponseModel
-
+from typing import Optional
 
 class UserAuth(BaseModel):
     username: str
@@ -62,5 +62,34 @@ class UserDetail(BaseModel):
     username: str
     role: str
     
+
+class AddUserModel(BaseModel):
+    first_name: str
+    last_name: str
+    birth_date: str
+    gender: str
+    ssn: str
+    phone_number: str
+    address: str
+    email: str
+    health_insurance: str
+
+
+class PatchUserDetailModel(BaseModel):
+    phone_number: Optional[str]
+    birth_date: Optional[str]
+    gender: Optional[str]
+    health_insurance: Optional[str]
+    last_name: Optional[str]
+    first_name: Optional[str]
+    address: Optional[str]
+
 class UserDetailResponse(BaseResponseModel):
     data: UserDetail
+
+
+class QueryUserModel(BaseModel):
+    username: Optional[str]
+    id: Optional[str]
+    ssn: Optional[str]
+    email: Optional[str]

@@ -1,46 +1,54 @@
 from repository.schemas.user import User
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from collections import namedtuple
+from models.user import QueryUserModel, PatchUserDetailModel, AddUserModel
 from uuid import uuid4
 from typing import Tuple, Optional
-
-GetUserQuery = namedtuple('GetUserQuery', ['id', 'username'])
 
 
 class UserRepo:
     def __init__(self, session: Session):
         self._session: Session = session
 
-    async def get(self, query: GetUserQuery) -> Tuple[User, Exception]:
+    async def get(
+        self,
+        query: QueryUserModel
+    ) -> Tuple[User, Exception]:
         try:
-            if query.username:
-                user = self._session.query(User).filter(
-                    User.username == query.username).first()
-            if query.id:
-                user = self._session.query(User).filter(
-                    User.id == query.id).first()
+            user = self._session.query(User).filter(
+                User.id == query.id
+                or User.username == query.username
+                or User.email == query.email
+                or User.ssn == query.ssn
+            ).first()
             return user, None
         except Exception as err:
             return None, err
 
-    async def update(self, query: GetUserQuery, update_item: dict) -> Tuple[User, Exception]:
+    async def update(
+        self,
+        query: QueryUserModel,
+        update_item: PatchUserDetailModel
+    ) -> Tuple[User, Exception]:
         try:
             user: User = await self.get(query)
-            if user:
-                for attr in update_item.keys():
-                    setattr(user, attr, update_item[attr])
-                self._session.add(user)
-                self._session.commit()
-                self._session.refresh(user)
+            for attr in update_item.model_dump().keys():
+                setattr(user, attr, update_item[attr])
+            self._session.add(user)
+            self._session.commit()
+            self._session.refresh(user)
             return user, None
         except Exception as err:
             return None, err
 
-    async def create(self, item: dict) -> Tuple[User, Optional[Exception | IntegrityError]]:
+    async def create(
+        self,
+        user: QueryUserModel
+    ) -> Tuple[User, Optional[Exception | IntegrityError]]:
         try:
-            item.update({'id': str(uuid4())})
-            new_user = User(**item)
+            new_user = user.model_dump()
+            new_user.update({"id": str(uuid4())})
+            new_user = User(**new_user)
             self._session.add(new_user)
             self._session.commit()
             return new_user, None
@@ -49,12 +57,11 @@ class UserRepo:
         except Exception as err:
             return None, err
 
-    async def delete(self, query: GetUserQuery) -> Tuple[User, Exception]:
+    async def delete(self, query: QueryUserModel) -> Tuple[User, Exception]:
         try:
             user: User = await self.get(query)
-            if user:
-                self._session.delete(user)
-                self._session.commit()
+            self._session.delete(user)
+            self._session.commit()
             return user, None
         except Exception as e:
             return None, e
