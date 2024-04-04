@@ -24,5 +24,23 @@ class EmployeeDetailModel(UserDetail):
 class EmployeeDetailReponseModel(BaseResponseModel):
     data: EmployeeDetailModel
 
+class AddEmployeeRequestModel(BaseModel):
+    first_name: str
+    last_name: str
+    birth_date: str
+    gender: str
+    ssn: str
+    phone_number: str
+    address: str
+    email: Optional[str]
+    health_insurance: Optional[str]
 
+class NewEmployeeModel(BaseModel):
+    username: str
+    password: str
+    user_id: str
+
+class NewEmployeeResponseModel(BaseResponseModel):
+    data: NewEmployeeModel
+    
 

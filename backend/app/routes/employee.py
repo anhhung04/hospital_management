@@ -4,7 +4,7 @@ from repository import Storage
 from fastapi import Query, Path, HTTPException, status
 from typing import Annotated
 from util.response import APIResponse
-from models.employee import ListEmployeeModel, EmployeeDetailReponseModel
+from models.employee import ListEmployeeModel, EmployeeDetailReponseModel, NewEmployeeResponseModel, AddEmployeeRequestModel
 
 router = APIRouter(tags=["employee"])
 
@@ -41,3 +41,18 @@ async def get_employee(
         code=status.HTTP_200_OK, data=employee, message="Employee fetched successful"
     )
         
+@router.post("/create", response_model=NewEmployeeResponseModel)
+async def create_employee(
+    new_user: AddEmployeeRequestModel,
+    request: Request,
+    db_sess=Depends(Storage.get)
+):
+    try:
+        employee = await EmployeeService(db_sess, request.state.user).create(new_user.model_dump())
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, message="Employee created successfully", data=employee
+    )
