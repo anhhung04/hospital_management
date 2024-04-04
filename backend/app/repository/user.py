@@ -1,6 +1,7 @@
 from repository.schemas.user import User
 from util.log import logger
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from collections import namedtuple
 from uuid import uuid4
 
@@ -19,10 +20,9 @@ class UserRepo:
             if query.id:
                 user = self._session.query(User).filter(
                     User.id == query.id).first()
-            return user
-        except Exception as e:
-            logger.error(e)
-            return None
+            return user, None
+        except Exception as err:
+            return None, err
 
     async def update(self, query: GetUserQuery, update_item: dict) -> User:
         try:
@@ -33,9 +33,9 @@ class UserRepo:
                 self._session.add(user)
                 self._session.commit()
                 self._session.refresh(user)
-            return user
-        except Exception as e:
-            return None
+            return user, None
+        except Exception as err:
+            return None, err
 
     async def create(self, item: dict) -> User:
         try:
@@ -43,9 +43,9 @@ class UserRepo:
             new_user = User(**item)
             self._session.add(new_user)
             self._session.commit()
-            return new_user
-        except Exception as e:
-            return None
+            return new_user, None
+        except IntegrityError as err:
+            return None, err
 
     async def delete(self, query: GetUserQuery) -> User:
         try:
@@ -53,6 +53,6 @@ class UserRepo:
             if user:
                 self._session.delete(user)
                 self._session.commit()
-            return user
+            return user, None
         except Exception as e:
-            return None
+            return None, e
