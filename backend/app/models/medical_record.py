@@ -3,6 +3,10 @@ from models.response import BaseResponseModel
 from typing import Optional
 
 
+class QueryMedicalRecordModel(BaseModel):
+    patient_id: Optional[str]
+    id: Optional[str]
+
 class ProgressRecordModel(BaseModel):
     id: str
     created_at: int
@@ -43,6 +47,10 @@ class PatchMedicalRecordModel(BaseModel):
     food_allergies: Optional[str]
     medical_history: Optional[str]
 
+
+class DeleteMedicalRecordModel(BaseModel):
+    id: Optional[str]
+    patient_id: Optional[str]
 
 class MedicalRecordResponseModel(BaseResponseModel):
     data: MedicalRecordModel
