@@ -18,7 +18,6 @@ from util.crypto import PasswordContext
 from uuid import uuid4
 from fastapi import Depends
 from middleware.user_ctx import UserContext
-from typing import Annotated
 
 
 class PatientService:

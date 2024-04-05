@@ -1,4 +1,3 @@
-from typing import Any
 from redis import Redis
 from models.user import UserAuth
 from util.jwt import JWTHandler, JWTPayload
