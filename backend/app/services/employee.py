@@ -7,7 +7,7 @@ from models.employee import (
   QueryEmployeeModel
 )
 from permissions import Permission
-from permissions.user import UserRole
+from permissions.user import UserRole, EmployeeType
 from repository.employee import EmployeeRepo
 from repository.user import UserRepo
 from middleware.user_ctx import UserContext
@@ -24,7 +24,7 @@ class EmployeeService:
         self._user_repo = user_repo
 
     
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
+    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE, EmployeeType.MANAGER])
     async def get_employees(self, employee_type: str, page: int = 1, employee_per_page: int = 10):
         page = 1 if page < 1 else page
         employee_per_page = 1 if employee_per_page <= 0 else employee_per_page
@@ -59,7 +59,7 @@ class EmployeeService:
         if error:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error in fetching employee"
+                detail="Error in fetching employee information"
             )
         if not employee:
             raise HTTPException(

@@ -21,7 +21,7 @@ class EmployeeDetailModel(BaseModel):
     begin_date: str
     end_date: str
     faculty: str
-    status: EmployeeStatus
+    status: Optional[EmployeeStatus | None] = None
     personal_info: UserDetail
 
 class EmployeeDetailReponseModel(BaseResponseModel):
