@@ -1,20 +1,12 @@
-import InfoContent from "./InfoContent";
+import InfoContent from "./info_content";
 import { useState } from "react";
-import ProgressContent from "./ProgressContent";
-import PatientContent from "./PatientContent";
-import ResultContent from "./ResultContent";
-import MedicineContent from "./MedicineContent";
+import ProgressContent from "./progress_content";
+import PatientContent from "./patient_content";
+import ResultContent from "./result_content/ResultContent";
+import MedicineContent from "./medicine_content";
 import HuyButton from "../../Button/Huy_Button";
 import LuuButton from "../../Button/Luu_Button";
 import Alert from "../../Alert";
-import PropTypes from 'prop-types';
-
-PatientAdd.propTypes = {
-    isStore: PropTypes.bool,
-    closeAlert: PropTypes.func,
-    CloseAdd: PropTypes.func,
-    setStore: PropTypes.func,
-};
 
 function PatientAdd(props) {
   const [current_content, setCurrent_content] = useState("info");
@@ -42,7 +34,7 @@ function PatientAdd(props) {
   }
 
   function handleNumMedicineAdded() {
-    // console.log("click");
+    console.log("click");
     setNumMedicineAdded((pre) => pre + 1);
   }
 

@@ -1,14 +1,5 @@
-import AddStaff from "./addStaff";
-import AddStaffNonHeader from "./addStaffNonHeader";
-import PropTypes from 'prop-types';
-
-MedicineContent.propTypes = {
-    isAddMedicine: PropTypes.bool,
-    setAddMedicine: PropTypes.func,
-    numMedicineAdded: PropTypes.number,
-    handleNumMedicineAdded: PropTypes.func,
-    handleNumMedicineRemove: PropTypes.func,
-};
+import AddStaff from "../progress_content/components/addStaff";
+import AddStaffNonHeader from "../progress_content/components/addStaffNonHeader";
 
 function MedicineContent(props) {
 
