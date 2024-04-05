@@ -48,6 +48,7 @@ class UserRepo:
             self._session.refresh(user)
             return user, None
         except Exception as err:
+            self._session.rollback()
             return None, err
 
     async def create(
@@ -61,6 +62,7 @@ class UserRepo:
             self._session.commit()
             return new_user, None
         except IntegrityError as err:
+            self._session.rollback()
             return None, err
         except Exception as err:
             return None, err
@@ -74,4 +76,5 @@ class UserRepo:
             self._session.commit()
             return user, None
         except Exception as e:
+            self._session.rollback()
             return None, e
