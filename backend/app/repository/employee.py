@@ -6,6 +6,7 @@ from typing import Tuple
 from fastapi import Depends
 from repository import Storage
 from sqlalchemy.orm import Session
+from models.employee import QueryEmployeeModel
 
 GetEmployeeQuery = namedtuple("GetEmployeeQuery", ["id", "username"])
 
@@ -30,11 +31,11 @@ class EmployeeRepo:
           return [], e
         return employees, None
     
-    async def get(self, employee_id: str) -> Employee:
+    async def get(self, query: QueryEmployeeModel) -> Tuple[Employee, Exception]:
         try:
           employee = self._sess.query(Employee).filter(
-              Employee.user_id == employee_id).first()
+              Employee.user_id == query.user_id).first()
         except Exception as e:
-          return None
-        return employee
+          return None, e
+        return employee, None
 
