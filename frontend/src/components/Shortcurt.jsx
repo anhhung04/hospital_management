@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 Shortcurt.propTypes = {
     source: PropTypes.string,
-    value: PropTypes.number,
+    value: PropTypes.string,
     title: PropTypes.string,
 };
 

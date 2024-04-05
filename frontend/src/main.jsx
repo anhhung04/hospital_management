@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { makeServer } from "../mock/server.js";
-import DefaultLayout from "./components/Layout/DefaultLayout/DefaultLayout.jsx";
+import DefaultLayout from "./components/Layout/DefaultLayout";
 import {Fragment} from "react";
 import {publicRoutes} from "./routes";
 import './index.css';
