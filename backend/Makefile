@@ -26,7 +26,7 @@ test:
 	cd ./app && PYTHONPATH=./ pytest  --disable-warnings
 
 migrate-all:
-	cd ./app && alembic upgrade head
+	cd ./app && PYTHONPATH=./ alembic upgrade head
 
 migrate-new:
 	@echo "Enter migration message: "; \

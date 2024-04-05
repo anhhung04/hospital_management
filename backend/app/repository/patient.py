@@ -1,67 +1,133 @@
-from repository import IRepo
-from collections import namedtuple
-from repository.schemas.patient import Patient
-from repository.user import UserRepo
+from repository.schemas.patient import Patient, MedicalRecord, PatientProgress
 from repository.schemas.user import User
-from util.crypto import PasswordContext
-from permissions.user import UserRole
-from permissions import Permission
+from repository.user import UserRepo
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import Tuple
+from models.patient import QueryPatientModel, PatchPatientModel, AddPatientModel
+from models.patient_progress import NewPatientProgressModel
+from repository import Storage
+from fastapi import Depends
 
-
-GetPatientQuery = namedtuple("GetPatientQuery", ["id", "username"])
-
-
-class PatientRepo(IRepo):
-    def __init__(self, session):
+class PatientRepo:
+    def __init__(
+        self,
+        userRepo: UserRepo = Depends(UserRepo),
+        session: Session = Depends(Storage.get)
+    ):
         self._sess = session
-        self._user_repo = UserRepo(session)
+        self._user_repo = userRepo
 
-    async def get(self, patient_id: str) -> User:
+    @staticmethod
+    async def call():
+        return PatientRepo()
+
+    async def get(self, query: QueryPatientModel) -> Tuple[Patient, Exception]:
         try:
             patient = self._sess.query(Patient).filter(
-                Patient.user_id == patient_id).first()
-        except Exception:
-            return None
-        return patient
+                Patient.user_id == query.user_id
+            ).outerjoin(
+                self._sess.query(MedicalRecord).filter(
+                    MedicalRecord.id == Patient.medical_record_id
+                ).outerjoin(
+                    self._sess.query(PatientProgress).filter(
+                        PatientProgress.medical_record_id == MedicalRecord.id
+                    ).limit(query.max_progress).subquery()
+                ).subquery()
+            ).first()
+        except Exception as err:
+            return None, err
+        return patient, None
 
-    async def create(self, patient_info: dict) -> Tuple[User, Patient, str]:
-        gen_password = PasswordContext.rand_key()
-        username = f"patient_{patient_info['ssn']}"
-        patient_info.update({
-            "role": Permission(str(UserRole.PATIENT)).get(),
-            "username": username,
-            "password": PasswordContext(gen_password, username).hash()
-        })
-        new_user = await self._user_repo.create(patient_info)
-        new_patient = Patient(
-            user_id=new_user.id,
-            weight=0,
-            height=0,
-        )
-        self._sess.add(new_patient)
-        self._sess.commit()
-        return new_user, new_patient, gen_password
-
-    async def update(self, query: GetPatientQuery, patient_update: dict) -> Tuple[Patient, str]:
+    async def create(self, patient_info: AddPatientModel) -> Tuple[Patient]:
         try:
-            patient = self._sess.query(Patient).filter(
-                Patient.user_id == query['user_id']).first()
-            if not patient:
-                return None
-            for attr in patient_update.keys():
-                setattr(patient, attr, patient_update[attr])
+            new_patient = Patient(
+                user_id=patient_info.user_id,
+                personal_info=User(**patient_info.personal_info.model_dump()),
+                medical_record=MedicalRecord(
+                    **patient_info.medical_record.model_dump()
+                )
+            )
+            self._sess.add(new_patient)
+            self._sess.commit()
+        except IntegrityError as err:
+            return None, err
+        except Exception as err:
+            return None, err
+        return new_patient, None
+
+    async def update(
+        self,
+        query: QueryPatientModel,
+        patient_update: PatchPatientModel
+    ) -> Tuple[Patient, Exception]:
+        try:
+            patient, err = await self.get(query)
+            if err:
+                return None, err
+            dump_update_patient = patient_update.model_dump()
+            if dump_update_patient.get("personal_info"):
+                for attr, value in dump_update_patient.get("personal_info", {}).items():
+                    setattr(
+                        patient.personal_info,
+                        attr,
+                        value
+                    ) if value else None
+            if dump_update_patient.get("medical_record"):
+                for attr, value in dump_update_patient.get("medical_record", {}).items():
+                    setattr(
+                        patient.medical_record,
+                        attr,
+                        value
+                    ) if value else None
             self._sess.add(patient)
             self._sess.commit()
             self._sess.refresh(patient)
-        except Exception as e:
-            return None, e
+        except Exception as err:
+            return None, err
         return patient, None
 
-    async def list_patient(self, page: int, patient_per_page: int) -> list[Patient]:
+    async def list_patient(
+        self,
+        page: int,
+        limit: int
+    ) -> Tuple[list[Patient], Exception]:
         try:
-            patients = self._sess.query(Patient).limit(
-                patient_per_page).offset((page - 1) * patient_per_page).all()
-        except Exception:
-            return []
-        return patients
+            patients = self._sess.query(Patient).outerjoin(
+                self._sess.query(MedicalRecord).filter(
+                    MedicalRecord.id == Patient.medical_record_id
+                ).outerjoin(
+                    self._sess.query(PatientProgress).filter(
+                        PatientProgress.medical_record_id == MedicalRecord.id
+                    ).limit(1).subquery()
+                ).subquery()
+            ).limit(
+                limit
+            ).offset(
+                (page - 1) * limit
+            ).all()
+        except Exception as err:
+            return [], err
+        return patients, None
+
+    async def create_progress(
+        self,
+        patient_id: int,
+        progress: NewPatientProgressModel
+    ) -> Tuple[PatientProgress, Exception]:
+        try:
+            medical_record_id = self._sess.query(Patient.medical_record_id).filter(
+                Patient.user_id == patient_id
+            ).first().tuple()[0]
+            if not medical_record_id:
+                raise Exception("Medical record not found")
+            new_progress = PatientProgress(
+                medical_record_id=medical_record_id,
+                patient_id=patient_id,
+                **progress.model_dump()
+            )
+            self._sess.add(new_progress)
+            self._sess.commit()
+        except Exception as err:
+            return None, err
+        return new_progress, None

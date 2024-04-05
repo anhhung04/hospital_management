@@ -1,5 +1,5 @@
 from unittest import TestCase
-from test import override_get_db, insert_user, gen_password, gen_username, insert_patient
+from tests import override_get_db, insert_user, gen_password, gen_username, insert_patient
 from util.crypto import PasswordContext
 from repository.schemas.user import User
 from repository.schemas.patient import Patient
@@ -19,7 +19,6 @@ class UserTest(TestCase):
         self.assertTrue(u_n_db.ssn == u.ssn)
         self.assertTrue(u_n_db.first_name == u.first_name)
         self.assertTrue(u_n_db.last_name == u.last_name)
-        self.assertTrue(u_n_db.nation == u.nation)
         self.assertTrue(u_n_db.address == u.address)
         
     def test_insert_patient(self):

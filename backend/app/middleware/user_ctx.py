@@ -1,21 +1,23 @@
 from models.request import AUTH_HEADER
 from util.jwt import JWTHandler
-from repository import RedisStorage
-from fastapi import Request, Depends, HTTPException
+from fastapi import Request, Depends
 
-async def auth_middleware(request: Request, rc=Depends(RedisStorage.get)):
-    auth_header = request.headers.get(AUTH_HEADER, None)
-    token = auth_header.split(" ")[-1] if auth_header else None
-    try:
-        if auth_header is None:
-            request.state.user = None
-        else:
-            token_data, err = JWTHandler(rc).verify(token)
-            if err:
-                raise HTTPException(status_code=401, detail=str(err))
-            sub = token_data.get('sub')
-            token_data = token_data.get('info', None)
-            token_data.update({'sub': sub})
-            request.state.user = token_data
-    except Exception:
-        request.state.user = None
+
+class UserContext:
+    def __init__(self, request: Request, jwt_handler: JWTHandler = Depends(JWTHandler)):
+        auth_header = request.headers.get(AUTH_HEADER, None)
+        token = auth_header.split(" ")[-1] if auth_header else None
+        try:
+            if auth_header is None:
+                self._info = {}
+            else:
+                token_data = jwt_handler.verify(token)
+                self._info = token_data
+        except Exception:
+            self._info = {}
+
+    def role(self):
+        return self._info.get('info', {}).get('role', None)
+
+    def id(self):
+        return self._info.get('sub', None)
