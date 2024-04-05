@@ -12,6 +12,7 @@ from models.employee import(
   QueryEmployeeModel,
   EmployeeTypeQueryModel
 )
+from models.request import IdPath
 
 
 router = APIRouter(tags=["employee"])
@@ -37,7 +38,7 @@ async def list_employees(
 
 @router.get("/{employee_id}", response_model=EmployeeDetailReponseModel)
 async def get_employee(
-    employee_id: Annotated[str, Path(regex=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")],
+    employee_id: IdPath,
     service: EmployeeService = Depends(EmployeeService)
 ):
     try:
