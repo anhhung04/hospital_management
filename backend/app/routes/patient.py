@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from services.patient import PatientService
 from fastapi import Query, status, HTTPException, Path
 from typing import Annotated
@@ -33,11 +33,15 @@ async def list_patients(
 @router.get("/{patient_id}", tags=["patient"], response_model=PatientDetailResponseModel)
 async def get_patient(
     patient_id: Annotated[str, Path(regex=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")],
+    max_progress: int = Query(lt=10, gt=0, default=1),
     service: PatientService = Depends(PatientService),
 ):
     try:
         patient = await service.get(
-            QueryPatientModel(user_id=patient_id)
+            QueryPatientModel(
+                user_id=patient_id,
+                max_progress=max_progress
+            )
         )
     except HTTPException as e:
         return APIResponse.as_json(

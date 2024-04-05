@@ -17,7 +17,7 @@ class Permission:
                 if not user:
                     raise HTTPException(
                         status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-                uc = [str(c).lower() for c in user.role().split(":")]
+                uc = [str(c).lower() for c in Permission(user.role())]
                 for ac in acl:
                     if str(ac).lower() in uc:
                         return func(*args, **kwargs)
@@ -44,3 +44,7 @@ class Permission:
     def delete(self, role):
         self._role.pop(role)
         return self
+
+    def __iter__(self):
+        for role in self._role:
+            yield role

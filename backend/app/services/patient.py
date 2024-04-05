@@ -8,7 +8,7 @@ from models.patient import (
     AddPatientRequestModel
 )
 from models.user import AddUserDetailModel, UserDetail
-from models.medical_record import MedicalRecordModel
+from models.medical_record import NewMedicalRecordModel, MedicalRecordModel
 from permissions import Permission
 from permissions.user import UserRole
 from repository.user import UserRepo
@@ -59,7 +59,7 @@ class PatientService:
                     appointment_date=appointment_date
                 ).model_dump()
             patients = [process_patient(p) for p in patients]
-        except Exception:
+        except Exception as err:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail='Error in convert patients list'
@@ -87,6 +87,7 @@ class PatientService:
             )
         appointment_date = None
         if patient.medical_record:
+            patient.medical_record.progress = patient.medical_record.progress[-query.max_progress:]
             appointment_date = PatientService.find_appointment_date(
                 patient.medical_record.progress
             )
@@ -104,38 +105,36 @@ class PatientService:
         raw_password = PasswordContext.rand_key()
         username = f"patient_{new_patient.ssn}"
         user_info = new_patient.model_dump()
+        patient_id = str(uuid4())
         user_info.update({
-            "id": str(uuid4()),
+            "id": patient_id,
             "password": PasswordContext(raw_password, username).hash(),
             "username": username,
             "role": Permission(UserRole.PATIENT).get(),
         })
-        user_in_db, err = await self._user_repo.create(
-            AddUserDetailModel.model_validate(user_info)
-        )
-        if err:
-            patient_info = {
-                "user_id": err.params.get("id"),
-            }
-        else:
-            patient_info = {
-                "user_id": user_in_db.id,
-            }
-        patient_in_db, _ = await self._patient_repo.create(
+        patient_info = {
+            "user_id": patient_id,
+            "personal_info": AddUserDetailModel.model_validate(user_info).model_dump(),
+            "medical_record": NewMedicalRecordModel(
+                weight=0,
+                height=0,
+                note="",
+                current_treatment="",
+                drug_allergies="",
+                food_allergies="",
+                medical_history="",
+            ).model_dump(),
+        }
+        patient_in_db, err = await self._patient_repo.create(
             AddPatientModel.model_validate(patient_info)
         )
-        if user_in_db and patient_in_db:
+        if patient_in_db:
             return {
                 "username": patient_in_db.personal_info.username,
                 "password": raw_password,
                 "user_id": patient_in_db.user_id,
             }
-        if not user_in_db:
-            raise HTTPException(
-                status_code=500,
-                detail='Error in create user'
-            )
-        if not patient_in_db:
+        if err or not patient_in_db:
             raise HTTPException(
                 status_code=500,
                 detail='Error in create patient'

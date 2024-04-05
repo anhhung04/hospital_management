@@ -16,6 +16,7 @@ class ProgressType(Enum):
 class Patient(Base):
     __tablename__ = 'patients'
     user_id = mapped_column(ObjectID, ForeignKey('users.id'), primary_key=True)
+    medical_record_id = mapped_column(ForeignKey('medical_records.id'))
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="patient")
     personal_info = relationship("User", primaryjoin="Patient.user_id == User.id", uselist=False)
 
@@ -34,7 +35,6 @@ class MedicalRecord(Base):
     drug_allergies = mapped_column(String)
     food_allergies = mapped_column(String)
     medical_history = mapped_column(String)
-    patient_id = mapped_column(ForeignKey('patients.user_id'))
     patient: Mapped["Patient"] = relationship(
         "Patient", back_populates="medical_record")
     progress: Mapped[List["PatientProgress"]] = relationship(

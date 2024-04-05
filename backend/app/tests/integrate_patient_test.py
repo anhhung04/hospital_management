@@ -7,6 +7,8 @@ class TestPatient(TestIntegration):
         self._route = "/patient"
 
     def test_list_patient(self):
+        for i in range(5):
+            self.test_create_patient()
         res = self._s.get(self.path('/list'), params={
             "page": 1,
             "limit": 5
@@ -53,14 +55,17 @@ class TestPatient(TestIntegration):
             "page": 1,
             "limit": 1
         })
+        print(res.json())
         data = res.json()['data']
         patient_id = data[0]['id']
         res = self._s.patch(self.path(f"/update/{patient_id}"), json={
-            "first_name":        "new first name",
-            "last_name":        "new last name",
-            "birth_date":       "2004-05-06",
+            "personal_info": {
+                "first_name":        "new first name",
+                "last_name":        "new last name",
+                "birth_date":       "2004-05-06",
+            }
         })
-        print(res.json()['data'])
+        print(res.json())
         self.assertEqual(res.status_code, 200)
         self.assertEqual(
             res.json()['data']['personal_info']["first_name"], "new first name")

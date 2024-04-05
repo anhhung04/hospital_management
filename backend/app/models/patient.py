@@ -1,14 +1,14 @@
 from pydantic import BaseModel
 from models.response import BaseResponseModel
-from models.user import PatchUserDetailModel, UserDetail, AddUserModel
-from models.medical_record import MedicalRecordModel
+from models.user import PatchUserDetailModel, UserDetail, AddUserModel, AddUserDetailModel
+from models.medical_record import NewMedicalRecordModel, MedicalRecordModel, PatchMedicalRecordModel
 from typing import Optional
 
 
 class PatientModel(BaseModel):
     id: str
     full_name: str
-    phone_number: str
+    phone_number: Optional[str | None] = None
     appointment_date: Optional[str | None] = None
     medical_record_id: Optional[int | None] = None
 
@@ -21,6 +21,8 @@ class ListPatientsModel(BaseResponseModel):
 
 class AddPatientModel(BaseModel):
     user_id: str
+    medical_record: NewMedicalRecordModel
+    personal_info: AddUserDetailModel
 
 
 class AddPatientRequestModel(AddUserModel):
@@ -49,9 +51,11 @@ class PatientDetailResponseModel(BaseResponseModel):
     data: PatientDetailModel
 
 
-class PatchPatientModel(PatchUserDetailModel):
-    pass
+class PatchPatientModel(BaseModel):
+    personal_info: Optional[PatchUserDetailModel | None] = None
+    medical_record: Optional[PatchMedicalRecordModel | None] = None
 
 
 class QueryPatientModel(BaseModel):
     user_id: Optional[str | None] = None
+    max_progress: int = 1

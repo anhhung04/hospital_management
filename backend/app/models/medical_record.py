@@ -12,7 +12,6 @@ class ProgressRecordModel(BaseModel):
 
 class MedicalRecordModel(BaseModel):
     id: int
-    patient_id: str
     weight: Optional[float | None]
     height: Optional[float | None]
     note: Optional[str]
@@ -24,9 +23,8 @@ class MedicalRecordModel(BaseModel):
 
 
 class NewMedicalRecordModel(BaseModel):
-    patient_id: str
-    weight: float
-    height: float
+    weight: Optional[float | None] = None
+    height: Optional[float | None] = None
     note: Optional[str | None] = None
     current_treatment: Optional[str | None] = None
     drug_allergies: Optional[str | None] = None
@@ -52,5 +50,5 @@ class MedicalRecordResponseModel(BaseResponseModel):
 
 
 class QueryMedicalRecordModel(BaseModel):
-    patient_id: Optional[str | None] = None
     id: Optional[int | None] = None
+    patient_id: Optional[str | None] = None
