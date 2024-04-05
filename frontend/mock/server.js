@@ -60,6 +60,32 @@ export function makeServer({ environment, namespace } =
                     return JSON.stringify(wrap_response(401, "Invalid credentials", {}));
                 }
             });
+            this.post('/auth/password/change', (schema, request) => {
+                let jsonData = JSON.parse(request.requestBody);
+                if (jsonData.old_password === 'guest1'){
+                    return {
+                        "status": 200,
+                        "message": "string",
+                        "data": {
+                          "success": true
+                        }
+                      }
+                }else{
+                    return {
+                        "status": 401,
+                        "detail": [
+                          {
+                            "loc": [
+                              "string",
+                              0
+                            ],
+                            "msg": "string",
+                            "type": "string"
+                          }
+                        ]
+                      }
+                }
+            });
             this.get('/patients/list', () => {
                 return [
                         {
