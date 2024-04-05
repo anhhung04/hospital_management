@@ -1,9 +1,11 @@
-from sqlalchemy.orm import Session
-from services import IService
 from util.log import logger
 from fastapi import HTTPException, Depends, status
 from models.user import UserDetail
-from models.employee import EmployeeModel, EmployeeDetailModel, QueryEmployeeModel
+from models.employee import (
+  EmployeeModel, 
+  EmployeeDetailModel, 
+  QueryEmployeeModel
+)
 from permissions import Permission
 from permissions.user import UserRole
 from repository.employee import EmployeeRepo

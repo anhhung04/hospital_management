@@ -3,6 +3,7 @@ from models.response import BaseResponseModel
 from typing import Optional
 from models.user import UserDetail
 from repository.schemas.employee import EmployeeStatus, EducateLevel
+from permissions.user import EmployeeType
 
 class EmployeeModel(BaseModel):
     id: str
@@ -14,7 +15,7 @@ class ListEmployeeModel(BaseResponseModel):
     data: list[EmployeeModel]
 
 class EmployeeDetailModel(BaseModel):
-    employee_type: str
+    employee_type: EmployeeType
     educational_level: EducateLevel
     begin_date: str
     end_date: str
@@ -47,3 +48,5 @@ class NewEmployeeResponseModel(BaseResponseModel):
 class QueryEmployeeModel(BaseModel):
     user_id: str
 
+class EmployeeTypeModel(BaseModel):
+    employee_type: EmployeeType
