@@ -1,14 +1,5 @@
-import AddStaff from "./addStaff";
-import AddStaffNonHeader from "./addStaffNonHeader";
-import PropTypes from 'prop-types';
-
-ProgressContent.propTypes = {
-    isAdd: PropTypes.bool,
-    setAdd: PropTypes.func,
-    numStaffAdded: PropTypes.number,
-    removeStaffAdded: PropTypes.func,
-    addStaff: PropTypes.func,
-};
+import AddStaff from "./components/addStaff";
+import AddStaffNonHeader from "./components/addStaffNonHeader";
 
 function ProgressContent(props) {
   return (
