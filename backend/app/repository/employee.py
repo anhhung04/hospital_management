@@ -19,7 +19,7 @@ class EmployeeRepo:
       self._sess = session
       self._user_repo = user_repo
 
-    async def list_employees(self, employee_type: str, page: int, employee_per_page: int) -> list[Employee]:
+    async def list_employees(self, employee_type: str, page: int, employee_per_page: int) -> Tuple[list[Employee], Exception]:
         try:
             query = self._sess.query(Employee)
             if employee_type != "all" and employee_type != "other":
