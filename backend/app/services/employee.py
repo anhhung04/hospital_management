@@ -27,7 +27,7 @@ class EmployeeService:
     @Permission.permit([UserRole.ADMIN])
     async def get_employees(self, employee_type: str, page: int = 1, employee_per_page: int = 10):
         page = 1 if page < 1 else page
-        employee_per_page = 1 if employee_per_page < 0 else employee_per_page
+        employee_per_page = 1 if employee_per_page <= 0 else employee_per_page
         employees, error = await self._employee_repo.list_employees(employee_type, page, employee_per_page)
         if error:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -50,8 +50,11 @@ class EmployeeService:
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def get(self, query: QueryEmployeeModel):
         if Permission.has_role([UserRole.EMPLOYEE], self._current_user):
-            if self._current_user['sub'] != query.user_id:
-                raise HTTPException(status_code=403, detail='Permission denied')
+            if self._current_user.id() != query.user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN, 
+                    detail='Permission denied'
+                )
         employee, error = await self._employee_repo.get(query)
         if error:
             raise HTTPException(
