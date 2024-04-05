@@ -49,7 +49,7 @@ class NewEmployeeResponseModel(BaseResponseModel):
 class QueryEmployeeModel(BaseModel):
     user_id: str
 
-class EmployeeTypeQueryModel(str, Enum):
+class EmployeeTypeModel(str, Enum):
     ALL = 'all'
     DOCTOR = 'doctor'
     NURSE = 'nurse'

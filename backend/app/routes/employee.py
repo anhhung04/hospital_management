@@ -10,23 +10,23 @@ from models.employee import(
   NewEmployeeResponseModel, 
   AddEmployeeRequestModel,
   QueryEmployeeModel,
-  EmployeeTypeQueryModel
+  EmployeeTypeModel
 )
 from models.request import IdPath
 
 
 router = APIRouter(tags=["employee"])
 
-@router.get("/list/{employee_type}", response_model=ListEmployeeModel)
+@router.get("/list", response_model=ListEmployeeModel)
 async def list_employees(
-    employee_type: EmployeeTypeQueryModel,
+    type: EmployeeTypeModel,
     page: Annotated[int, Query(gt=0)] = 1,
     employee_per_page: Annotated[int, Query(gt=0)] = 10,
     service: EmployeeService = Depends(EmployeeService)
 ):
     try:
         employees = await service.get_employees(
-          employee_type,  page, employee_per_page
+          type,  page, employee_per_page
         )
     except HTTPException as error:
         return APIResponse.as_json(
