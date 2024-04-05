@@ -21,13 +21,13 @@ function Homepage() {
             .then((response) => response.json())
             .then((data) => {
                 setPatients(data);
-                //console.log(data);
+                console.log(data);
             });
     }, []);
 
     const navigate = useNavigate();
 
-    //console.log("data",typeof listpatient.data);
+    console.log("data",typeof listpatient.data);
  
     return ( <div className="w-full bg-[#EFF7FE] flex justify-center items-center">
         <div className="w-[1080px] h-[1116px] flex flex-col gap-[45px]">
