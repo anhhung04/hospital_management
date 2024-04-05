@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, Query
 from services.patient import PatientService
 from typing import Annotated
 from util.response import APIResponse
