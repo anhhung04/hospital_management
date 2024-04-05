@@ -1,5 +1,10 @@
-import { useState } from "react";
-import React from 'react';
+import PropTypes from 'prop-types';
+
+TableList.propTypes = {
+    children: PropTypes.node,
+    handleClick: PropTypes.func,
+    handleCheckedAll: PropTypes.func,
+};
 
 function TableList({children,handleClick, handleCheckedAll}) {
     return ( <div className="w-[1080px] h-[978px] inline-flex flex-col items-end gap-[26px]  ">
