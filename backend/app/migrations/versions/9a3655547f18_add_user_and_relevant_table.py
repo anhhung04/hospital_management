@@ -67,7 +67,7 @@ def upgrade() -> None:
     sa.Column('end_date', sa.DATE(), autoincrement=False, nullable=True),
     sa.Column('faculty', sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.Column('status', postgresql.ENUM('ACTIVE', 'INACTIVE', 'PENDING',
-                  'SUSPENDED', 'WIP', name='emlpoyeestatus'), autoincrement=False, nullable=True),
+                  'SUSPENDED', 'WIP', name='employeestatus'), autoincrement=False, nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name='employees_user_id_fkey'),
     sa.PrimaryKeyConstraint('user_id', name='employees_pkey')
     )

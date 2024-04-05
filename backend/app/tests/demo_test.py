@@ -4,6 +4,7 @@ from app import app
 
 client = TestClient(app)
 
+
 class TestDemo(TestCase):
     def test_demo(self):
         response = client.get("/api/demo/hello")

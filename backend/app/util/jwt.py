@@ -4,14 +4,20 @@ from datetime import datetime, timedelta
 from util.crypto import PasswordContext
 from util.log import logger
 from redis import Redis
+from repository import RedisStorage
 from collections import namedtuple
 from repository.schemas.user import ObjectID
+from fastapi import HTTPException, status, Depends
 
 JWTPayload = namedtuple("JWTPayload", ["username", "id", "role"])
 
 
 class JWTHandler:
-    def __init__(self, redis_client: Redis, expire_minutes: int = 1440):
+    def __init__(
+        self,
+        expire_minutes: int = 1440,
+        redis_client: Redis = Depends(RedisStorage.get)
+    ):
         self._rc = redis_client
         self._expire_minutes = expire_minutes
 
@@ -37,7 +43,7 @@ class JWTHandler:
         token: str = jwt.encode(jwt_payload, secret_key, algorithm="HS256")
         return token, None
 
-    def verify(self, token: str) -> Tuple[dict, Exception]:
+    def verify(self, token: str) -> dict:
         try:
             jwt_payload: dict = jwt.get_unverified_claims(token)
             user_id: ObjectID = jwt_payload.get('sub', None)
@@ -45,16 +51,23 @@ class JWTHandler:
                 float(jwt_payload.get('exp', 0))
             )
             if exp_time.__le__(datetime.now()):
-                return None, "Token expired!"
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token expired!"
+                )
             secret_key = self._rc.get(user_id)
             if not secret_key:
-                return None, "Token expired!"
-
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token invalid!"
+                )
             payload: dict = jwt.decode(token, secret_key, algorithms=["HS256"])
-            return payload, None
+            return payload
         except JWTError as e:
-            logger.error("verify_access_token error", reason=str(e))
-            return None, "Token invalid!"
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=e
+            )
 
     @staticmethod
     def unverify_decode(token: str) -> dict:
