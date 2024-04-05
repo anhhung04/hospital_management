@@ -9,6 +9,11 @@ from models.patient import (
 )
 from models.user import AddUserDetailModel, UserDetail
 from models.medical_record import NewMedicalRecordModel, MedicalRecordModel
+from models.patient_progress import (
+    NewPatientProgressModel,
+    QueryPatientProgressModel,
+    PatientProgressModel
+)
 from permissions import Permission
 from permissions.user import UserRole
 from repository.user import UserRepo
@@ -46,7 +51,7 @@ class PatientService:
                 appointment_date = None
                 if patient.medical_record:
                     appointment_date = PatientService.find_appointment_date(
-                        patient.medical_record.progress
+                        patient.medical_record
                     )
                 return PatientModel(
                     id=patient.user_id,
@@ -89,7 +94,7 @@ class PatientService:
         if patient.medical_record:
             patient.medical_record.progress = patient.medical_record.progress[-query.max_progress:]
             appointment_date = PatientService.find_appointment_date(
-                patient.medical_record.progress
+                patient.medical_record
             )
         return PatientDetailModel(
             appointment_date=appointment_date,
@@ -163,8 +168,27 @@ class PatientService:
                 obj=patient.medical_record, strict=False, from_attributes=True
             ),
             appointment_date=PatientService.find_appointment_date(
-                patient.medical_record.progress
+                patient.medical_record
             )
+        ).model_dump()
+
+    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
+    async def add_progress(
+        self,
+        query: QueryPatientProgressModel,
+        progress: NewPatientProgressModel
+    ):
+        progress, err = await self._patient_repo.create_progress(
+            query.patient_id,
+            progress
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail='Error in add progress'
+            )
+        return PatientProgressModel.model_validate(
+            obj=progress, strict=False, from_attributes=True
         ).model_dump()
 
     @staticmethod

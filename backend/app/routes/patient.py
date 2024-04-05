@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, Query
 from services.patient import PatientService
-from fastapi import Query, status, HTTPException, Path
+from fastapi import Query, status, HTTPException
 from typing import Annotated
 from util.response import APIResponse
 from models.patient import (
     ListPatientsModel, AddPatientRequestModel, NewPatientReponseModel,
     PatientDetailResponseModel, QueryPatientModel, PatchPatientModel
 )
+from models.patient_progress import NewPatientProgressModel, QueryPatientProgressModel, PatientProgressResponseModel
+from models.request import IdPath
 
 router = APIRouter()
 
@@ -32,7 +34,7 @@ async def list_patients(
 
 @router.get("/{patient_id}", tags=["patient"], response_model=PatientDetailResponseModel)
 async def get_patient(
-    patient_id: Annotated[str, Path(regex=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")],
+    patient_id: IdPath,
     max_progress: int = Query(lt=10, gt=0, default=1),
     service: PatientService = Depends(PatientService),
 ):
@@ -70,7 +72,7 @@ async def create_patient(
 
 @router.patch("/update/{patient_id}", tags=["patient"], response_model=PatientDetailResponseModel)
 async def patch_patient(
-    patient_id: Annotated[str, Path(regex=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")],
+    patient_id: IdPath,
     patient_update: PatchPatientModel,
     service: PatientService = Depends(PatientService),
 ):
@@ -85,4 +87,30 @@ async def patch_patient(
         )
     return APIResponse.as_json(
         code=status.HTTP_200_OK, data=patient, message="Patient updated successfully"
+    )
+
+
+@router.post(
+    "/{patient_id}/progress/create",
+    tags=["patient"],
+    response_model=PatientProgressResponseModel
+)
+async def add_new_patient_progress(
+    patient_id: IdPath,
+    progress: NewPatientProgressModel,
+    service: PatientService = Depends(PatientService),
+):
+    try:
+        new_progress = await service.add_progress(
+            QueryPatientProgressModel(patient_id=patient_id),
+            progress
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=new_progress,
+        message="Progress added successfully"
     )

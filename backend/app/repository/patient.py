@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import Tuple
 from models.patient import QueryPatientModel, PatchPatientModel, AddPatientModel
+from models.patient_progress import NewPatientProgressModel
 from repository import Storage
 from fastapi import Depends
 
@@ -92,7 +93,15 @@ class PatientRepo:
         limit: int
     ) -> Tuple[list[Patient], Exception]:
         try:
-            patients = self._sess.query(Patient).limit(
+            patients = self._sess.query(Patient).outerjoin(
+                self._sess.query(MedicalRecord).filter(
+                    MedicalRecord.id == Patient.medical_record_id
+                ).outerjoin(
+                    self._sess.query(PatientProgress).filter(
+                        PatientProgress.medical_record_id == MedicalRecord.id
+                    ).limit(1).subquery()
+                ).subquery()
+            ).limit(
                 limit
             ).offset(
                 (page - 1) * limit
@@ -100,3 +109,25 @@ class PatientRepo:
         except Exception as err:
             return [], err
         return patients, None
+
+    async def create_progress(
+        self,
+        patient_id: int,
+        progress: NewPatientProgressModel
+    ) -> Tuple[PatientProgress, Exception]:
+        try:
+            medical_record_id = self._sess.query(Patient.medical_record_id).filter(
+                Patient.user_id == patient_id
+            ).first().tuple()[0]
+            if not medical_record_id:
+                raise Exception("Medical record not found")
+            new_progress = PatientProgress(
+                medical_record_id=medical_record_id,
+                patient_id=patient_id,
+                **progress.model_dump()
+            )
+            self._sess.add(new_progress)
+            self._sess.commit()
+        except Exception as err:
+            return None, err
+        return new_progress, None

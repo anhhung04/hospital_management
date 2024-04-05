@@ -1,13 +1,20 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from models.response import BaseResponseModel
 from typing import Optional
+from datetime import datetime
 
 class ProgressRecordModel(BaseModel):
-    id: str
+    id: int
     created_at: str
     treatment_schedule: str
     treatment_type: str
     patient_condition: str
+
+    @validator('created_at', pre=True)
+    def validate_created_at(cls, v):
+        if v and isinstance(v, datetime):
+            return v.strftime('%Y-%m-%d %H:%M:%S')
+        return str(v)
 
 
 class MedicalRecordModel(BaseModel):

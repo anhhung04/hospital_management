@@ -1,5 +1,5 @@
 from tests import TestIntegration, gen_name, gen_username, gen_ssn
-
+import random
 
 class TestPatient(TestIntegration):
     def __init__(self, methodName: str = "runTest") -> None:
@@ -49,6 +49,10 @@ class TestPatient(TestIntegration):
         self.assertIsNotNone(res.json()['data']['username'])
         self.assertIsNotNone(res.json()['data']['password'])
         self.assertIsNotNone(res.json()['data']['user_id'])
+        username = res.json()['data']['username']
+        password = res.json()['data']['password']
+        patient_id = res.json()['data']['user_id']
+        return username, password, patient_id
 
     def test_update_patient(self):
         res = self._s.get(self.path('/list'), params={
@@ -72,3 +76,34 @@ class TestPatient(TestIntegration):
         self.assertEqual(
             res.json()['data']['personal_info']["last_name"], "new last name")
         self.assertEqual(res.json()['data']['personal_info']["id"], patient_id)
+
+    def test_add_new_progress(self):
+        _, _, patient_id = self.test_create_patient()
+        res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
+            "treatment_schedule": "everyday",
+            "duration": 30,
+            "treatment_type": gen_username(),
+            "patient_condition": "good"
+        })
+        print(res.json())
+        self.assertEqual(res.status_code, 200)
+
+    def test_view_progress(self):
+        _, _, patient_id = self.test_create_patient()
+        for _ in range(20):
+            res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
+                "treatment_schedule": "everyday",
+                "duration": 30,
+                "treatment_type": gen_username(),
+                "patient_condition": "good"
+            })
+            print(res.json())
+            self.assertEqual(res.status_code, 200)
+        max_progress = random.randint(1, 8)
+        res = self._s.get(self.path(f"/{patient_id}"), params={
+            "max_progress": max_progress
+        })
+        print(res.json())
+        self.assertEqual(res.status_code, 200)
+        data = res.json()['data']
+        self.assertEqual(len(data['medical_record']['progress']), max_progress)
