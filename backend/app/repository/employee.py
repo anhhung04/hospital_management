@@ -1,5 +1,5 @@
 from collections import namedtuple
-from repository.schemas.employee import Employee 
+from repository.schemas.employees import Employee 
 from repository.user import UserRepo
 from repository.schemas.user import User
 from typing import Tuple
