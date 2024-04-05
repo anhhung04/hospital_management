@@ -49,11 +49,8 @@ class NewEmployeeResponseModel(BaseResponseModel):
 class QueryEmployeeModel(BaseModel):
     user_id: str
 
-class EmployeeTypeModel(str, Enum):
-    ALL: "all"
+class EmployeeTypeQueryModel(str, Enum):
+    ALL = 'all'
     DOCTOR = 'doctor'
     NURSE = 'nurse'
     OTHER = 'other'
-
-class EmployeeTypeQueryModel(BaseModel):
-    employee_type: EmployeeTypeModel

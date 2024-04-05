@@ -16,24 +16,24 @@ from models.employee import(
 
 router = APIRouter(tags=["employee"])
 
-# @router.get("/list/{employee_type}", response_model=ListEmployeeModel)
-# async def list_employees(
-#     employee_type: EmployeeTypeQueryModel,
-#     page: Annotated[int, Query(gt=0)] = 1,
-#     employee_per_page: Annotated[int, Query(gt=0)] = 10,
-#     service: EmployeeService = Depends(EmployeeService)
-# ):
-#     try:
-#         employees = await service.get_employees(
-#             employee_type, page, employee_per_page
-#         )
-#     except HTTPException as error:
-#         return APIResponse.as_json(
-#             code=error.status_code, message=str(error.detail), data={}
-#         )
-#     return APIResponse.as_json(
-#         code=status.HTTP_200_OK, data=employees, message="Employees fetched successful"
-#     )
+@router.get("/list/{employee_type}", response_model=ListEmployeeModel)
+async def list_employees(
+    employee_type: EmployeeTypeQueryModel,
+    page: Annotated[int, Query(gt=0)] = 1,
+    employee_per_page: Annotated[int, Query(gt=0)] = 10,
+    service: EmployeeService = Depends(EmployeeService)
+):
+    try:
+        employees = await service.get_employees(
+          employee_type,  page, employee_per_page
+        )
+    except HTTPException as error:
+        return APIResponse.as_json(
+            code=error.status_code, message=str(error.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, data=employees, message="Employees fetched successful"
+    )
 
 @router.get("/{employee_id}", response_model=EmployeeDetailReponseModel)
 async def get_employee(
