@@ -3,8 +3,6 @@ from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTo
 from util.response import APIResponse
 from services.auth import AuthService
 from util.jwt import JWTHandler
-from typing import Annotated
-from pydantic import Field
 
 router = APIRouter()
 
