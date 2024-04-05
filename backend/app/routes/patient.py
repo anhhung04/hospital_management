@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, status, HTTPException
 from services.patient import PatientService
-from fastapi import Query, status, HTTPException
 from typing import Annotated
 from util.response import APIResponse
 from models.patient import (

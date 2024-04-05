@@ -1,7 +1,7 @@
 import uvicorn
 import os
 
-from fastapi import FastAPI, status, Depends
+from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError, HTTPException
 from config import config
 
