@@ -4,6 +4,7 @@ from typing import Optional
 from models.user import UserDetail
 from repository.schemas.employee import EmployeeStatus, EducateLevel
 from permissions.user import EmployeeType
+from enum import Enum
 
 class EmployeeModel(BaseModel):
     id: str
@@ -48,5 +49,11 @@ class NewEmployeeResponseModel(BaseResponseModel):
 class QueryEmployeeModel(BaseModel):
     user_id: str
 
-class EmployeeTypeModel(BaseModel):
-    employee_type: EmployeeType
+class EmployeeTypeModel(str, Enum):
+    ALL: "all"
+    DOCTOR = 'doctor'
+    NURSE = 'nurse'
+    OTHER = 'other'
+
+class EmployeeTypeQueryModel(BaseModel):
+    employee_type: EmployeeTypeModel
