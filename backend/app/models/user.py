@@ -1,12 +1,19 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 from models.response import BaseResponseModel
-from typing import Optional
+from typing import Optional, Annotated
 from datetime import datetime
 
 class UserAuth(BaseModel):
     email: Optional[str | None] = None
     username: Optional[str | None] = None
     password: str
+
+
+class ChangePasswordRequestModel(BaseModel):
+    old_password: Annotated[str, Field(
+        description="old password", max_length=255)]
+    new_password: Annotated[str, Field(
+        description="new password", max_length=255)]
 
 class ChangePasswordStateModel(BaseModel):
     success: bool

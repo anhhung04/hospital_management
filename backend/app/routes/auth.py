@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, HTTPException, Depends
-from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse, LogoutResponseModel, UserDetailResponse, ChangePasswordResponse
+from models.user import UserAuth, UserAuthResponse, VerifyTokenRequest, VerifyTokenReponse, LogoutResponseModel, UserDetailResponse, ChangePasswordResponse, ChangePasswordRequestModel
 from util.response import APIResponse
 from services.auth import AuthService
 from util.jwt import JWTHandler
@@ -45,15 +45,13 @@ async def verify_user_token(
 
 @router.post("/password/change", response_model=ChangePasswordResponse, tags=["auth"])
 async def changge_password(
-    old_password: Annotated[str, Field(description="old password", max_length=255)],
-    new_password: Annotated[str, Field(
-        description="new password", max_length=255)],
+    password_req: ChangePasswordRequestModel,
     service: AuthService = Depends(AuthService)
 ):
     try:
         await service.change_password(
-            old_password,
-            new_password
+            password_req.old_password,
+            password_req.new_password
         )
     except HTTPException as e:
         return APIResponse.as_json(e.status_code, str(e.detail), {"success": False})
