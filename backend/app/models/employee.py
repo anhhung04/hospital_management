@@ -13,13 +13,14 @@ class EmployeeModel(BaseModel):
 class ListEmployeeModel(BaseResponseModel):
     data: list[EmployeeModel]
 
-class EmployeeDetailModel(UserDetail):
+class EmployeeDetailModel(BaseModel):
     employee_type: str
     educational_level: EducateLevel
     begin_date: str
     end_date: str
     faculty: str
     status: EmployeeStatus
+    personal_info: UserDetail
 
 class EmployeeDetailReponseModel(BaseResponseModel):
     data: EmployeeDetailModel
@@ -42,5 +43,7 @@ class NewEmployeeModel(BaseModel):
 
 class NewEmployeeResponseModel(BaseResponseModel):
     data: NewEmployeeModel
-    
+
+class QueryEmployeeModel(BaseModel):
+    user_id: str
 
