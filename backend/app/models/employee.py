@@ -9,8 +9,8 @@ from enum import Enum
 class EmployeeModel(BaseModel):
     id: str
     full_name: str
-    falcuty: str
-    status: EmployeeStatus
+    faculty: str
+    status: Optional[EmployeeStatus | None] = None
 
 class ListEmployeeModel(BaseResponseModel):
     data: list[EmployeeModel]

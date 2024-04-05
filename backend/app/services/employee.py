@@ -24,7 +24,7 @@ class EmployeeService:
         self._user_repo = user_repo
 
     
-    @Permission.permit([UserRole.ADMIN])
+    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
     async def get_employees(self, employee_type: str, page: int = 1, employee_per_page: int = 10):
         page = 1 if page < 1 else page
         employee_per_page = 1 if employee_per_page <= 0 else employee_per_page
