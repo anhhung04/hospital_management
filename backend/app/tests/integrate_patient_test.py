@@ -62,7 +62,7 @@ class TestPatient(TestIntegration):
         print(res.json())
         data = res.json()['data']
         patient_id = data[0]['id']
-        res = self._s.patch(self.path(f"/update/{patient_id}"), json={
+        res = self._s.patch(self.path(f"/{patient_id}/update"), json={
             "personal_info": {
                 "first_name":        "new first name",
                 "last_name":        "new last name",
