@@ -69,7 +69,7 @@ async def create_patient(
     )
 
 
-@router.patch("/update/{patient_id}", tags=["patient"], response_model=PatientDetailResponseModel)
+@router.patch("/{patient_id}/update", tags=["patient"], response_model=PatientDetailResponseModel)
 async def patch_patient(
     patient_id: IdPath,
     patient_update: PatchPatientModel,
