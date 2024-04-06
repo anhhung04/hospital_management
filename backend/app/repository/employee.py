@@ -6,7 +6,11 @@ from typing import Tuple
 from fastapi import Depends
 from repository import Storage
 from sqlalchemy.orm import Session
-from models.employee import QueryEmployeeModel
+from sqlalchemy.exc import IntegrityError
+from models.employee import(
+  QueryEmployeeModel, 
+  AddEmployeeModel
+)
 
 GetEmployeeQuery = namedtuple("GetEmployeeQuery", ["id", "username"])
 
@@ -38,4 +42,26 @@ class EmployeeRepo:
         except Exception as e:
             return None, e
         return employee, None
+    
+    async def create(self, employee_info: AddEmployeeModel) -> Tuple[Employee, Exception]:
+        try:
+            new_employee = Employee(
+                user_id=employee_info.user_id,
+                employee_type=employee_info.employee_type,
+                education_level=employee_info.education_level,
+                begin_date=employee_info.begin_date,
+                end_date=employee_info.end_date,
+                faculty=employee_info.faculty,
+                status=employee_info.status,
+                personal_info=User(**employee_info.personal_info.model_dump())
+            )
+            self._sess.add(new_employee)
+            self._sess.commit()
+        except IntegrityError as e:
+            self._sess.rollback()
+            return None, e
+        except Exception as e:
+            return None, e
+        return new_employee, None
+
 

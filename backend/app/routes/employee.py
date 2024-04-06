@@ -54,12 +54,11 @@ async def get_employee(
         
 @router.post("/create", response_model=NewEmployeeResponseModel)
 async def create_employee(
-    new_user: AddEmployeeRequestModel,
-    request: Request,
-    db_sess=Depends(Storage.get)
+    new_employee_request: AddEmployeeRequestModel,
+    service: EmployeeService = Depends(EmployeeService)
 ):
     try:
-        employee = await EmployeeService(db_sess, request.state.user).create(new_user.model_dump())
+        employee = await service.create(new_employee_request)
     except HTTPException as e:
         return APIResponse.as_json(
             code=e.status_code, message=str(e.detail), data={}

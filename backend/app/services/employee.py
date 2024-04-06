@@ -1,16 +1,20 @@
 from util.log import logger
 from fastapi import HTTPException, Depends, status
-from models.user import UserDetail
+from models.user import UserDetail, AddUserDetailModel
 from models.employee import (
   EmployeeModel, 
   EmployeeDetailModel, 
-  QueryEmployeeModel
+  QueryEmployeeModel,
+  AddEmployeeRequestModel,
+  AddEmployeeModel
 )
 from permissions import Permission
 from permissions.user import UserRole, EmployeeType
 from repository.employee import EmployeeRepo
 from repository.user import UserRepo
 from middleware.user_ctx import UserContext
+from util.crypto import PasswordContext
+from uuid import uuid4
 
 class EmployeeService:
     def __init__(
@@ -77,4 +81,43 @@ class EmployeeService:
                 obj=employee.personal_info, strict=False, from_attributes=True
             )
         ).model_dump()
+    
+    @Permission.permit([UserRole.EMPLOYEE])
+    async def create(self, employee: AddEmployeeRequestModel):
+        raw_password = PasswordContext.rand_key()
+        username = f"employee_{employee.ssn}"
+        user_info = employee.model_dump()
+        employee_id = str(uuid4())
+        user_info.update({
+            "id": employee_id,
+            "username": username,
+            "password": PasswordContext(raw_password, username).hash(),
+            "role": Permission(UserRole.EMPLOYEE).get(),
+        })
+        employee_info = {
+            "user_id": employee_id,
+            "employee_type": None,
+            "education_level": None,
+            "begin_date": None,
+            "end_date": None,
+            "faculty": None,
+            "status": None,
+            "personal_info": AddUserDetailModel.model_validate(user_info).model_dump()
+        }
+        employee_in_db, error = await self._employee_repo.create(
+            AddEmployeeModel.model_validate(employee_info)
+        )
+        if employee_in_db:
+            return {
+                "username": employee_in_db.personal_info.username,
+                "password": raw_password,
+                "user_id": employee_in_db.user_id
+            }
+        if error or not employee_in_db:
+            print(error)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error in create employee"
+            )
         
+            
