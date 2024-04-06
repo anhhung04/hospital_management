@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from models.response import BaseResponseModel
 from typing import Optional
 from models.user import UserDetail
@@ -10,18 +10,20 @@ class EmployeeModel(BaseModel):
     id: str
     full_name: str
     faculty: str
-    status: Optional[str | None] = None
+    status: Optional[EmployeeStatus | None] = None
 
 class ListEmployeeModel(BaseResponseModel):
     data: list[EmployeeModel]
 
 class EmployeeDetailModel(BaseModel):
-    employee_type: str
-    educational_level: str
+    model_config = ConfigDict(use_enum_values=True)
+
+    employee_type: EmployeeType
+    educational_level: EducateLevel
     begin_date: str
     end_date: str
     faculty: str
-    status: Optional[str | None] = None
+    status: Optional[EmployeeStatus | None] = None
     personal_info: UserDetail
 
 class EmployeeDetailReponseModel(BaseResponseModel):
