@@ -10,18 +10,18 @@ class EmployeeModel(BaseModel):
     id: str
     full_name: str
     faculty: str
-    status: Optional[EmployeeStatus | None] = None
+    status: Optional[str | None] = None
 
 class ListEmployeeModel(BaseResponseModel):
     data: list[EmployeeModel]
 
 class EmployeeDetailModel(BaseModel):
-    employee_type: EmployeeType
-    educational_level: EducateLevel
+    employee_type: str
+    educational_level: str
     begin_date: str
     end_date: str
     faculty: str
-    status: Optional[EmployeeStatus | None] = None
+    status: Optional[str | None] = None
     personal_info: UserDetail
 
 class EmployeeDetailReponseModel(BaseResponseModel):

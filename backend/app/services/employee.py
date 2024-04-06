@@ -67,8 +67,8 @@ class EmployeeService:
                 detail='Employee not found'
             )
         return EmployeeDetailModel(
-            employee_type=employee.employee_type,
-            educational_level=employee.education_level,
+            employee_type=employee.employee_type.value,
+            educational_level=employee.education_level.value,
             begin_date=str(employee.begin_date),
             end_date=str(employee.end_date),
             faculty=employee.faculty,

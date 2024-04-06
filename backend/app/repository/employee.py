@@ -25,17 +25,17 @@ class EmployeeRepo:
             if employee_type != "all" and employee_type != "other":
                 query = query.filter(Employee.employee_type == employee_type)
             elif employee_type == "other":
-               query = query.filter(Employee.employee_type != 'doctor' | Employee.employee_type != 'nurse') 
+                query = query.filter(Employee.employee_type != 'doctor' | Employee.employee_type != 'nurse') 
             employees = query.limit(employee_per_page).offset((page - 1) * employee_per_page).all()
         except Exception as e:
-          return [], e
+            return [], e
         return employees, None
     
     async def get(self, query: QueryEmployeeModel) -> Tuple[Employee, Exception]:
         try:
-          employee = self._sess.query(Employee).filter(
-              Employee.user_id == query.user_id).first()
+            employee = self._sess.query(Employee).filter(
+                Employee.user_id == query.user_id).first()
         except Exception as e:
-          return None, e
+            return None, e
         return employee, None
 
