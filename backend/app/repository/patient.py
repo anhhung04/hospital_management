@@ -51,6 +51,7 @@ class PatientRepo:
             self._sess.add(new_patient)
             self._sess.commit()
         except IntegrityError as err:
+            self._sess.rollback()
             return None, err
         except Exception as err:
             return None, err
@@ -84,6 +85,7 @@ class PatientRepo:
             self._sess.commit()
             self._sess.refresh(patient)
         except Exception as err:
+            self._sess.rollback()
             return None, err
         return patient, None
 
@@ -129,5 +131,6 @@ class PatientRepo:
             self._sess.add(new_progress)
             self._sess.commit()
         except Exception as err:
+            self._sess.rollback()
             return None, err
         return new_progress, None
