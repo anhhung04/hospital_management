@@ -10,7 +10,8 @@ from models.employee import(
   NewEmployeeResponseModel, 
   AddEmployeeRequestModel,
   QueryEmployeeModel,
-  EmployeeTypeModel
+  EmployeeTypeModel,
+  PatchEmployeeModel
 )
 from models.request import IdPath
 
@@ -65,4 +66,23 @@ async def create_employee(
         )
     return APIResponse.as_json(
         code=status.HTTP_200_OK, message="Employee created successfully", data=employee
+    )
+
+@router.patch("/{employee_id}/update", response_model=EmployeeDetailReponseModel)
+async def patch_update(
+    employee_id: IdPath,
+    employee_update: PatchEmployeeModel,
+    service: EmployeeService = Depends(EmployeeService)
+):
+    try:
+        employee = await service.update(
+            QueryEmployeeModel(user_id=employee_id),
+            employee_update
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, message="Employee updated successfully", data=employee
     )

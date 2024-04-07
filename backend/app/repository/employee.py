@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.employee import(
   QueryEmployeeModel, 
-  AddEmployeeModel
+  AddEmployeeModel,
+  PatchEmployeeModel
 )
 
 GetEmployeeQuery = namedtuple("GetEmployeeQuery", ["id", "username"])
@@ -64,4 +65,36 @@ class EmployeeRepo:
             return None, e
         return new_employee, None
 
+    async def update(
+        self, 
+        query: QueryEmployeeModel, 
+        employee_update: PatchEmployeeModel
+    ) -> Tuple[Employee, Exception]:
+        try:
+            employee, error = await self.get(query)
+            if error:
+                return None, error
+            new_employee_dict = employee_update.model_dump()
+            print(new_employee_dict)
+            for attr, value in new_employee_dict.items():
+                if attr == "personal_info" and new_employee_dict.get("personal_info"):
+                    for _attr, _value in new_employee_dict.get("personal_info", {}).items():
+                        setattr(
+                            employee.personal_info,
+                            _attr,
+                            _value
+                        ) if _value else None
+                else:
+                    setattr(
+                        employee,
+                        attr,
+                        value
+                    ) if value else None
+            self._sess.add(employee)
+            self._sess.commit()
+            self._sess.refresh(employee)
+        except Exception as e:
+            self._sess.rollback()
+            return None, e
+        return employee, None
 

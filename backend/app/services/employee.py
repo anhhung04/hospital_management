@@ -6,7 +6,8 @@ from models.employee import (
   EmployeeDetailModel, 
   QueryEmployeeModel,
   AddEmployeeRequestModel,
-  AddEmployeeModel
+  AddEmployeeModel,
+  PatchEmployeeModel
 )
 from permissions import Permission
 from permissions.user import UserRole, EmployeeType
@@ -118,5 +119,34 @@ class EmployeeService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error in create employee"
             )
-        
+    
+    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
+    async def update(self, query: QueryEmployeeModel, employee_update: PatchEmployeeModel):
+        if Permission.has_role([UserRole.EMPLOYEE], self._current_user):
+            if self._current_user.id() != query.user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN, 
+                    detail='Permission denied'
+                )
+        employee, error = await self._employee_repo.update(
+            QueryEmployeeModel.model_validate(query),
+            employee_update
+        )
+        if error:
+            print(error)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error in update employee information"
+            )
+        return EmployeeDetailModel(
+            employee_type=employee.employee_type,
+            educational_level=employee.education_level,
+            begin_date=str(employee.begin_date),
+            end_date=str(employee.end_date),
+            faculty=employee.faculty,
+            status=employee.status,
+            personal_info=UserDetail.model_validate(
+                obj=employee.personal_info, strict=False, from_attributes=True
+            )
+        ).model_dump()
             
