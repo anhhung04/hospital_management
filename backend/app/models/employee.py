@@ -7,6 +7,8 @@ from permissions.user import EmployeeType
 from enum import Enum
 
 class EmployeeModel(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
+    
     id: str
     full_name: str
     faculty: Optional[str | None] = None
