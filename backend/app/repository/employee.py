@@ -12,6 +12,7 @@ from models.employee import(
   AddEmployeeModel,
   PatchEmployeeModel
 )
+from repository.schemas.employees import EmployeeStatus, EmployeeType, EducateLevel
 
 GetEmployeeQuery = namedtuple("GetEmployeeQuery", ["id", "username"])
 
@@ -77,19 +78,26 @@ class EmployeeRepo:
             new_employee_dict = employee_update.model_dump()
             print(new_employee_dict)
             for attr, value in new_employee_dict.items():
-                if attr == "personal_info" and new_employee_dict.get("personal_info"):
-                    for _attr, _value in new_employee_dict.get("personal_info", {}).items():
+                if value:
+                    if attr == "personal_info":
+                        for _attr, _value in new_employee_dict.get("personal_info", {}).items():
+                            setattr(
+                                employee.personal_info,
+                                _attr,
+                                _value
+                            ) if _value else None
+                    else:
+                        if attr == "employee_type":
+                            value = EmployeeType(value)
+                        elif attr == "status":
+                            value = EmployeeStatus(value)
+                        elif attr == "education_level":
+                            value = EducateLevel(value)
                         setattr(
-                            employee.personal_info,
-                            _attr,
-                            _value
-                        ) if _value else None
-                else:
-                    setattr(
-                        employee,
-                        attr,
-                        value
-                    ) if value else None
+                            employee,
+                            attr,
+                            value
+                        )            
             self._sess.add(employee)
             self._sess.commit()
             self._sess.refresh(employee)
