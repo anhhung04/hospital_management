@@ -37,7 +37,6 @@ class EmployeeRepo:
             query = self._sess.query(Employee)
             if employee_type != "all" and employee_type != "other":
                 enum_type = EmployeeType(employee_type)
-            if employee_type != "all" and employee_type != "other":
                 query = query.filter(Employee.employee_type == enum_type)
             elif employee_type == "other":
                 query = query.filter((Employee.employee_type != EmployeeType.DOCTOR) & (Employee.employee_type != EmployeeType.NURSE)) 
