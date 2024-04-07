@@ -9,7 +9,7 @@ from enum import Enum
 class EmployeeModel(BaseModel):
     id: str
     full_name: str
-    faculty: str
+    faculty: Optional[str | None] = None
     status: Optional[EmployeeStatus | None] = None
 
 class ListEmployeeModel(BaseResponseModel):
@@ -18,11 +18,11 @@ class ListEmployeeModel(BaseResponseModel):
 class EmployeeDetailModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
 
-    employee_type: EmployeeType
-    educational_level: EducateLevel
-    begin_date: str
-    end_date: str
-    faculty: str
+    employee_type: Optional[EmployeeType | None] = None
+    educational_level: Optional[EducateLevel | None] = None
+    begin_date: Optional[str | None] = None
+    end_date: Optional[str | None] = None
+    faculty: Optional[str | None] = None
     status: Optional[EmployeeStatus | None] = None
     personal_info: UserDetail
 

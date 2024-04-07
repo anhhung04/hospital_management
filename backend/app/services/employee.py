@@ -82,7 +82,7 @@ class EmployeeService:
             )
         ).model_dump()
     
-    @Permission.permit([UserRole.EMPLOYEE])
+    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE]) #Cần xóa employee
     async def create(self, employee: AddEmployeeRequestModel):
         raw_password = PasswordContext.rand_key()
         username = f"employee_{employee.ssn}"
@@ -114,7 +114,6 @@ class EmployeeService:
                 "user_id": employee_in_db.user_id
             }
         if error or not employee_in_db:
-            print(error)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error in create employee"
