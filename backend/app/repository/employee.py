@@ -12,9 +12,16 @@ from models.employee import(
   AddEmployeeModel,
   PatchEmployeeModel
 )
-from repository.schemas.employees import EmployeeStatus, EmployeeType, EducateLevel
+from repository.schemas.employees import EmployeeStatus, EducateLevel
+from permissions.user import EmployeeType
 
 GetEmployeeQuery = namedtuple("GetEmployeeQuery", ["id", "username"])
+
+attribute_mapping = {
+  "employee_type": EmployeeType,
+  "education_level": EducateLevel,
+  "status": EmployeeStatus
+}
 
 class EmployeeRepo:
     def __init__(
@@ -76,7 +83,6 @@ class EmployeeRepo:
             if error:
                 return None, error
             new_employee_dict = employee_update.model_dump()
-            print(new_employee_dict)
             for attr, value in new_employee_dict.items():
                 if value:
                     if attr == "personal_info":
@@ -86,13 +92,9 @@ class EmployeeRepo:
                                 _attr,
                                 _value
                             ) if _value else None
-                    else:
-                        if attr == "employee_type":
-                            value = EmployeeType(value)
-                        elif attr == "status":
-                            value = EmployeeStatus(value)
-                        elif attr == "education_level":
-                            value = EducateLevel(value)
+                    else: 
+                        if attr in attribute_mapping:
+                            value = attribute_mapping[attr](value)
                         setattr(
                             employee,
                             attr,
