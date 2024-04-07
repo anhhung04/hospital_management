@@ -36,11 +36,14 @@ class EmployeeRepo:
         try:
             query = self._sess.query(Employee)
             if employee_type != "all" and employee_type != "other":
-                query = query.filter(Employee.employee_type == employee_type)
+                enum_type = EmployeeType(employee_type)
+            if employee_type != "all" and employee_type != "other":
+                query = query.filter(Employee.employee_type == enum_type)
             elif employee_type == "other":
-                query = query.filter(Employee.employee_type != 'doctor' | Employee.employee_type != 'nurse') 
+                query = query.filter((Employee.employee_type != EmployeeType.DOCTOR) & (Employee.employee_type != EmployeeType.NURSE)) 
             employees = query.limit(employee_per_page).offset((page - 1) * employee_per_page).all()
         except Exception as e:
+            print(e)
             return [], e
         return employees, None
     
