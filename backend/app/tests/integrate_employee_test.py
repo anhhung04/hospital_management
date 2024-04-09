@@ -49,7 +49,7 @@ class TestEmployee(TestIntegration):
         user_id = data['personal_info']['id']
         self.assertEqual(user_id, employee_id)
 
-        response = self._s.get(self.path(f"/fake_wrong_format_id"))
+        response = self._s.get(self.path("/fake_wrong_format_id"))
         self.assertEqual(response.status_code, 500)
 
         real_id_no_permission = gen_id()
