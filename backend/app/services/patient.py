@@ -71,15 +71,12 @@ class PatientService:
             )
         return patients
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
-    async def get(self, query: QueryPatientModel):
-        if Permission.has_role([UserRole.PATIENT], self._current_user):
-            if self._current_user.id() != query.user_id:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail='Permission denied'
-                )
-        patient, err = await self._patient_repo.get(query)
+    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE], acl=[UserRole.PATIENT])
+    async def get(self, id: str, max_progress: int = 5):
+        patient, err = await self._patient_repo.get(query=QueryPatientModel(
+            user_id=id,
+            max_progress=abs(max_progress)
+        ))
         if err:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -92,7 +89,7 @@ class PatientService:
             )
         appointment_date = None
         if patient.medical_record:
-            patient.medical_record.progress = patient.medical_record.progress[-query.max_progress:]
+            patient.medical_record.progress = patient.medical_record.progress[-max_progress:]
             appointment_date = PatientService.find_appointment_date(
                 patient.medical_record
             )
