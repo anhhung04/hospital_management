@@ -84,34 +84,3 @@ async def update_employee(
     return APIResponse.as_json(
         code=status.HTTP_200_OK, message="Employee updated successfully", data=employee
     )
-
-@router.get("/{employee_id}/event/list") # Cần bổ sung event
-async def list_events(
-    employee_id: IdPath,
-    service: EmployeeService = Depends(EmployeeService)
-):
-    try:
-        events = await service.get_events(employee_id)
-    except HTTPException as e:
-        return APIResponse.as_json(
-            code=e.status_code, message=str(e.detail), data={}
-        )
-    return APIResponse.as_json(
-        code=status.HTTP_200_OK, message="Events fetched successfully", data=events
-    )
-
-@router.get("/{employee_id}/event/{event_id}")
-async def get_event(
-    employee_id: IdPath,
-    event_id: IdPath,
-    service: EmployeeService = Depends(EmployeeService)
-):
-    try:
-        event = await service.get_event(employee_id, event_id)
-    except HTTPException as e:
-        return APIResponse.as_json(
-            code=e.status_code, message=str(e.detail), data={}
-        )
-    return APIResponse.as_json(
-        code=status.HTTP_200_OK, message="Event fetched successfully", data=event
-    )

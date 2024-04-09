@@ -52,7 +52,7 @@ class EmployeeService:
         
         return employees
     
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE]) # Cần fix chỗ này
+    @Permission.permit([UserRole.ADMIN, EmployeeType.MANAGER]) # Cần fix chỗ này
     async def get(self, query: QueryEmployeeModel):
         if Permission.has_role([UserRole.EMPLOYEE], self._current_user):
             if self._current_user.id() != query.user_id:
