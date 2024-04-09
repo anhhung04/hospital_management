@@ -20,7 +20,7 @@ class EmployeeDetailModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
 
     employee_type: Optional[EmployeeType | None] = None
-    educational_level: Optional[EducateLevel | None] = None
+    education_level: Optional[EducateLevel | None] = None
     begin_date: Optional[str | None] = None
     end_date: Optional[str | None] = None
     faculty: Optional[str | None] = None

@@ -7,7 +7,6 @@ from models.employee import(
   EmployeeDetailReponseModel, 
   NewEmployeeResponseModel, 
   AddEmployeeRequestModel,
-  QueryEmployeeModel,
   PatchEmployeeModel
 )
 from models.request import IdPath
