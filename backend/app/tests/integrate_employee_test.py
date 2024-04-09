@@ -1,4 +1,4 @@
-from tests import gen_name, gen_username, gen_ssn, TestIntegration, gen_id
+from tests import gen_name, gen_username, gen_ssn, TestIntegration
 
 class TestEmployee(TestIntegration):
     def __init__(self, methodName: str = "runTest") -> None:
