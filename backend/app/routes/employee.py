@@ -42,7 +42,7 @@ async def get_employee(
 ):
     try:
         employee = await service.get(
-            QueryEmployeeModel(user_id=employee_id)
+            id=employee_id
         )
     except HTTPException as e:
         return APIResponse.as_json(
