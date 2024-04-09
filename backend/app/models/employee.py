@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 from models.response import BaseResponseModel
 from typing import Optional
 from models.user import UserDetail, AddUserModel, AddUserDetailModel, PatchUserDetailModel
