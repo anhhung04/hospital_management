@@ -6,23 +6,29 @@ class Permission:
         self._role = str(current_role).upper().split(":")
 
     @staticmethod
-    def permit(acl):
+    def permit(superACL, acl=[]):
         def decorator(func):
             def wrapper(*args, **kwargs):
                 try:
                     user = args[0]._current_user
+                    assert user
                 except Exception:
                     raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-                if not user:
-                    raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Forbidden"
+                    )
                 uc = [str(c).upper() for c in Permission(user.role())]
-                for ac in acl:
+                for ac in superACL:
                     if str(ac).upper() in uc:
                         return func(*args, **kwargs)
+                for ac in acl:
+                    if str(ac).upper() in uc and user.id() == kwargs.get("id"):
+                        return func(*args, **kwargs)
+
                 raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Permission denied"
+                )
             return wrapper
         return decorator
 

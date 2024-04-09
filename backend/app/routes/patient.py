@@ -39,10 +39,7 @@ async def get_patient(
 ):
     try:
         patient = await service.get(
-            QueryPatientModel(
-                user_id=patient_id,
-                max_progress=max_progress
-            )
+            id=str(patient_id), max_progress=max_progress
         )
     except HTTPException as e:
         return APIResponse.as_json(
