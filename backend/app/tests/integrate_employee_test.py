@@ -9,7 +9,6 @@ class TestEmployee(TestIntegration):
         for _ in range(5):
             self.test_create_employee()
         response = self._s.get(self.path('/list'), params={
-            "type": "all",
             "page": 1,
             "employee_per_page": 5
         })
@@ -74,13 +73,13 @@ class TestEmployee(TestIntegration):
                 "last_name": new_last_name,
                 "birth_date": "2004-05-06",   
             },
-            "employee_type": "doctor"
+            "employee_type": "DOCTOR"
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['data']['personal_info']['first_name'], new_first_name)
         self.assertEqual(response.json()['data']['personal_info']['last_name'], new_last_name)
         self.assertEqual(response.json()['data']['personal_info']['id'], employee_id)
-        self.assertEqual(response.json()['data']['employee_type'], "doctor")
+        self.assertEqual(response.json()['data']['employee_type'], "DOCTOR")
         
         real_id_no_permission = gen_id()
         response = self._s.patch(self.path(f"/{real_id_no_permission}/update"), json={
@@ -89,7 +88,7 @@ class TestEmployee(TestIntegration):
                 "last_name": new_last_name,
                 "birth_date": "2004-05-06",   
             },
-            "employee_type": "nurse"
+            "employee_type": "NURSE"
         })
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json()['message'], "Permission denied")

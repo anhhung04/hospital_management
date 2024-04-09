@@ -4,7 +4,6 @@ from typing import Optional
 from models.user import UserDetail, AddUserModel, AddUserDetailModel, PatchUserDetailModel
 from repository.schemas.employees import EmployeeStatus, EducateLevel
 from permissions.user import EmployeeType
-from enum import Enum
 
 class EmployeeModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
@@ -56,12 +55,6 @@ class NewEmployeeResponseModel(BaseResponseModel):
 
 class QueryEmployeeModel(BaseModel):
     user_id: str
-
-class EmployeeTypeModel(str, Enum):
-    ALL = 'all'
-    DOCTOR = 'doctor'
-    NURSE = 'nurse'
-    OTHER = 'other'
 
 class PatchEmployeeModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)    

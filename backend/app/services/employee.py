@@ -30,7 +30,7 @@ class EmployeeService:
 
     
     @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE, EmployeeType.MANAGER])
-    async def get_employees(self, employee_type: str, page: int = 1, employee_per_page: int = 10):
+    async def get_employees(self, employee_type: EmployeeType | None, page: int = 1, employee_per_page: int = 10):
         page = 1 if page < 1 else page
         employee_per_page = 1 if employee_per_page <= 0 else employee_per_page
         employees, error = await self._employee_repo.list_employees(employee_type, page, employee_per_page)

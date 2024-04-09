@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from services.employee import EmployeeService
-from fastapi import Query, HTTPException, status
-from typing import Annotated
+from fastapi import HTTPException, status
 from util.response import APIResponse
 from models.employee import(
   ListEmployeeModel, 
@@ -9,24 +8,24 @@ from models.employee import(
   NewEmployeeResponseModel, 
   AddEmployeeRequestModel,
   QueryEmployeeModel,
-  EmployeeTypeModel,
   PatchEmployeeModel
 )
 from models.request import IdPath
-
+from permissions.user import EmployeeType
+from typing import Annotated
 
 router = APIRouter(tags=["employee"])
 
 @router.get("/list", response_model=ListEmployeeModel)
 async def list_employees(
-    type: EmployeeTypeModel,
+    type: Annotated[EmployeeType | None, Query] = None,
     page: Annotated[int, Query(gt=0)] = 1,
     employee_per_page: Annotated[int, Query(gt=0)] = 10,
     service: EmployeeService = Depends(EmployeeService)
 ):
     try:
         employees = await service.get_employees(
-          type,  page, employee_per_page
+            type, page, employee_per_page
         )
     except HTTPException as error:
         return APIResponse.as_json(
@@ -68,7 +67,7 @@ async def create_employee(
     )
 
 @router.patch("/{employee_id}/update", response_model=EmployeeDetailReponseModel)
-async def patch_update(
+async def update_employee(
     employee_id: IdPath,
     employee_update: PatchEmployeeModel,
     service: EmployeeService = Depends(EmployeeService)

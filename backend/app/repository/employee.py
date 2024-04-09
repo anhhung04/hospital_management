@@ -32,15 +32,14 @@ class EmployeeRepo:
       self._sess = session
       self._user_repo = user_repo
 
-    async def list_employees(self, employee_type: str, page: int, employee_per_page: int) -> Tuple[list[Employee], Exception]:
+    async def list_employees(self, employee_type: EmployeeType | None, page: int, employee_per_page: int) -> Tuple[list[Employee], Exception]:
         try:
             query = self._sess.query(Employee)
-            if employee_type != "all" and employee_type != "other":
-                enum_type = EmployeeType(employee_type)
-                query = query.filter(Employee.employee_type == enum_type)
-            elif employee_type == "other":
-                query = query.filter((Employee.employee_type != EmployeeType.DOCTOR) & (Employee.employee_type != EmployeeType.NURSE)) 
-            employees = query.limit(employee_per_page).offset((page - 1) * employee_per_page).all()
+            query = query.limit(employee_per_page).offset(
+                (page - 1) * employee_per_page)
+            if employee_type:
+                query = query.filter(Employee.employee_type == employee_type)
+            employees = query.all()
         except Exception as e:
             print(e)
             return [], e
