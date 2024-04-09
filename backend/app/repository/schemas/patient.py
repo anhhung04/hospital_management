@@ -1,10 +1,11 @@
 from sqlalchemy import (
-    String, Integer, ForeignKey, Float, DateTime, func, Table, Column,
+    String, Integer, ForeignKey, Float, DateTime, func, Table, Column, Date,
     Enum as DBEnum
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from repository.schemas import Base, ObjectID
 from repository.schemas.employees import Employee
+from repository.schemas.warehouse import Medicine, medical_instruction
 from typing import List
 from enum import Enum
 
@@ -69,3 +70,36 @@ class PatientProgress(Base):
     lead_employee: Mapped[List["Employee"]] = relationship(secondary=employee_handle_patient)
 
     __table_args__ = {"extend_existing": True}
+
+class Conclusion(Base):
+    __tablename__ = "conclusions"
+
+    id = mapped_column(Integer, primary_key=True,
+                       index=True, autoincrement=True)
+    diagnosis = mapped_column(String)
+    advice = mapped_column(String)
+    prescription_id = mapped_column(ForeignKey("prescriptions.id"))
+    prescription: Mapped["Prescription"] = relationship(
+        "Prescription", back_populates="conclusion")
+
+
+class TestResult(Base):
+    __tablename__ = "test_results"
+
+    id = mapped_column(Integer, primary_key=True,
+                       index=True, autoincrement=True)
+    created_at = mapped_column(DateTime, default=func.now())
+    result_date = mapped_column(Date)
+    test_type = mapped_column(String)
+    details = mapped_column(String)
+    medical_record_id = mapped_column(ForeignKey("medical_records.id"))
+
+class Prescription(Base):
+    __tablename__ = "prescriptions"
+
+    id = mapped_column(ObjectID, primary_key=True, index=True)
+    note = mapped_column(String)
+    progress_id = mapped_column(ForeignKey("patient_progresses.id"))
+    medical_instruction: Mapped[List["Medicine"]] = relationship(secondary=medical_instruction)
+    conclusion: Mapped["Conclusion"] = relationship(back_populates="prescription")
+

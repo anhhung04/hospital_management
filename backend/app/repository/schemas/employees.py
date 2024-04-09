@@ -1,9 +1,10 @@
-from sqlalchemy import String, Date, ForeignKey
+from sqlalchemy import String, Date, ForeignKey, Integer, Time, Table, Column
 from sqlalchemy import Enum as DBEnum
-from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from enum import Enum
 from permissions.user import EmployeeType
 from repository.schemas import Base, ObjectID
+from typing import List
 
 
 class EducateLevel(Enum):
@@ -21,6 +22,58 @@ class EmployeeStatus(Enum):
     SUSPENDED = 'suspended'
     WIP = 'work in progress'
 
+class Frequency(Enum):
+    DAILY = 'daily'
+    WEEKLY = 'weekly'
+    MONTHLY = 'monthly'
+    YEARLY = 'yearly'
+
+class ScheduleStatus(Enum):
+    ACTIVE = 'active'
+    INACTIVE = 'inactive'
+    PENDING = 'pending'
+    SUSPENDED = 'suspended'
+    INPROGRESS = 'in progress'
+
+class FixedSchedule(Base):
+    __tablename__ = 'fixed_schedules'
+    
+    id = mapped_column(Integer, primary_key=True,
+                       index=True, autoincrement=True)
+    day = mapped_column(String)
+    begin_time = mapped_column(Time)
+    end_time = mapped_column(Time)
+    begin_date = mapped_column(Date)
+    end_date = mapped_column(Date)
+    frequency = mapped_column(DBEnum(Frequency))
+    employee_id = mapped_column(ObjectID, ForeignKey('employees.user_id'))
+
+class OvertimeSchedule(Base):
+    __tablename__ = 'overtime_schedules'
+
+    id = mapped_column(Integer, primary_key=True,
+                          index=True, autoincrement=True)
+    date = mapped_column(Date)
+    begin_time = mapped_column(Time)
+    end_time = mapped_column(Time)
+    employee_id = mapped_column(ObjectID, ForeignKey('employees.user_id'))
+
+fixed_schedule_of_employee = Table(
+    "employee_fixed_schedules", Base.metadata,
+    Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
+    Column("schedule_id", Integer, ForeignKey("fixed_schedules.id")),
+    Column("status", DBEnum(ScheduleStatus), default = ScheduleStatus.ACTIVE),
+    extend_existing=True
+)
+
+overtime_schedule_of_employee = Table(
+    "employee_overtime_schedules", Base.metadata,
+    Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
+    Column("schedule_id", Integer, ForeignKey("overtime_schedules.id")),
+    Column("status", DBEnum(ScheduleStatus), default = ScheduleStatus.ACTIVE),
+    extend_existing=True
+)
+
 class Employee(Base):
     __tablename__ = 'employees'
 
@@ -32,5 +85,8 @@ class Employee(Base):
     faculty = mapped_column(String)
     status = mapped_column(DBEnum(EmployeeStatus))
     personal_info = relationship("User", primaryjoin="Employee.user_id == User.id", uselist=False)
+    fixed_schedule: Mapped[List["FixedSchedule"]] = relationship(secondary=fixed_schedule_of_employee)
+    overtime_schedule: Mapped[List["OvertimeSchedule"]] = relationship(secondary=overtime_schedule_of_employee)
     
     __table_args__ = {"extend_existing": True}
+
