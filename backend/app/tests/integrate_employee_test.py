@@ -40,17 +40,11 @@ class TestEmployee(TestIntegration):
         return username, password, employee_id
     
     def test_get_employee_by_id(self):
-        response = self._s.get(self.path('/list'), params={
-            "type": "all",
-            "page": 1,
-            "employee_per_page": 1
-        })
-        data = response.json()['data']
-        employee_id = data[0]['id']
-        self.assertEqual(response.status_code, 200)
+        employee_id = "189a8780-98f2-45de-8522-a048b36beb9e"
 
         response = self._s.get(self.path(f"/{employee_id}"))
         self.assertEqual(response.status_code, 200)
+
         data = response.json()['data']
         user_id = data['personal_info']['id']
         self.assertEqual(user_id, employee_id)
@@ -64,16 +58,16 @@ class TestEmployee(TestIntegration):
         self.assertEqual(response.json()['message'], "Permission denied")
 
     def test_update_employee(self):
-        response = self._s.get(self.path('/list'), params={
-            "type": "all",
-            "page": 1,
-            "employee_per_page": 1
-        })
-        data = response.json()['data']
-        employee_id = data[0]['id']
-        first_name, last_name = gen_name()
+        employee_id = "189a8780-98f2-45de-8522-a048b36beb9e"
+
+        response = self._s.get(self.path(f"/{employee_id}"))
+        self.assertEqual(response.status_code, 200)
+
+        first_name = response.json()['data']['personal_info']['first_name']
+        last_name = response.json()['data']['personal_info']['last_name'] 
         new_first_name = f"new {first_name}"
         new_last_name = f"new {last_name}"
+
         response = self._s.patch(self.path(f"/{employee_id}/update"), json={
             "personal_info": {
                 "first_name": new_first_name,
