@@ -35,7 +35,7 @@ class Permission:
         return False
 
     def add(self, role):
-        self._role.append(role)
+        self._role.append(str(role).lower())
         return self
 
     def get(self):
