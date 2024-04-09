@@ -25,8 +25,8 @@ def upgrade() -> None:
         ('289a8780-98f2-45de-8522-a048b36beb9e', '123456780', '0123456780', '2000-01-01', 'female', '123456780', 'Nguyễn Thị', 'B', '268 Ly Thuong Kiet', 'nguyenvanb@gmail.com', 'employee2', 'de08da8c83b62313f3cb789d6fd46fa2621b71113a754ecf8f422504ac977f94', 'employee');
         
         INSERT INTO employees (user_id, employee_type, education_level, begin_date, end_date, faculty) VALUES
-        ('189a8780-98f2-45de-8522-a048b36beb9e', 'doctor', 'unknown', '2020-01-01', '2024-12-01', 'Back Khoa University'),
-        ('289a8780-98f2-45de-8522-a048b36beb9e', 'nurse', 'bachelor', '2020-01-01', '2024-12-01', 'Back Khoa University');
+        ('189a8780-98f2-45de-8522-a048b36beb9e', 'MANAGER', 'UNKNOWN', '2020-01-01', '2024-12-01', 'Back Khoa University'),
+        ('289a8780-98f2-45de-8522-a048b36beb9e', 'DOCTOR', 'BACHELOR', '2020-01-01', '2024-12-01', 'Back Khoa University');
     """)
     # ### end Alembic commands ###
 
