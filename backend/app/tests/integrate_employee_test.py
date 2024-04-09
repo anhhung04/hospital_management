@@ -1,4 +1,4 @@
-from tests import gen_name, gen_username, gen_ssn, TestIntegration
+from tests import gen_name, gen_username, gen_ssn, TestIntegration, gen_id
 
 class TestEmployee(TestIntegration):
     def __init__(self, methodName: str = "runTest") -> None:
@@ -10,7 +10,7 @@ class TestEmployee(TestIntegration):
             self.test_create_employee()
         response = self._s.get(self.path('/list'), params={
             "type": "all",
-            "page": 5,
+            "page": 1,
             "employee_per_page": 5
         })
         data = response.json()['data']
@@ -49,6 +49,20 @@ class TestEmployee(TestIntegration):
         employee_id = data[0]['id']
         self.assertEqual(response.status_code, 200)
 
+        response = self._s.get(self.path(f"/{employee_id}"))
+        self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        user_id = data['personal_info']['id']
+        self.assertEqual(user_id, employee_id)
+
+        response = self._s.get(self.path(f"/fake_wrong_format_id"))
+        self.assertEqual(response.status_code, 500)
+
+        real_id_no_permission = gen_id()
+        response = self._s.get(self.path(f"/{real_id_no_permission}"))
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['message'], "Permission denied")
+
     def test_update_employee(self):
         response = self._s.get(self.path('/list'), params={
             "type": "all",
@@ -74,3 +88,14 @@ class TestEmployee(TestIntegration):
         self.assertEqual(response.json()['data']['personal_info']['id'], employee_id)
         self.assertEqual(response.json()['data']['employee_type'], "doctor")
         
+        real_id_no_permission = gen_id()
+        response = self._s.patch(self.path(f"/{real_id_no_permission}/update"), json={
+            "personal_info": {
+                "first_name": new_first_name,
+                "last_name": new_last_name,
+                "birth_date": "2004-05-06",   
+            },
+            "employee_type": "nurse"
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['message'], "Permission denied")
