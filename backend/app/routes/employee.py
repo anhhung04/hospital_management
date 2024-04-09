@@ -42,7 +42,7 @@ async def get_employee(
 ):
     try:
         employee = await service.get(
-            id=employee_id
+            id=str(employee_id)
         )
     except HTTPException as e:
         return APIResponse.as_json(
@@ -74,8 +74,8 @@ async def update_employee(
 ):
     try:
         employee = await service.update(
-            QueryEmployeeModel(user_id=employee_id),
-            employee_update
+            id=str(employee_id),
+            employee_update=employee_update
         )
     except HTTPException as e:
         return APIResponse.as_json(

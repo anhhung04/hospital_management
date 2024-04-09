@@ -59,7 +59,6 @@ class QueryEmployeeModel(BaseModel):
 class PatchEmployeeModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)    
 
-    employee_type: Optional[EmployeeType | None] = None
     education_level: Optional[EducateLevel | None] = None
     begin_date: Optional[str | None] = None
     end_date: Optional[str | None] = None
