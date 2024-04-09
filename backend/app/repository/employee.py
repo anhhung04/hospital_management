@@ -110,3 +110,6 @@ class EmployeeRepo:
             return None, e
         return employee, None
 
+    async def get_events(self, query: QueryEmployeeModel):
+        pass
+    

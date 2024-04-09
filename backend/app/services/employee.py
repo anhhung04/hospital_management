@@ -46,7 +46,7 @@ class EmployeeService:
                 status=employee.status
             ).model_dump() for employee in employees]
         except Exception as e:
-            logger.error('Error in fetching employee list', reason=e)
+            logger.error('Error in converting employee list', reason=e)
             raise HTTPException(
                 status_code=500, detail='Error in converting employee list')
         
@@ -151,3 +151,18 @@ class EmployeeService:
             )
         ).model_dump()
             
+    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
+    async def get_events(self, query: QueryEmployeeModel):
+        if Permission.has_role([UserRole.EMPLOYEE], self._current_user):
+            if self._current_user.id() != query.user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN, 
+                    detail='Permission denied'
+                )
+        events, error = await self._employee_repo.get_events(query)
+        if error:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error in fetching employee events"
+            )
+        return events
