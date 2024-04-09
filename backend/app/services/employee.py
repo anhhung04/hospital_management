@@ -89,20 +89,22 @@ class EmployeeService:
         username = f"employee_{employee.ssn}"
         user_info = employee.model_dump()
         employee_id = str(uuid4())
+        if not employee.employee_type:
+            employee.employee_type = EmployeeType.OTHER
         user_info.update({
             "id": employee_id,
             "username": username,
             "password": PasswordContext(raw_password, username).hash(),
-            "role": Permission(UserRole.EMPLOYEE).get(),
+            "role": Permission(UserRole.EMPLOYEE).add(employee.employee_type).get(),
         })
         employee_info = {
             "user_id": employee_id,
-            "employee_type": None,
             "education_level": None,
             "begin_date": None,
             "end_date": None,
             "faculty": None,
             "status": None,
+            "employee_type": employee.employee_type,
             "personal_info": AddUserDetailModel.model_validate(user_info).model_dump()
         }
         employee_in_db, error = await self._employee_repo.create(

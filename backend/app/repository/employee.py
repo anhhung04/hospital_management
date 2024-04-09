@@ -35,10 +35,11 @@ class EmployeeRepo:
     async def list_employees(self, employee_type: EmployeeType | None, page: int, employee_per_page: int) -> Tuple[list[Employee], Exception]:
         try:
             query = self._sess.query(Employee)
-            query = query.limit(employee_per_page).offset(
-                (page - 1) * employee_per_page)
             if employee_type:
                 query = query.filter(Employee.employee_type == employee_type)
+            query = query.limit(employee_per_page).offset(
+                (page - 1) * employee_per_page
+            )
             employees = query.all()
         except Exception as e:
             print(e)

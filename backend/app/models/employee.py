@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from models.response import BaseResponseModel
 from typing import Optional
 from models.user import UserDetail, AddUserModel, AddUserDetailModel, PatchUserDetailModel
@@ -31,7 +31,7 @@ class EmployeeDetailReponseModel(BaseResponseModel):
     data: EmployeeDetailModel
 
 class AddEmployeeRequestModel(AddUserModel):
-    pass
+    employee_type: Optional[EmployeeType | None] = None
 
 class AddEmployeeModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)    

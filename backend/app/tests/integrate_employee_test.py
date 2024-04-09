@@ -16,7 +16,45 @@ class TestEmployee(TestIntegration):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data), 5)
 
-    def test_create_employee(self):
+    def test_list_doctor(self):
+        for _ in range(5):
+            self.test_create_employee()
+        response = self._s.get(self.path('/list'), params={
+            "page": 1,
+            "employee_per_page": 5,
+            "type": "DOCTOR"
+        })
+        print(response.json())
+        data = response.json()['data']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 5)
+
+    def test_list_nurse(self):
+        for _ in range(5):
+            self.test_create_employee(type="NURSE")
+        response = self._s.get(self.path('/list'), params={
+            "page": 1,
+            "employee_per_page": 5,
+            "type": "NURSE"
+        })
+        print(response.json())
+        data = response.json()['data']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 5)
+
+    def test_list_other(self):
+        for _ in range(5):
+            self.test_create_employee(type=None)
+        response = self._s.get(self.path('/list'), params={
+            "page": 1,
+            "employee_per_page": 5,
+            "type": "OTHER"
+        })
+        data = response.json()['data']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 5)
+
+    def test_create_employee(self, type="DOCTOR"):
         first_name, last_name = gen_name()
         response = self._s.post(self.path('/create'), json={
             "first_name":         first_name,
@@ -28,6 +66,7 @@ class TestEmployee(TestIntegration):
             "email":              gen_username() + "@user.com",
             "health_insurance":    "11111111111",
             "address":            "268 ly thuong kiet",
+            "employee_type":      type,
         })
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.json()['data']['username'])
