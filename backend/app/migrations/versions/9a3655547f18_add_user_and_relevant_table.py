@@ -61,8 +61,8 @@ def upgrade() -> None:
     op.create_index('ix_users_id', 'users', ['id'], unique=False)
     op.create_table('employees',
     sa.Column('user_id', sa.VARCHAR(), autoincrement=False, nullable=False),
-    sa.Column('employee_type', postgresql.ENUM('DOCTOR', 'NURSE', 'MANAGER', name='employeetype'), autoincrement=False, nullable=True),
-    sa.Column('education_level', postgresql.ENUM('BACHELOR', 'MASTER', 'DOCTOR', 'UNDERGRADUATE', 'UNKNOWN', name='educatelevel'), autoincrement=False, nullable=True),
+    sa.Column('employee_type', postgresql.ENUM('doctor', 'nurse', 'manager', name='employeetype'), autoincrement=False, nullable=True),
+    sa.Column('education_level', postgresql.ENUM('bachelor', 'master', 'doctor', 'undergraduate', 'unknown', name='educatelevel'), autoincrement=False, nullable=True),
     sa.Column('begin_date', sa.DATE(), autoincrement=False, nullable=True),
     sa.Column('end_date', sa.DATE(), autoincrement=False, nullable=True),
     sa.Column('faculty', sa.VARCHAR(), autoincrement=False, nullable=True),
