@@ -8,19 +8,19 @@ from typing import List
 
 
 class EducateLevel(Enum):
-    BACHELOR = 'bachelor'
-    MASTER = 'master'
-    DOCTOR = 'doctor'
-    UNDERGRADUATE = 'undergraduate'
-    UNKNOWN = 'unknown'
+    BACHELOR = 'BACHELOR'
+    MASTER = 'MASTER'
+    DOCTOR = 'DOCTOR'
+    UNDERGRADUATE = 'UNDERGRADUATE'
+    UNKNOWN = 'UNKNOWN'
 
 
 class EmployeeStatus(Enum):
-    ACTIVE = 'active'
-    INACTIVE = 'inactive'
-    PENDING = 'pending'
-    SUSPENDED = 'suspended'
-    WIP = 'work in progress'
+    ACTIVE = 'ACTIVE'
+    INACTIVE = 'INACTIVE'
+    PENDING = 'PENDING'
+    SUSPENDED = 'SUSPENDED'
+    WIP = 'WIP'
 
 class Frequency(Enum):
     DAILY = 'daily'

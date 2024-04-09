@@ -2,11 +2,11 @@ from enum import Enum
 
 
 class UserRole:
-    PATIENT = 'patient'
-    EMPLOYEE = 'employee'
-    ADMIN = 'admin'
+    PATIENT = 'PATIENT'
+    EMPLOYEE = 'EMPLOYEE'
+    ADMIN = 'ADMIN'
 
 class EmployeeType(Enum):
-    DOCTOR = 'doctor'
-    NURSE = 'nurse'
-    MANAGER = 'manager'
+    DOCTOR = 'DOCTOR'
+    NURSE = 'NURSE'
+    MANAGER = 'MANAGER'

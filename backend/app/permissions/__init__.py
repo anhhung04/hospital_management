@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 
 class Permission:
     def __init__(self, current_role="user"):
-        self._role = str(current_role).split(":")
+        self._role = str(current_role).upper().split(":")
 
     @staticmethod
     def permit(acl):
@@ -17,9 +17,9 @@ class Permission:
                 if not user:
                     raise HTTPException(
                         status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-                uc = [str(c).lower() for c in Permission(user.role())]
+                uc = [str(c).upper() for c in Permission(user.role())]
                 for ac in acl:
-                    if str(ac).lower() in uc:
+                    if str(ac).upper() in uc:
                         return func(*args, **kwargs)
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
@@ -28,14 +28,14 @@ class Permission:
 
     @staticmethod
     def has_role(role, user):
-        uc = [str(c).lower() for c in user.role().split(":")]
+        uc = [str(c).upper() for c in user.role().split(":")]
         for ac in role:
-            if str(ac).lower() in uc:
+            if str(ac).upper() in uc:
                 return True
         return False
 
     def add(self, role):
-        self._role.append(role)
+        self._role.append(str(role).upper())
         return self
 
     def get(self):

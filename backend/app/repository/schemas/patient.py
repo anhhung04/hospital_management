@@ -10,9 +10,9 @@ from typing import List
 from enum import Enum
 
 class ProgressType(Enum):
-    SCHEDULING = 'scheduling'
-    PROCESSINT = 'processing'
-    FINISHED = 'finished'
+    SCHEDULING = 'SCHEDULING'
+    PROCESSINT = 'PROCESSING'
+    FINISHED = 'FINISHED'
 
 class Patient(Base):
     __tablename__ = 'patients'
