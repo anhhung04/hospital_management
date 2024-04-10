@@ -9,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 from repository.schemas import Base
 from repository.schemas.user import User
 from repository.schemas.patient import Patient
+from repository.schemas.employees import Employee
 from repository import Storage, RedisStorage
 from uuid import uuid4
 from app import app
@@ -143,3 +144,17 @@ def insert_patient(db, id=None, username=None, password=None):
     db.add(patient)
     db.commit()
     return patient
+
+def insert_employee(db, user_id, employee_type, education_level, begin_date, end_date, faculty, status):
+    employee = Employee(
+        user_id=user_id,
+        employee_type=employee_type,
+        education_level=education_level,
+        begin_date=begin_date,
+        end_date=end_date,
+        faculty=faculty,
+        status=status
+    )
+    db.add(employee)
+    db.commit()
+    return employee

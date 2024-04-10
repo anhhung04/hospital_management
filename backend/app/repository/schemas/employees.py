@@ -4,6 +4,7 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped
 from enum import Enum
 from permissions.user import EmployeeType
 from repository.schemas import Base, ObjectID
+from repository.schemas.warehouse import employee_manage_container, Container
 from typing import List
 
 
@@ -46,7 +47,6 @@ class FixedSchedule(Base):
     begin_date = mapped_column(Date)
     end_date = mapped_column(Date)
     frequency = mapped_column(DBEnum(Frequency))
-    employee_id = mapped_column(ObjectID, ForeignKey('employees.user_id'))
 
 class OvertimeSchedule(Base):
     __tablename__ = 'overtime_schedules'
@@ -56,8 +56,7 @@ class OvertimeSchedule(Base):
     date = mapped_column(Date)
     begin_time = mapped_column(Time)
     end_time = mapped_column(Time)
-    employee_id = mapped_column(ObjectID, ForeignKey('employees.user_id'))
-
+    
 fixed_schedule_of_employee = Table(
     "employee_fixed_schedules", Base.metadata,
     Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
@@ -87,6 +86,7 @@ class Employee(Base):
     personal_info = relationship("User", primaryjoin="Employee.user_id == User.id", uselist=False)
     fixed_schedule: Mapped[List["FixedSchedule"]] = relationship(secondary=fixed_schedule_of_employee)
     overtime_schedule: Mapped[List["OvertimeSchedule"]] = relationship(secondary=overtime_schedule_of_employee)
-    
+    container_management: Mapped[List["Container"]] = relationship(secondary=employee_manage_container)
+
     __table_args__ = {"extend_existing": True}
 
