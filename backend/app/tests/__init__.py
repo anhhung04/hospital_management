@@ -10,7 +10,6 @@ from repository.schemas import Base
 from repository.schemas.user import User
 from repository.schemas.patient import Patient
 from repository.schemas.employees import Employee
-from repository.schemas.employees import Employee
 from repository import Storage, RedisStorage
 from uuid import uuid4
 from app import app
