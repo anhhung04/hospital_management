@@ -1,8 +1,16 @@
 from unittest import TestCase
-from tests import override_get_db, insert_user, gen_password, gen_username, insert_patient
+from tests import(
+    override_get_db, 
+    insert_user, 
+    gen_password, 
+    gen_username, 
+    insert_patient, 
+    insert_employee
+)
 from util.crypto import PasswordContext
 from repository.schemas.user import User
 from repository.schemas.patient import Patient
+from repository.schemas.employees import Employee
 
 class UserTest(TestCase):
     def test_insert_user(self):
@@ -29,3 +37,12 @@ class UserTest(TestCase):
         patient_n_db = db.query(Patient).filter(Patient.user_id == patient.user_id).first()
         self.assertEqual(patient_n_db.user_id, patient.user_id)
         self.assertEqual(patient_n_db.personal_info, u)
+
+    def test_insert_employee(self):
+        db = next(override_get_db())
+        password = gen_password()
+        u = insert_user(db, gen_username(), password, 'EMPLOYEE')
+        employee = insert_employee(db, u.id)
+        employee_n_db = db.query(Employee).filter(Employee.user_id == employee.user_id).first()
+        self.assertEqual(employee_n_db.user_id, employee.user_id)
+        self.assertEqual(employee_n_db.personal_info, u)

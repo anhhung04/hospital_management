@@ -1,17 +1,23 @@
-from models.request import AUTH_HEADER
 from util.jwt import JWTHandler
-from fastapi import Request, Depends
+from fastapi import Depends
+from typing import Annotated
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+securityHeader = HTTPBearer(
+    scheme_name="Bearer", auto_error=False
+)
 
 class UserContext:
-    def __init__(self, request: Request, jwt_handler: JWTHandler = Depends(JWTHandler)):
-        auth_header = request.headers.get(AUTH_HEADER, None)
-        token = auth_header.split(" ")[-1] if auth_header else None
+    def __init__(
+        self,
+        token: Annotated[HTTPAuthorizationCredentials, Depends(securityHeader)],
+        jwt_handler: JWTHandler = Depends(JWTHandler)
+    ):
         try:
-            if auth_header is None:
+            if token is None:
                 self._info = {}
             else:
-                token_data = jwt_handler.verify(token)
+                token_data = jwt_handler.verify(token.credentials)
                 self._info = token_data
         except Exception:
             self._info = {}

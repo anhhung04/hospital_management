@@ -30,6 +30,31 @@ class TestPatient(TestIntegration):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.json()['data']['personal_info']["id"], patient_id)
 
+    def test_get_own_patient(self):
+        other_id = res = self._s.get(self.path('/list'), params={
+            "page": 1,
+            "limit": 1
+        }).json()['data'][0]['id']
+        res = self._s.get(self.path(f"/{other_id}"))
+        self.assertEqual(res.status_code, 200)
+        username, password, patient_id = self.test_create_patient()
+        res = self._s.post(self._base + "/auth/login", json={
+            "username": username,
+            "password": password
+        })
+        self._access_token = res.json()['data']['access_token']
+        self._s.headers.update({
+            "Authorization": f"Bearer {self._access_token}"
+        })
+        res = self._s.get(self.path(f"/{patient_id}"))
+        print(res.json())
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['data']['personal_info']["id"], patient_id)
+        res = self._s.get(self.path(f"/{other_id}"))
+        print(res.json())
+        self.assertEqual(res.status_code, 403)
+
+
     def test_create_patient(self):
         first_name, last_name = gen_name()
         res = self._s.post(self.path('/create'), json={
