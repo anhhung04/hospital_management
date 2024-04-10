@@ -1,5 +1,5 @@
 from unittest import TestCase
-from tests import override_get_db, insert_employee
+from tests import override_get_db, insert_employee_full
 from repository.schemas.employees import Employee, FixedSchedule, OvertimeSchedule, EmployeeType, EducateLevel, EmployeeStatus, Frequency, fixed_schedule_of_employee, overtime_schedule_of_employee, ScheduleStatus
 from datetime import date, time
 
@@ -13,7 +13,7 @@ class EmployeeTest(TestCase):
         end_date = date(2022, 12, 31)
         faculty = "Engineering"
         status = EmployeeStatus.ACTIVE
-        e = insert_employee(db, user_id, employee_type, education_level, begin_date, end_date, faculty, status)
+        e = insert_employee_full(db, user_id, employee_type, education_level, begin_date, end_date, faculty, status)
         e_n_db = db.query(Employee).filter(Employee.user_id == e.user_id).first()
         self.assertTrue(e_n_db is not None)
         self.assertTrue(e_n_db.user_id == e.user_id)
