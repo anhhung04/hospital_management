@@ -115,7 +115,9 @@ class AuthService:
             )
         user_update, err = await self._user_repo.update(
             QueryUserModel(id=self._current_user.id()),
-            PatchUserPrivateInfoModel(password=new_password)
+            PatchUserPrivateInfoModel(
+                password=PasswordContext(new_password, user.username).hash()
+            )
         )
         if err:
             raise HTTPException(
