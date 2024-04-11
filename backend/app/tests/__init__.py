@@ -16,7 +16,7 @@ from app import app
 from util.crypto import PasswordContext
 import requests
 
-USER_DB = json.loads(open('./tests/data.json').read())
+USER_DB = json.loads(open('./tests/data.json', errors="replace").read())
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 

@@ -32,7 +32,7 @@ class EmployeeRepo:
       self._sess = session
       self._user_repo = user_repo
 
-    async def list_employees(self, employee_type: EmployeeType | None, page: int, employee_per_page: int) -> Tuple[list[Employee], Exception]:
+    async def list_employees(self, employee_type: EmployeeType | None, page: int, employee_per_page: int) -> Tuple[list[Employee], Exception | None]:
         try:
             query = self._sess.query(Employee)
             if employee_type:
@@ -46,7 +46,7 @@ class EmployeeRepo:
             return [], e
         return employees, None
     
-    async def get(self, query: QueryEmployeeModel) -> Tuple[Employee, Exception]:
+    async def get(self, query: QueryEmployeeModel) -> Tuple[Employee, Exception | None]:
         try:
             employee = self._sess.query(Employee).filter(
                 Employee.user_id == query.user_id).first()
@@ -54,7 +54,7 @@ class EmployeeRepo:
             return None, e
         return employee, None
     
-    async def create(self, employee_info: AddEmployeeModel) -> Tuple[Employee, Exception]:
+    async def create(self, employee_info: AddEmployeeModel) -> Tuple[Employee, Exception | None]:
         try:
             new_employee = Employee(
                 user_id=employee_info.user_id,
@@ -79,7 +79,7 @@ class EmployeeRepo:
         self, 
         query: QueryEmployeeModel, 
         employee_update: PatchEmployeeModel
-    ) -> Tuple[Employee, Exception]:
+    ) -> Tuple[Employee, Exception | None]:
         try:
             employee, error = await self.get(query)
             if error:
@@ -109,7 +109,3 @@ class EmployeeRepo:
             self._sess.rollback()
             return None, e
         return employee, None
-
-    async def get_events(self, query: QueryEmployeeModel):
-        pass
-    
