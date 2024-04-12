@@ -29,7 +29,7 @@ class EmployeeService:
         self._user_repo = user_repo
 
     
-    @Permission.permit([UserRole.ADMIN, EmployeeType.MANAGER])
+    @Permission.permit([EmployeeType.MANAGER])
     async def get_employees(self, employee_type: EmployeeType | None, page: int = 1, employee_per_page: int = 10):
         page = 1 if page < 1 else page
         employee_per_page = 1 if employee_per_page <= 0 else employee_per_page
@@ -52,7 +52,7 @@ class EmployeeService:
         
         return employees
     
-    @Permission.permit([UserRole.ADMIN, EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
+    @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
     async def get(self, id: str):
         employee, error = await self._employee_repo.get(
             query=QueryEmployeeModel(user_id=id)
@@ -79,7 +79,7 @@ class EmployeeService:
             )
         ).model_dump()
     
-    @Permission.permit([UserRole.ADMIN, EmployeeType.MANAGER])
+    @Permission.permit([EmployeeType.MANAGER])
     async def create(self, employee: AddEmployeeRequestModel):
         raw_password = PasswordContext.rand_key()
         username = f"employee_{employee.ssn}"
@@ -118,7 +118,7 @@ class EmployeeService:
                 detail="Error in create employee"
             )
     
-    @Permission.permit([UserRole.ADMIN, EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
+    @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
     async def update(self, id: str, employee_update: PatchEmployeeModel):
         employee, error = await self._employee_repo.update(
             QueryEmployeeModel.model_validate(QueryEmployeeModel(user_id=id)),

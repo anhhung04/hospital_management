@@ -18,7 +18,7 @@ class UserRepo:
     async def get(
         self,
         query: QueryUserModel
-    ) -> Tuple[User, Exception]:
+    ) -> Tuple[User, Exception | None]:
         try:
             user = self._session.query(User).filter(
                 User.id == query.id if query.id else None
@@ -34,7 +34,7 @@ class UserRepo:
         self,
         query: QueryUserModel,
         update_user: PatchUserDetailModel
-    ) -> Tuple[User, Exception]:
+    ) -> Tuple[User, Exception | None]:
         try:
             user, err = await self.get(query)
             if err:
@@ -54,7 +54,7 @@ class UserRepo:
     async def create(
         self,
         user: AddUserDetailModel
-    ) -> Tuple[User, Optional[Exception | IntegrityError]]:
+    ) -> Tuple[User, Optional[Exception | IntegrityError | None]]:
         try:
             new_user = user.model_dump()
             new_user = User(**new_user)
@@ -67,7 +67,7 @@ class UserRepo:
         except Exception as err:
             return None, err
 
-    async def delete(self, query: QueryUserModel) -> Tuple[User, Exception]:
+    async def delete(self, query: QueryUserModel) -> Tuple[User, Exception | None]:
         try:
             user, err = await self.get(query)
             if err:

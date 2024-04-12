@@ -54,7 +54,7 @@ class AuthService:
             )
         return token
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.PATIENT])
+    @Permission.permit([UserRole.EMPLOYEE, UserRole.PATIENT])
     async def get_user(self) -> dict:
         if not self._current_user:
             raise HTTPException(
@@ -94,7 +94,7 @@ class AuthService:
                 detail="Failed to logout user"
             )
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.PATIENT])
+    @Permission.permit([UserRole.EMPLOYEE, UserRole.PATIENT])
     async def change_password(
         self,
         old_password: str,
@@ -115,7 +115,9 @@ class AuthService:
             )
         user_update, err = await self._user_repo.update(
             QueryUserModel(id=self._current_user.id()),
-            PatchUserPrivateInfoModel(password=new_password)
+            PatchUserPrivateInfoModel(
+                password=PasswordContext(new_password, user.username).hash()
+            )
         )
         if err:
             raise HTTPException(

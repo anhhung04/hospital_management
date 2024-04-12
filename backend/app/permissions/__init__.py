@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from permissions.user import UserRole
 
 
 class Permission:
@@ -18,6 +19,8 @@ class Permission:
                         detail="Forbidden"
                     )
                 uc = [str(c).upper() for c in Permission(user.role())]
+                if str(UserRole.ADMIN).upper() in uc:
+                    return func(*args, **kwargs)
                 for ac in superACL:
                     if str(ac).upper() in uc:
                         return func(*args, **kwargs)

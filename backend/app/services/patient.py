@@ -36,7 +36,7 @@ class PatientService:
         self._patient_repo = patient_repo
         self._user_repo = user_repo
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
+    @Permission.permit([UserRole.EMPLOYEE])
     async def get_patients(self, page: int = 1, limit: int = 10):
         page, limit = abs(page) if page else 1, abs(limit)
         patients, err = await self._patient_repo.list_patient(page, limit)
@@ -71,7 +71,7 @@ class PatientService:
             )
         return patients
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE], acl=[UserRole.PATIENT])
+    @Permission.permit([UserRole.EMPLOYEE], acl=[UserRole.PATIENT])
     async def get(self, id: str, max_progress: int = 5):
         patient, err = await self._patient_repo.get(query=QueryPatientModel(
             user_id=id,
@@ -142,7 +142,7 @@ class PatientService:
                 detail='Error in create patient'
             )
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
+    @Permission.permit([UserRole.EMPLOYEE])
     async def update(
         self,
         query: QueryPatientModel,
@@ -169,7 +169,7 @@ class PatientService:
             )
         ).model_dump()
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE])
+    @Permission.permit([UserRole.EMPLOYEE])
     async def add_progress(
         self,
         query: QueryPatientProgressModel,

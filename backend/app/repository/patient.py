@@ -22,7 +22,7 @@ class PatientRepo:
     async def call():
         return PatientRepo()
 
-    async def get(self, query: QueryPatientModel) -> Tuple[Patient, Exception]:
+    async def get(self, query: QueryPatientModel) -> Tuple[Patient, Exception | None]:
         try:
             patient = self._sess.query(Patient).filter(
                 Patient.user_id == query.user_id
@@ -39,7 +39,7 @@ class PatientRepo:
             return None, err
         return patient, None
 
-    async def create(self, patient_info: AddPatientModel) -> Tuple[Patient]:
+    async def create(self, patient_info: AddPatientModel) -> Tuple[Patient, Exception | None]:
         try:
             new_patient = Patient(
                 user_id=patient_info.user_id,
@@ -61,7 +61,7 @@ class PatientRepo:
         self,
         query: QueryPatientModel,
         patient_update: PatchPatientModel
-    ) -> Tuple[Patient, Exception]:
+    ) -> Tuple[Patient, Exception | None]:
         try:
             patient, err = await self.get(query)
             if err:
@@ -93,7 +93,7 @@ class PatientRepo:
         self,
         page: int,
         limit: int
-    ) -> Tuple[list[Patient], Exception]:
+    ) -> Tuple[list[Patient], Exception | None]:
         try:
             patients = self._sess.query(Patient).outerjoin(
                 self._sess.query(MedicalRecord).filter(
@@ -116,7 +116,7 @@ class PatientRepo:
         self,
         patient_id: int,
         progress: NewPatientProgressModel
-    ) -> Tuple[PatientProgress, Exception]:
+    ) -> Tuple[PatientProgress, Exception | None]:
         try:
             medical_record_id = self._sess.query(Patient.medical_record_id).filter(
                 Patient.user_id == patient_id
