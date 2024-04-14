@@ -59,3 +59,7 @@ class PatchPatientModel(BaseModel):
 class QueryPatientModel(BaseModel):
     user_id: Optional[str | None] = None
     max_progress: int = 1
+
+
+class DeleteLeadEmployeeModel(BaseModel):
+    employee_email: str

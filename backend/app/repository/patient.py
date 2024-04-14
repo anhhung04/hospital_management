@@ -153,14 +153,15 @@ class PatientRepo:
             for attr, value in dump_update_progress.items():
                 setattr(patient_progress, attr, value) if value else None
             if lead_employee:
-                self._sess.execute(text("""
-                    INSERT INTO in_charge_of_patients (employee_id, progress_id, action) VALUES
-                    {};
-                """ .format(
-                    ", \n".join(
-                        f"('{emp.get("employee_id")}', {query.progress_id}, '{emp.get("action")}')" for emp in lead_employee
-                    )
-                )))
+                for employee in lead_employee:
+                    self._sess.execute(text("""
+                        INSERT INTO in_charge_of_patients (progress_id, employee_id, action)
+                        VALUES (:progress_id, :employee_id, :action);
+                    """), {
+                        "progress_id": query.progress_id,
+                        "employee_id": employee.get("employee_id"),
+                        "action": employee.get("action", "")
+                    })
             self._sess.add(patient_progress)
             self._sess.commit()
             self._sess.refresh(patient_progress)
@@ -181,3 +182,22 @@ class PatientRepo:
         except Exception as err:
             return None, err
         return patient_progress, None
+
+    async def delete_lead_employee(
+        self,
+        query: QueryPatientProgressModel,
+        employee_id: str
+    ):
+        try:
+            self._sess.execute(text("""
+                DELETE FROM in_charge_of_patients
+                WHERE progress_id = :id AND employee_id = :employee_id;
+            """), {"id": query.progress_id, "employee_id": employee_id})
+            self._sess.commit()
+            newProgress, err = await self.get_progress(query)
+            if err:
+                return None, err
+            return newProgress, None
+        except Exception as err:
+            self._sess.rollback()
+            return None, err

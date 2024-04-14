@@ -204,3 +204,28 @@ class TestPatient(TestIntegration):
         self.assertEqual(res.status_code, 200)
         print(res.json())
         self.assertEqual(res.json()['data']['lead_employee'][0]['employee_email'], "nguyenvana@gmail.com")
+
+    def test_delete_lead_employee(self):
+        _, _, patient_id = self.test_create_patient()
+        res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
+            "start_treatment": "2024-05-06 00:00:00",
+            "end_treatment": "2024-06-06 00:00:00",
+            "patient_condition": "good"
+        })
+        progress_id = res.json()['data']['id']
+        self.assertEqual(res.status_code, 200)
+        res = self._s.patch(self.path(f"/{patient_id}/progress/{progress_id}/update"), json={
+            "lead_employee": [
+                {
+                    "employee_email": "nguyenvana@gmail.com",
+                    "action": "test"
+                }
+            ]
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['data']['lead_employee'][0]['employee_email'], "nguyenvana@gmail.com")
+        res = self._s.delete(self.path(f"/{patient_id}/progress/{progress_id}/lead_employee"), json={
+            "employee_email": "nguyenvana@gmail.com"
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['data']['lead_employee'], [])

@@ -16,6 +16,7 @@ from models.patient_progress import (
     PatchPatientProgressModel,
     PatientProgressDetailModel
 )
+from models.employee import QueryEmployeeModel
 from permissions import Permission
 from permissions.user import UserRole
 from repository.user import UserRepo, QueryUserModel
@@ -297,6 +298,48 @@ class PatientService:
                 "action": rel.action
             } for rel in progress.lead_employee
         ]
+        dump_progress = ProgressRecordModel.model_validate(
+            obj=progress, strict=False, from_attributes=True
+        ).model_dump()
+        dump_progress.update({"lead_employee": lead_employee})
+        return PatientProgressDetailModel.model_validate(
+            dump_progress
+        ).model_dump()
+
+    @Permission.permit([UserRole.EMPLOYEE])
+    async def delete_lead_employee(
+        self,
+        query: QueryPatientProgressModel,
+        delete_employee: QueryEmployeeModel
+    ):
+        employee, err = await self._user_repo.get(
+            QueryUserModel(
+                email=delete_employee.employee_email
+            )
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=err
+            )
+        progress, err = await self._patient_repo.delete_lead_employee(
+            query,
+            employee.id
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=err
+            )
+        lead_employee = [
+            {
+                "full_name": " ".join([
+                    rel.employee.personal_info.last_name,
+                    rel.employee.personal_info.first_name
+                ]),
+                "employee_email": rel.employee.personal_info.email,
+                "action": rel.action
+            } for rel in progress.lead_employee]
         dump_progress = ProgressRecordModel.model_validate(
             obj=progress, strict=False, from_attributes=True
         ).model_dump()
