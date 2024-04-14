@@ -25,11 +25,12 @@ class EmployeeTest(TestCase):
         self.assertTrue(e_n_db.status == e.status)
 
         # Test FixedSchedule
-        fs = FixedSchedule(day="Monday", begin_time=time(9, 0), end_time=time(17, 0), begin_date=date(2022, 1, 1), end_date=date(2022, 12, 31), frequency=Frequency.DAILY)
+        fs = FixedSchedule(day="Monday", begin_time=time(9, 0), end_time=time(17, 0), begin_date=date(2022, 1, 1), end_date=date(2022, 12, 31), frequency=Frequency.DAILY, title="Morning Shift")
         db.add(fs)
         db.commit()
         fs_n_db = db.query(FixedSchedule).filter(FixedSchedule.id == fs.id).first()
         self.assertTrue(fs_n_db is not None)
+        self.assertTrue(fs_n_db.title == fs.title)
         self.assertTrue(fs_n_db.day == fs.day)
         self.assertTrue(fs_n_db.begin_time == fs.begin_time)
         self.assertTrue(fs_n_db.end_time == fs.end_time)
@@ -38,12 +39,13 @@ class EmployeeTest(TestCase):
         self.assertTrue(fs_n_db.frequency == fs.frequency)
 
         # Test OvertimeSchedule
-        os = OvertimeSchedule(date=date(2022, 1, 1), begin_time=time(17, 0), end_time=time(19, 0))
+        os = OvertimeSchedule(date=date(2022, 1, 1), begin_time=time(17, 0), end_time=time(19, 0), title="Evening Shift")
         db.add(os)
         db.commit()
         os_n_db = db.query(OvertimeSchedule).filter(OvertimeSchedule.id == os.id).first()
         self.assertTrue(os_n_db is not None)
         self.assertTrue(os_n_db.date == os.date)
+        self.assertTrue(os_n_db.title == os.title)
         self.assertTrue(os_n_db.begin_time == os.begin_time)
         self.assertTrue(os_n_db.end_time == os.end_time)
 

@@ -41,6 +41,7 @@ class FixedSchedule(Base):
     
     id = mapped_column(Integer, primary_key=True,
                        index=True, autoincrement=True)
+    title = mapped_column(String)
     day = mapped_column(String)
     begin_time = mapped_column(Time)
     end_time = mapped_column(Time)
@@ -53,6 +54,7 @@ class OvertimeSchedule(Base):
 
     id = mapped_column(Integer, primary_key=True,
                           index=True, autoincrement=True)
+    title = mapped_column(String)
     date = mapped_column(Date)
     begin_time = mapped_column(Time)
     end_time = mapped_column(Time)
