@@ -224,7 +224,6 @@ class PatientService:
                     detail='End treatment must be greater than start treatment'
                 )
         incharge_employees = []
-        result_incharge_employee = []
         if progress.lead_employee and isinstance(progress.lead_employee, list):
             for employee in progress.lead_employee:
                 if not employee.employee_email and not employee.employee_username:
@@ -245,13 +244,6 @@ class PatientService:
                     )
                 incharge_employees.append({
                     "employee_id": incharge_user.id,
-                    "action": employee.action
-                })
-                result_incharge_employee.append({
-                    "full_name": " ".join(
-                        [incharge_user.last_name, incharge_user.first_name]
-                    ),
-                    "employee_email": incharge_user.email,
                     "action": employee.action
                 })
                 progress.lead_employee = incharge_employees
