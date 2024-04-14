@@ -141,3 +141,30 @@ async def update_patient_progress(
         data=updated_progress,
         message="Progress updated successfully"
     )
+
+
+@router.get(
+    "/{patient_id}/progress/{progress_id}",
+    tags=["patient"],
+    response_model=PatientProgressDetailResponseModel
+)
+async def get_patient_progress(
+    patient_id: IdPath,
+    progress_id: int,
+    service: PatientService = Depends(PatientService),
+):
+    try:
+        progress = await service.get_progress(
+            QueryPatientProgressModel(
+                patient_id=patient_id, progress_id=progress_id
+            )
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=progress,
+        message="Progress fetched successfully"
+    )

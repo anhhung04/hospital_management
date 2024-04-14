@@ -168,3 +168,16 @@ class PatientRepo:
             self._sess.rollback()
             return None, err
         return patient_progress, None
+
+    async def get_progress(
+        self,
+        query: QueryPatientProgressModel
+    ):
+        try:
+            patient_progress = self._sess.query(PatientProgress).filter(
+                PatientProgress.id == query.progress_id
+                and PatientProgress.patient_id == query.patient_id
+            ).first()
+        except Exception as err:
+            return None, err
+        return patient_progress, None
