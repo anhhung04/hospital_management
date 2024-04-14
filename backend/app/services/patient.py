@@ -12,7 +12,7 @@ from models.medical_record import NewMedicalRecordModel, MedicalRecordModel
 from models.patient_progress import (
     NewPatientProgressModel,
     QueryPatientProgressModel,
-    PatientProgressModel
+    ProgressRecordModel
 )
 from permissions import Permission
 from permissions.user import UserRole
@@ -23,6 +23,7 @@ from util.crypto import PasswordContext
 from uuid import uuid4
 from fastapi import Depends
 from middleware.user_ctx import UserContext
+from datetime import datetime
 
 
 class PatientService:
@@ -175,6 +176,20 @@ class PatientService:
         query: QueryPatientProgressModel,
         progress: NewPatientProgressModel
     ):
+        start_treatment = datetime.strptime(
+            progress.start_treatment, '%Y-%m-%d %H:%M:%S'
+        ) if progress.start_treatment else None
+        end_treatment = datetime.strptime(
+            progress.end_treatment, '%Y-%m-%d %H:%M:%S'
+        ) if progress.end_treatment else None
+        if end_treatment.__le__(start_treatment):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='End treatment must be greater than start treatment'
+            )
+        current_time = datetime.now()
+        if start_treatment.__le__(current_time):
+            progress.status = ProgressType.PROCESSING
         progress, err = await self._patient_repo.create_progress(
             query.patient_id,
             progress
@@ -184,7 +199,7 @@ class PatientService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail='Error in add progress'
             )
-        return PatientProgressModel.model_validate(
+        return ProgressRecordModel.model_validate(
             obj=progress, strict=False, from_attributes=True
         ).model_dump()
 
@@ -195,8 +210,11 @@ class PatientService:
         progress = media_record.progress
         appointment_date = None
         if progress and len(progress) > 0:
-            latest_progress = progress[-1]
+            progress.sort(
+                key=lambda x: x and x.start_treatment, reverse=True
+            )
+            latest_progress = progress[0]
             appointment_date = str(
-                latest_progress.created_at
+                latest_progress.start_treatment
             ) if latest_progress and latest_progress.status == ProgressType.SCHEDULING else None
         return appointment_date
