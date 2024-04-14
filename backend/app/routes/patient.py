@@ -6,7 +6,10 @@ from models.patient import (
     ListPatientsModel, AddPatientRequestModel, NewPatientReponseModel,
     PatientDetailResponseModel, QueryPatientModel, PatchPatientModel
 )
-from models.patient_progress import NewPatientProgressModel, QueryPatientProgressModel, PatientProgressResponseModel
+from models.patient_progress import (
+    NewPatientProgressModel, QueryPatientProgressModel, PatientProgressResponseModel,
+    PatientProgressDetailResponseModel, PatchPatientProgressModel
+)
 from models.request import IdPath
 
 router = APIRouter()
@@ -109,4 +112,32 @@ async def add_new_patient_progress(
         code=status.HTTP_200_OK,
         data=new_progress,
         message="Progress added successfully"
+    )
+
+
+@router.patch(
+    "/{patient_id}/progress/{progress_id}/update",
+    tags=["patient"],
+    response_model=PatientProgressDetailResponseModel
+)
+async def update_patient_progress(
+    patient_id: IdPath,
+    progress_id: int,
+    progress: PatchPatientProgressModel,
+    service: PatientService = Depends(PatientService),
+):
+    try:
+        updated_progress = await service.update_progress(
+            QueryPatientProgressModel(
+                patient_id=patient_id, progress_id=progress_id),
+            progress
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=updated_progress,
+        message="Progress updated successfully"
     )

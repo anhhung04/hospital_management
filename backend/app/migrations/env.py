@@ -7,7 +7,7 @@ from alembic import context
 
 from repository.schemas import Base # noqa
 from repository.schemas.user import User # noqa
-from repository.schemas.patient import Patient, MedicalRecord, PatientProgress, employee_handle_patient  # noqa
+from repository.schemas.patient import Patient, MedicalRecord, PatientProgress, EmployeeHandlePatient  # noqa
 from repository.schemas.employees import Employee # noqa
 
 import os

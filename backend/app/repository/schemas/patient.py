@@ -1,10 +1,9 @@
 from sqlalchemy import (
-    String, Integer, ForeignKey, Float, DateTime, func, Table, Column,
+    String, Integer, ForeignKey, Float, DateTime, func,
     Enum as DBEnum
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from repository.schemas import Base, ObjectID
-from repository.schemas.employees import Employee
 from typing import List
 from enum import Enum
 
@@ -43,13 +42,22 @@ class MedicalRecord(Base):
     __table_args__ = {"extend_existing": True}
 
 
-employee_handle_patient = Table(
-    "in_charge_of_patients", Base.metadata,
-    Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
-    Column("progress_id", Integer, ForeignKey("patient_progresses.id")),
-    Column("action", String, default=""),
-    extend_existing=True
-)
+class EmployeeHandlePatient(Base):
+    __tablename__ = 'in_charge_of_patients'
+    employee_id = mapped_column(ForeignKey(
+        'employees.user_id'), primary_key=True)
+    progress_id = mapped_column(ForeignKey(
+        'patient_progresses.id'), primary_key=True)
+    employee = relationship(
+        "Employee",
+        primaryjoin="EmployeeHandlePatient.employee_id == Employee.user_id"
+    )
+    progress = relationship(
+        "PatientProgress",
+        primaryjoin="PatientProgress.id == EmployeeHandlePatient.progress_id"
+    )
+    action = mapped_column(String, default='')
+
 
 class PatientProgress(Base):
     __tablename__ = 'patient_progresses'
@@ -65,6 +73,9 @@ class PatientProgress(Base):
                            default=ProgressType.SCHEDULING)
     medical_record_id = mapped_column(ForeignKey('medical_records.id'))
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="progress")
-    lead_employee: Mapped[List["Employee"]] = relationship(secondary=employee_handle_patient)
+    lead_employee: Mapped[List["EmployeeHandlePatient"]] = relationship(
+        "EmployeeHandlePatient",
+        primaryjoin="PatientProgress.id == EmployeeHandlePatient.progress_id"
+    )
 
     __table_args__ = {"extend_existing": True}

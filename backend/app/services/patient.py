@@ -12,11 +12,13 @@ from models.medical_record import NewMedicalRecordModel, MedicalRecordModel
 from models.patient_progress import (
     NewPatientProgressModel,
     QueryPatientProgressModel,
-    ProgressRecordModel
+    ProgressRecordModel,
+    PatchPatientProgressModel,
+    PatientProgressDetailModel
 )
 from permissions import Permission
 from permissions.user import UserRole
-from repository.user import UserRepo
+from repository.user import UserRepo, QueryUserModel
 from repository.schemas.patient import MedicalRecord
 from repository.schemas.patient import Patient, ProgressType
 from util.crypto import PasswordContext
@@ -201,6 +203,75 @@ class PatientService:
             )
         return ProgressRecordModel.model_validate(
             obj=progress, strict=False, from_attributes=True
+        ).model_dump()
+
+    @Permission.permit([UserRole.EMPLOYEE])
+    async def update_progress(
+        self,
+        query: QueryPatientProgressModel,
+        progress: PatchPatientProgressModel
+    ):
+        start_treatment = datetime.strptime(
+            progress.start_treatment, '%Y-%m-%d %H:%M:%S'
+        ) if progress.start_treatment else None
+        end_treatment = datetime.strptime(
+            progress.end_treatment, '%Y-%m-%d %H:%M:%S'
+        ) if progress.end_treatment else None
+        if start_treatment and end_treatment:
+            if end_treatment.__le__(start_treatment):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail='End treatment must be greater than start treatment'
+                )
+        incharge_employees = []
+        if progress.lead_employee and isinstance(progress.lead_employee, list):
+            for employee in progress.lead_employee:
+                if not employee.employee_email and not employee.employee_username:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='Employee email or username is required'
+                    )
+                incharge_user, err = await self._user_repo.get(
+                    QueryUserModel(
+                        email=employee.employee_email,
+                        username=employee.employee_username
+                    )
+                )
+                if err:
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail='Error in get employee information'
+                    )
+                incharge_employees.append({
+                    "employee_id": incharge_user.id,
+                    "action": employee.action
+                })
+                progress.lead_employee = incharge_employees
+        progress, err = await self._patient_repo.update_progress(
+            query,
+            progress
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail='Error in update progress'
+            )
+        lead_employee = [
+            {
+                "full_name": " ".join([
+                    rel.employee.personal_info.last_name,
+                    rel.employee.personal_info.first_name
+                ]),
+                "employee_email": rel.employee.personal_info.email,
+                "action": rel.action
+            } for rel in progress.lead_employee
+        ]
+        dump_progress = ProgressRecordModel.model_validate(
+            obj=progress, strict=False, from_attributes=True
+        ).model_dump()
+        dump_progress.update({"lead_employee": lead_employee})
+        return PatientProgressDetailModel.model_validate(
+            dump_progress
         ).model_dump()
 
     @staticmethod

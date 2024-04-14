@@ -26,6 +26,7 @@ class UserRepo:
                 or User.email == query.email if query.email else None
                 or User.ssn == query.ssn if query.ssn else None
             ).first()
+            assert user, "Nonexistent user"
             return user, None
         except Exception as err:
             return None, err
