@@ -1,10 +1,9 @@
 from sqlalchemy import (
-    String, Integer, ForeignKey, Float, DateTime, func, Table, Column,
+    String, Integer, ForeignKey, Float, DateTime, func,
     Enum as DBEnum
 )
-from sqlalchemy.orm import mapped_column, Mapped, relationship, Query
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from repository.schemas import Base, ObjectID
-from repository.schemas.employees import Employee
 from typing import List
 from enum import Enum
 
