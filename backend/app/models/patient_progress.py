@@ -32,6 +32,20 @@ class ProgressRecordModel(BaseModel):
         return str(v)
 
 
+class EmployeeInChargeModel(BaseModel):
+    employee_email: Optional[str | None] = None
+    employee_username: Optional[str | None] = None
+    action: str
+
+
+class PatchPatientProgressModel(BaseModel):
+    status: Optional[ProgressType | None] = None
+    patient_condition: Optional[str | None] = None
+    start_treatment: Optional[str | None] = None
+    end_treatment: Optional[str | None] = None
+    lead_employee: Optional[list[EmployeeInChargeModel | None] | None] = None
+
+
 class NewPatientProgressModel(BaseModel):
     start_treatment: str
     end_treatment: str
@@ -40,6 +54,21 @@ class NewPatientProgressModel(BaseModel):
 
 class PatientProgressResponseModel(BaseResponseModel):
     data: ProgressRecordModel
+
+
+class EmployeeInChargeInfoModel(BaseModel):
+    full_name: str
+    employee_email: str
+    action: str
+
+
+class PatientProgressDetailModel(ProgressRecordModel):
+    lead_employee: Optional[list[EmployeeInChargeInfoModel |
+                                 None] | None] = None
+
+
+class PatientProgressDetailResponseModel(BaseResponseModel):
+    data: PatientProgressDetailModel
 
 
 class QueryPatientProgressModel(BaseModel):

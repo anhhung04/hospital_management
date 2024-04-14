@@ -1,11 +1,12 @@
 from repository.schemas.patient import Patient, MedicalRecord, PatientProgress
 from repository.schemas.user import User
+from sqlalchemy.sql import text
 from repository.user import UserRepo
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import Tuple
 from models.patient import QueryPatientModel, PatchPatientModel, AddPatientModel
-from models.patient_progress import NewPatientProgressModel
+from models.patient_progress import NewPatientProgressModel, QueryPatientProgressModel, PatchPatientProgressModel
 from repository import Storage
 from fastapi import Depends
 
@@ -134,3 +135,36 @@ class PatientRepo:
             self._sess.rollback()
             return None, err
         return new_progress, None
+
+    async def update_progress(
+        self,
+        query: QueryPatientProgressModel,
+        progress: PatchPatientProgressModel
+    ):
+        try:
+            patient_progress = self._sess.query(PatientProgress).filter(
+                PatientProgress.id == query.progress_id
+                and PatientProgress.patient_id == query.patient_id
+            ).first()
+            if not patient_progress:
+                raise Exception("Patient progress not found")
+            dump_update_progress = progress.model_dump()
+            lead_employee = dump_update_progress.pop("lead_employee", None)
+            for attr, value in dump_update_progress.items():
+                setattr(patient_progress, attr, value) if value else None
+            if lead_employee:
+                self._sess.execute(text("""
+                    INSERT INTO in_charge_of_patients (employee_id, progress_id, action) VALUES
+                    {};
+                """ .format(
+                    ", \n".join(
+                        f"('{emp.get("employee_id")}', {query.progress_id}, '{emp.get("action")}')" for emp in lead_employee
+                    )
+                )))
+            self._sess.add(patient_progress)
+            self._sess.commit()
+            self._sess.refresh(patient_progress)
+        except Exception as err:
+            self._sess.rollback()
+            return None, err
+        return patient_progress, None

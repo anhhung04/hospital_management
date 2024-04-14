@@ -158,3 +158,27 @@ class TestPatient(TestIntegration):
         self.assertEqual(res.status_code, 200)
         data = res.json()['data']
         self.assertEqual(len(data['medical_record']['progress']), max_progress)
+
+    def test_update_progress(self):
+        _, _, patient_id = self.test_create_patient()
+        res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
+            "start_treatment": "2024-05-06 00:00:00",
+            "end_treatment": "2024-06-06 00:00:00",
+            "patient_condition": "good"
+        })
+        progress_id = res.json()['data']['id']
+        res = self._s.patch(self.path(f"/{patient_id}/progress/{progress_id}/update"), json={
+            "lead_employee": [
+                {
+                    "employee_email": "nguyenvana@gmail.com",
+                    "action": "do something"
+                }
+            ]
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['data']['lead_employee'][0]['employee_email'], "nguyenvana@gmail.com")
+        res = self._s.patch(self.path(f"/{patient_id}/progress/{progress_id}/update"), json={
+            "status": "FINISHED"
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['data']['status'], "FINISHED")
