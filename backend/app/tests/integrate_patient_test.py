@@ -105,21 +105,47 @@ class TestPatient(TestIntegration):
     def test_add_new_progress(self):
         _, _, patient_id = self.test_create_patient()
         res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
-            "treatment_schedule": "everyday",
-            "duration": 30,
-            "treatment_type": gen_username(),
+            "start_treatment": "2024-05-06 00:00:00",
+            "end_treatment": "2024-06-06 00:00:00",
             "patient_condition": "good"
         })
         print(res.json())
         self.assertEqual(res.status_code, 200)
 
+    def test_add_invalid_progress(self):
+        _, _, patient_id = self.test_create_patient()
+        res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
+            "start_treatment": "2024-05-06 00:00:00",
+            "end_treatment": "2024-06-06 00:00:00",
+            "patient_condition": "good"
+        })
+        self.assertEqual(res.status_code, 200)
+        res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
+            "start_treatment": "2024-05-06 00:00:00",
+            "end_treatment": "2024-03-06 00:00:00",
+            "patient_condition": "good"
+        })
+        self.assertEqual(res.status_code, 400)
+
+    def test_auto_process_progress(self):
+        from datetime import datetime, timedelta
+        _, _, patient_id = self.test_create_patient()
+        current = datetime.now()
+        res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
+            "start_treatment": current.__sub__(timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S"),
+            "end_treatment": (current := current.replace(
+                month=current.month + 1)).strftime("%Y-%m-%d %H:%M:%S"),
+            "patient_condition": "good"
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['data']['status'], "PROCESSING")
+
     def test_view_progress(self):
         _, _, patient_id = self.test_create_patient()
         for _ in range(20):
             res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
-                "treatment_schedule": "everyday",
-                "duration": 30,
-                "treatment_type": gen_username(),
+                "start_treatment": "2024-05-06 00:00:00",
+                "end_treatment": "2024-06-06 00:00:00",
                 "patient_condition": "good"
             })
             print(res.json())

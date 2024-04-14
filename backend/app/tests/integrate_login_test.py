@@ -24,11 +24,6 @@ class TestCase(TestIntegration):
         self._s.headers.update({
             "Authorization": f"Bearer {access_token}"
         })
-        self._s.get(self.path('/login'), json={
-            "username": "employee1",
-            "password": "admin"
-        })
-        self.assertEqual(res.status_code, 200)
         res = self._s.post(self.path('/password/change'), json={
             "old_password": "admin",
             "new_password": "demo"

@@ -10,7 +10,7 @@ from enum import Enum
 
 class ProgressType(Enum):
     SCHEDULING = 'SCHEDULING'
-    PROCESSINT = 'PROCESSING'
+    PROCESSING = 'PROCESSING'
     FINISHED = 'FINISHED'
 
 class Patient(Base):
@@ -57,9 +57,8 @@ class PatientProgress(Base):
     id = mapped_column(Integer, primary_key=True,
                        index=True, autoincrement=True)
     created_at = mapped_column(DateTime, default=func.now())
-    treatment_schedule = mapped_column(String)
-    duration = mapped_column(Integer)
-    treatment_type = mapped_column(String)
+    start_treatment = mapped_column(DateTime, default=func.now())
+    end_treatment = mapped_column(DateTime)
     patient_condition = mapped_column(String)
     patient_id = mapped_column(ForeignKey('patients.user_id'))
     status = mapped_column(DBEnum(ProgressType),
