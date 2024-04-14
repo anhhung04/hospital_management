@@ -254,7 +254,38 @@ class PatientService:
         if err:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail='Error in update progress'
+                detail=err
+            )
+        lead_employee = [
+            {
+                "full_name": " ".join([
+                    rel.employee.personal_info.last_name,
+                    rel.employee.personal_info.first_name
+                ]),
+                "employee_email": rel.employee.personal_info.email,
+                "action": rel.action
+            } for rel in progress.lead_employee
+        ]
+        dump_progress = ProgressRecordModel.model_validate(
+            obj=progress, strict=False, from_attributes=True
+        ).model_dump()
+        dump_progress.update({"lead_employee": lead_employee})
+        return PatientProgressDetailModel.model_validate(
+            dump_progress
+        ).model_dump()
+
+    @Permission.permit([UserRole.EMPLOYEE])
+    async def get_progress(
+        self,
+        query: QueryPatientProgressModel,
+    ):
+        progress, err = await self._patient_repo.get_progress(
+            query
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=err
             )
         lead_employee = [
             {
