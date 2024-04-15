@@ -21,7 +21,7 @@ from permissions import Permission
 from permissions.user import UserRole
 from repository.user import UserRepo, QueryUserModel
 from repository.schemas.patient import MedicalRecord
-from repository.schemas.patient import Patient, ProgressType
+from repository.schemas.patient import ProgressType
 from util.crypto import PasswordContext
 from uuid import uuid4
 from fastapi import Depends
