@@ -115,7 +115,7 @@ class PatientRepo:
 
     async def create_progress(
         self,
-        patient_id: int,
+        patient_id: str,
         progress: NewPatientProgressModel
     ) -> Tuple[PatientProgress, Exception | None]:
         try:

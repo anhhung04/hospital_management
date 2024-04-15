@@ -21,7 +21,7 @@ from permissions import Permission
 from permissions.user import UserRole
 from repository.user import UserRepo, QueryUserModel
 from repository.schemas.patient import MedicalRecord
-from repository.schemas.patient import Patient, ProgressType
+from repository.schemas.patient import ProgressType
 from util.crypto import PasswordContext
 from uuid import uuid4
 from fastapi import Depends
@@ -51,23 +51,20 @@ class PatientService:
                 detail='Error in get patients list'
             )
         try:
-            def process_patient(patient: Patient):
-                appointment_date = None
-                if patient.medical_record:
-                    appointment_date = PatientService.find_appointment_date(
-                        patient.medical_record
-                    )
-                return PatientModel(
-                    id=patient.user_id,
+            patients = [
+                PatientModel(
+                    id=p.user_id,
                     full_name=" ".join(
-                        [patient.personal_info.last_name,
-                            patient.personal_info.first_name]
+                        [p.personal_info.last_name,
+                            p.personal_info.first_name]
                     ),
-                    phone_number=patient.personal_info.phone_number,
-                    medical_record_id=patient.medical_record.id if patient.medical_record else None,
-                    appointment_date=appointment_date
-                ).model_dump()
-            patients = [process_patient(p) for p in patients]
+                    phone_number=p.personal_info.phone_number,
+                    medical_record_id=p.medical_record.id if p.medical_record else None,
+                    appointment_date=self.find_appointment_date(
+                        p.medical_record
+                    )
+                ).model_dump() for p in patients
+            ]
         except Exception as err:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -185,16 +182,18 @@ class PatientService:
         end_treatment = datetime.strptime(
             progress.end_treatment, '%Y-%m-%d %H:%M:%S'
         ) if progress.end_treatment else None
-        if end_treatment.__le__(start_treatment):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='End treatment must be greater than start treatment'
-            )
-        current_time = datetime.now()
-        if start_treatment.__le__(current_time):
-            progress.status = ProgressType.PROCESSING
+        if start_treatment:
+            if end_treatment:
+                if end_treatment.__le__(start_treatment):
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='End treatment must be greater than start treatment'
+                    )
+            current_time = datetime.now()
+            if start_treatment.__le__(current_time):
+                progress.status = ProgressType.PROCESSING
         progress, err = await self._patient_repo.create_progress(
-            query.patient_id,
+            str(query.patient_id),
             progress
         )
         if err:
@@ -349,17 +348,22 @@ class PatientService:
         ).model_dump()
 
     @staticmethod
-    def find_appointment_date(media_record: MedicalRecord) -> str:
+    def find_appointment_date(media_record: MedicalRecord | None) -> str | None:
         if not media_record:
             return None
         progress = media_record.progress
         appointment_date = None
-        if progress and len(progress) > 0:
+        if progress and isinstance(progress, list):
+            progress = list(filter(
+                lambda x: x and x.status == ProgressType.SCHEDULING,
+                progress
+            ))
             progress.sort(
                 key=lambda x: x and x.start_treatment, reverse=True
             )
-            latest_progress = progress[0]
-            appointment_date = str(
-                latest_progress.start_treatment
-            ) if latest_progress and latest_progress.status == ProgressType.SCHEDULING else None
+            if len(progress) > 0:
+                latest_progress = progress[0]
+                appointment_date = str(
+                    latest_progress.start_treatment
+                ) if latest_progress else None
         return appointment_date
