@@ -6,9 +6,6 @@ import apiCall from "../../utils/api";
 
 import { useEffect, useState } from "react";
 
-
-
-
 function PatientsList() {
 
   const [checkedState, setCheckedState] = useState([]);
