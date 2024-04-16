@@ -7,11 +7,18 @@ from models.employee import(
   EmployeeDetailReponseModel, 
   NewEmployeeResponseModel, 
   AddEmployeeRequestModel,
-  PatchEmployeeModel
+  PatchEmployeeModel,
+)
+from models.event import(
+  ListEventResponseModel,
+  EventRequestModel,
+  EventReponseModel,
+  PatchEventRequestModel
 )
 from models.request import IdPath
 from permissions.user import EmployeeType
 from typing import Annotated
+from datetime import date
 
 router = APIRouter(tags=["employee"])
 
@@ -82,4 +89,105 @@ async def update_employee(
         )
     return APIResponse.as_json(
         code=status.HTTP_200_OK, message="Employee updated successfully", data=employee
+    )
+
+@router.get("/{employee_id}/event", response_model=ListEventResponseModel)
+async def list_events(
+    employee_id: IdPath,
+    all: Annotated[bool, Query] = True,
+    begin_date: Annotated[date | None, Query] = None,
+    end_date: Annotated[date | None, Query] = None,
+    service: EmployeeService = Depends(EmployeeService)
+):
+    try:
+        events = await service.list_events(
+            id=str(employee_id),
+            all=all,
+            begin_date=begin_date,
+            end_date=end_date
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, message="Events fetched successfully", data=events
+    )
+
+@router.get("/{employee_id}/event/{event_id}", response_model=EventReponseModel)
+async def get_event(
+    employee_id: IdPath,
+    event_id: int,
+    service: EmployeeService = Depends(EmployeeService)
+):
+    try:
+        event = await service.get_event(
+            id=str(employee_id),
+            event_id=event_id
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, message="Event fetched successfully", data=event
+    )
+
+@router.post("/{employee_id}/event/create", response_model=EventReponseModel)
+async def create_event(
+    employee_id: IdPath,
+    event_request: EventRequestModel,
+    service: EmployeeService = Depends(EmployeeService)
+):
+    try:
+        event = await service.create_event(
+            id=str(employee_id),
+            event=event_request
+        ) 
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, message="Event created successfully", data=event
+    )
+
+@router.patch("/{employee_id}/event/{event_id}/update", response_model=EventReponseModel)
+async def update_event(
+    employee_id: IdPath,
+    event_id: int,
+    patch_event: PatchEventRequestModel,
+    service: EmployeeService = Depends(EmployeeService)
+):
+    try:
+        event = await service.update_event(
+            id=str(employee_id),
+            event_id=event_id,
+            patch_event=patch_event
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, message="Event updated successfully", data=event
+    )
+
+@router.delete("/{employee_id}/event/{event_id}/delete")
+async def delete_event(
+    employee_id: IdPath,
+    event_id: int,
+    service: EmployeeService = Depends(EmployeeService)
+):
+    try:
+        await service.delete_event(
+            id=str(employee_id),
+            event_id=event_id
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK, message="Event deleted successfully", data={}
     )

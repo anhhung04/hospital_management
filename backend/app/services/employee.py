@@ -9,6 +9,14 @@ from models.employee import (
   AddEmployeeModel,
   PatchEmployeeModel
 )
+from models.event import(
+  EventModel,
+  day_of_week_map,
+  freq_map,
+  EventRequestModel,
+  ListEventModel,
+  PatchEventRequestModel
+)
 from permissions import Permission
 from permissions.user import UserRole, EmployeeType
 from repository.employee import EmployeeRepo
@@ -16,6 +24,8 @@ from repository.user import UserRepo
 from middleware.user_ctx import UserContext
 from util.crypto import PasswordContext
 from uuid import uuid4
+from datetime import date, timedelta
+from dateutil.rrule import rrule
 
 class EmployeeService:
     def __init__(
@@ -140,3 +150,144 @@ class EmployeeService:
                 obj=employee.personal_info, strict=False, from_attributes=True
             )
         ).model_dump()
+    
+    @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
+    async def list_events(self, id: str, all: bool, begin_date: date, end_date: date):
+        if not all:
+            if not begin_date:
+                current_date = date.today()
+                days_to_monday = current_date.weekday()
+                begin_date = current_date - timedelta(days=days_to_monday)
+                end_date = begin_date + timedelta(days=6)
+            if not end_date:
+                end_date = begin_date + timedelta(days=6)
+            if begin_date > end_date:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Begin date must be less than or equal end date"
+                )
+        events, error = await self._employee_repo.list_events(
+            query=QueryEmployeeModel(user_id=id),
+            all=all,
+            begin_date=begin_date, 
+            end_date=end_date
+        )
+        if error:
+            
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error in fetching employee events"
+            )
+        events = [ListEventModel(
+            id=event.id,
+            title=event.title,
+            day_of_week=str(event.day_of_week.value),
+            begin_time=event.begin_time.strftime("%H:%M"),
+            end_time=event.end_time.strftime("%H:%M"),
+            begin_date=str(event.begin_date),
+            end_date=str(event.end_date),
+            occurence=[date.strftime("%Y-%m-%d") for date in list(rrule(
+                freq=freq_map[event.frequency.value],
+                dtstart=event.begin_date,
+                until=min(end_date, event.end_date),
+                byweekday=day_of_week_map[event.day_of_week.value]
+            ))] if event.is_recurring else [str(event.begin_date)]
+        ).model_dump() for event in events]
+        return events
+    
+    @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
+    async def create_event(
+        self, 
+        id: str, 
+        event: EventRequestModel
+    ):
+        try:
+            event_info = event.model_dump()
+            event_in_db, error = await self._employee_repo.create_event(
+                EventRequestModel.model_validate(event_info),
+                employee_id=id
+            )
+            if error or not event_in_db:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Error in creating event"
+                )
+            return EventModel(
+                id=event_in_db.id,
+                title=event_in_db.title,
+                day_of_week=str(event_in_db.day_of_week.value),
+                begin_time=event_in_db.begin_time.strftime("%H:%M"),
+                end_time=event_in_db.end_time.strftime("%H:%M"),
+                begin_date=str(event_in_db.begin_date),
+                end_date=str(event_in_db.end_date)
+            ).model_dump()
+        except Exception as e:
+            logger.error('Error in creating event', reason=e)
+            raise HTTPException(
+                status_code=500, detail='Error in creating event'
+            )
+        
+    @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
+    async def get_event(self, id: str, event_id: int):
+        event, error = await self._employee_repo.get_event(
+            query=QueryEmployeeModel(user_id=id),
+            event_id=event_id
+        )
+        if error:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error in fetching event"
+            )
+        if not event:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Event not found"
+            )
+        return EventModel(
+            id=event.id,
+            title=event.title,
+            day_of_week=str(event.day_of_week.value),
+            begin_time=event.begin_time.strftime("%H:%M"),
+            end_time=event.end_time.strftime("%H:%M"),
+            begin_date=str(event.begin_date),
+            end_date=str(event.end_date)
+        ).model_dump()
+    
+    @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
+    async def update_event(
+        self,
+        id: str,
+        event_id: int,
+        patch_event: PatchEventRequestModel
+    ):
+        event, error = await self._employee_repo.update_event(
+            QueryEmployeeModel(user_id=id),
+            event_id=event_id,
+            patch_event=patch_event
+        )
+        if error:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error in updating event"
+            )
+        return EventModel(
+            id=event.id,
+            title=event.title,
+            day_of_week=str(event.day_of_week.value),
+            begin_time=event.begin_time.strftime("%H:%M"),
+            end_time=event.end_time.strftime("%H:%M"),
+            begin_date=str(event.begin_date),
+            end_date=str(event.end_date)
+        ).model_dump()
+    
+    @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
+    async def delete_event(self, id: str, event_id: int):
+        error = await self._employee_repo.delete_event(
+            QueryEmployeeModel(user_id=id),
+            event_id=event_id
+        )
+        if error:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error in deleting event"
+            )
