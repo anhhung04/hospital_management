@@ -94,7 +94,6 @@ async def update_employee(
 @router.get("/{employee_id}/event", response_model=ListEventResponseModel)
 async def list_events(
     employee_id: IdPath,
-    all: Annotated[bool, Query] = True,
     begin_date: Annotated[date | None, Query] = None,
     end_date: Annotated[date | None, Query] = None,
     service: EmployeeService = Depends(EmployeeService)
@@ -102,7 +101,6 @@ async def list_events(
     try:
         events = await service.list_events(
             id=str(employee_id),
-            all=all,
             begin_date=begin_date,
             end_date=end_date
         )

@@ -119,7 +119,6 @@ class EmployeeRepo:
     async def list_events(
         self,
         query: QueryEmployeeModel,
-        all: bool,
         begin_date: date,
         end_date: date
     ) -> Tuple[list[Event], Exception | None]:
@@ -127,10 +126,7 @@ class EmployeeRepo:
             query = self._sess.query(Event).join(schedule).filter(
                 schedule.c.employee_id == query.user_id
             )
-            if all:
-                events = query.all()
-            else:
-                events = query.filter(Event.begin_date >= begin_date, Event.begin_date <= end_date).all()
+            events = query.filter(Event.begin_date >= begin_date, Event.begin_date <= end_date).all()
         except Exception as e:
             return [], e
         return events, None
@@ -149,7 +145,7 @@ class EmployeeRepo:
                 begin_date=event_info.begin_date,
                 end_date=event_info.end_date,
                 is_recurring=event_info.is_recurring,
-                frequency=Frequency(event_info.frequency)
+                frequency=Frequency(event_info.frequency) if event_info.frequency else None
             )
             employee = self._sess.query(Employee).filter(
                 Employee.user_id == employee_id

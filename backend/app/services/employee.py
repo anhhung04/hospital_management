@@ -152,28 +152,25 @@ class EmployeeService:
         ).model_dump()
     
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
-    async def list_events(self, id: str, all: bool, begin_date: date, end_date: date):
-        if not all:
-            if not begin_date:
-                current_date = date.today()
-                days_to_monday = current_date.weekday()
-                begin_date = current_date - timedelta(days=days_to_monday)
-                end_date = begin_date + timedelta(days=6)
-            if not end_date:
-                end_date = begin_date + timedelta(days=6)
-            if begin_date > end_date:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Begin date must be less than or equal end date"
-                )
+    async def list_events(self, id: str, begin_date: date, end_date: date):
+        if not begin_date:
+            current_date = date.today()
+            days_to_monday = current_date.weekday()
+            begin_date = current_date - timedelta(days=days_to_monday)
+            end_date = begin_date + timedelta(days=6)
+        if not end_date:
+            end_date = begin_date + timedelta(days=6)
+        if begin_date > end_date:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Begin date must be less than or equal end date"
+            )
         events, error = await self._employee_repo.list_events(
             query=QueryEmployeeModel(user_id=id),
-            all=all,
             begin_date=begin_date, 
             end_date=end_date
         )
         if error:
-            
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error in fetching employee events"
@@ -185,11 +182,12 @@ class EmployeeService:
             begin_time=event.begin_time.strftime("%H:%M"),
             end_time=event.end_time.strftime("%H:%M"),
             begin_date=str(event.begin_date),
-            end_date=str(event.end_date),
+            end_date=str(event.end_date) if event.end_date else None,
+            is_recurring=event.is_recurring,
             occurence=[date.strftime("%Y-%m-%d") for date in list(rrule(
                 freq=freq_map[event.frequency.value],
                 dtstart=event.begin_date,
-                until=min(end_date, event.end_date),
+                until=min(end_date, event.end_date) if event.end_date and end_date else end_date,
                 byweekday=day_of_week_map[event.day_of_week.value]
             ))] if event.is_recurring else [str(event.begin_date)]
         ).model_dump() for event in events]
@@ -219,7 +217,9 @@ class EmployeeService:
                 begin_time=event_in_db.begin_time.strftime("%H:%M"),
                 end_time=event_in_db.end_time.strftime("%H:%M"),
                 begin_date=str(event_in_db.begin_date),
-                end_date=str(event_in_db.end_date)
+                end_date=str(event_in_db.end_date) if event_in_db.end_date else None,
+                is_recurring=event_in_db.is_recurring,
+                frequency=event_in_db.frequency.value if event_in_db.frequency else None
             ).model_dump()
         except Exception as e:
             logger.error('Error in creating event', reason=e)
