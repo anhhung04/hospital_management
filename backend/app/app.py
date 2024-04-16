@@ -1,17 +1,16 @@
 import uvicorn
 import os
 
-from fastapi import FastAPI, status, Depends
+from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError, HTTPException
 from config import config
 
 from fastapi.middleware.cors import CORSMiddleware
 
 from util.response import APIResponse
-from middleware.user_ctx import auth_middleware
 
 app = FastAPI(docs_url='/api/docs', redoc_url='/api/redoc',
-              openapi_url='/api/openapi.json', dependencies=[Depends(auth_middleware)])
+              openapi_url='/api/openapi.json')
 
 
 app.add_middleware(

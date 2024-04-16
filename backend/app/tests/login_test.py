@@ -1,5 +1,5 @@
 from unittest import TestCase
-from test import override_get_db, client, gen_username, gen_password, create_user
+from tests import override_get_db, client, gen_username, gen_password, create_user
 
 
 def login(db):
@@ -11,6 +11,7 @@ def login(db):
         "/api/auth/login", json={"username": user.username, "password": raw_password})
     return res, user
 
+
 class TestDemo(TestCase):
     def test_login(self):
         db = next(override_get_db())
@@ -21,7 +22,7 @@ class TestDemo(TestCase):
     def test_login_fail(self):
         res = client.post("/api/auth/login",
                           json={"username": gen_username(), "password": gen_password()})
-        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(res.json()['message'], "Nonexistent user")
 
     def test_verify_token(self):
@@ -51,4 +52,4 @@ class TestDemo(TestCase):
                           headers={"Authorization": "Bearer aaa"})
         self.assertTrue(res.status_code, 401)
         self.assertIn("message", res.json())
-        self.assertEqual(res.json()['message'], "Token invalid!")
+        self.assertEqual(res.json()['message'], "Failed to logout user")

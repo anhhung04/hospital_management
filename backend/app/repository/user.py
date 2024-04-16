@@ -1,62 +1,81 @@
 from repository.schemas.user import User
-from util.log import logger
-from repository import IRepo
 from sqlalchemy.orm import Session
-from collections import namedtuple
-from uuid import uuid4
+from sqlalchemy.exc import IntegrityError
+from models.user import QueryUserModel, PatchUserDetailModel, AddUserDetailModel
+from typing import Tuple, Optional
+from fastapi import Depends
+from repository import Storage
 
-GetUserQuery = namedtuple('GetUserQuery', ['id', 'username'])
 
-
-class UserRepo(IRepo):
-    def __init__(self, session: Session):
+class UserRepo:
+    def __init__(self, session: Session = Depends(Storage.get)):
         self._session: Session = session
 
-    async def get(self, query: GetUserQuery):
-        try:
-            if query.username:
-                user = self._session.query(User).filter(
-                    User.username == query.username).first()
-            if query.id:
-                user = self._session.query(User).filter(
-                    User.id == query.id).first()
-            return user
-        except Exception as e:
-            logger.error(e)
-            return None
+    @staticmethod
+    async def call():
+        return UserRepo()
 
-    async def update(self, query: GetUserQuery, update_item: dict) -> User:
+    async def get(
+        self,
+        query: QueryUserModel
+    ) -> Tuple[User, Exception | None]:
         try:
-            user: User = await self.get(query)
-            if user:
-                for attr in update_item.keys():
-                    setattr(user, attr, update_item[attr])
-                self._session.add(user)
-                self._session.commit()
-                self._session.refresh(user)
-            return user
-        except Exception as e:
-            logger.error(e)
-            return None
+            user = self._session.query(User).filter(
+                User.id == query.id if query.id else None
+                or User.username == query.username if query.username else None
+                or User.email == query.email if query.email else None
+                or User.ssn == query.ssn if query.ssn else None
+            ).first()
+            assert user, "Nonexistent user"
+            return user, None
+        except Exception as err:
+            return None, err
 
-    async def create(self, item: dict) -> User:
+    async def update(
+        self,
+        query: QueryUserModel,
+        update_user: PatchUserDetailModel
+    ) -> Tuple[User, Exception | None]:
         try:
-            item.update({'id': str(uuid4())})
-            new_user = User(**item)
+            user, err = await self.get(query)
+            if err:
+                return None, err
+            dump_update_user = update_user.model_dump()
+            for attr in dump_update_user.keys():
+                if dump_update_user.get(attr) is not None:
+                    setattr(user, attr, dump_update_user.get(attr))
+            self._session.add(user)
+            self._session.commit()
+            self._session.refresh(user)
+            return user, None
+        except Exception as err:
+            self._session.rollback()
+            return None, err
+
+    async def create(
+        self,
+        user: AddUserDetailModel
+    ) -> Tuple[User, Optional[Exception | IntegrityError | None]]:
+        try:
+            new_user = user.model_dump()
+            new_user = User(**new_user)
             self._session.add(new_user)
             self._session.commit()
-            return new_user
-        except Exception as e:
-            logger.error(e)
-            return None
+            return new_user, None
+        except IntegrityError as err:
+            self._session.rollback()
+            return None, err
+        except Exception as err:
+            return None, err
 
-    async def delete(self, query: GetUserQuery) -> User:
+    async def delete(self, query: QueryUserModel) -> Tuple[User, Exception | None]:
         try:
-            user: User = await self.get(query)
-            if user:
-                self._session.delete(user)
-                self._session.commit()
-            return user
+            user, err = await self.get(query)
+            if err:
+                return None, err
+            self._session.delete(user)
+            self._session.commit()
+            return user, None
         except Exception as e:
-            logger.error(e)
-            return None
+            self._session.rollback()
+            return None, e

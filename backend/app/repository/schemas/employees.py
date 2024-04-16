@@ -7,29 +7,30 @@ from repository.schemas import Base, ObjectID
 
 
 class EducateLevel(Enum):
-    BACHELOR = 'bachelor'
-    MASTER = 'master'
-    DOCTOR = 'doctor'
-    UNDERGRADUATE = 'undergraduate'
-    UNKNOWN = 'unknown'
+    BACHELOR = 'BACHELOR'
+    MASTER = 'MASTER'
+    DOCTOR = 'DOCTOR'
+    UNDERGRADUATE = 'UNDERGRADUATE'
+    UNKNOWN = 'UNKNOWN'
 
 
 class EmployeeStatus(Enum):
-    ACTIVE = 'active'
-    INACTIVE = 'inactive'
-    PENDING = 'pending'
-    SUSPENDED = 'suspended'
-    WIP = 'work in progress'
+    ACTIVE = 'ACTIVE'
+    INACTIVE = 'INACTIVE'
+    PENDING = 'PENDING'
+    SUSPENDED = 'SUSPENDED'
+    WIP = 'WIP'
 
 class Employee(Base):
     __tablename__ = 'employees'
 
-    user_id = mapped_column(ObjectID, ForeignKey(
-        'users.id'), primary_key=True, unique=True)
+    user_id = mapped_column(ObjectID, ForeignKey('users.id'), primary_key=True)
     employee_type = mapped_column(DBEnum(EmployeeType))
     education_level = mapped_column(DBEnum(EducateLevel))
     begin_date = mapped_column(Date)
     end_date = mapped_column(Date)
     faculty = mapped_column(String)
     status = mapped_column(DBEnum(EmployeeStatus))
-    personal_info = relationship("User", back_populates="employees", uselist=False)
+    personal_info = relationship("User", primaryjoin="Employee.user_id == User.id", uselist=False)
+    
+    __table_args__ = {"extend_existing": True}

@@ -1,70 +1,129 @@
-from sqlalchemy.orm import Session
 from redis import Redis
 from models.user import UserAuth
-from typing import Tuple
 from util.jwt import JWTHandler, JWTPayload
 from util.crypto import PasswordContext
-from repository.user import UserRepo, GetUserQuery
-from repository.schemas.user import User
-from models.user import UserDetail
-from services import IService
+from repository.user import UserRepo
+from models.user import UserDetail, QueryUserModel, PatchUserPrivateInfoModel
 from permissions.user import UserRole
 from permissions import Permission
+from fastapi import HTTPException, status, Depends
+from repository import RedisStorage
+from middleware.user_ctx import UserContext
 
 
-class AuthService(IService):
-    def __init__(self, session: Session, user: dict, redis_client: Redis):
-        super().__init__(session, user, redis_client)
-        self._user_repo = UserRepo(session)
+class AuthService:
+    def __init__(
+        self,
+        user: UserContext = Depends(UserContext),
+        redis_client: Redis = Depends(RedisStorage.get),
+        user_repo: UserRepo = Depends(UserRepo)
+    ):
+        self._user_repo = user_repo
+        self._current_user = user
+        self._rc = redis_client
 
-    async def gen_token(self, auth_request: UserAuth) -> Tuple[str, str]:
-        user: User = await self._user_repo.get(
-            query=GetUserQuery(None, auth_request.username)
+    async def gen_token(self, auth_request: UserAuth) -> str:
+        user, err = await self._user_repo.get(
+            QueryUserModel(
+                username=auth_request.username,
+                email=auth_request.email
+            )
         )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Nonexistent user"
+            )
         if not user:
-            return None, "Nonexistent user"
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
         if not PasswordContext(auth_request.password, auth_request.username).verify(user.password):
-            return None, "Invalid username or password"
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid password"
+            )
         token, err = JWTHandler(redis_client=self._rc).create(
             payload=JWTPayload(user.username, user.id, user.role)
         )
         if err:
-            return None, err
-        return token, None
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate token"
+            )
+        return token
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.PATIENT])
-    async def get_user(self) -> User:
+    @Permission.permit([UserRole.EMPLOYEE, UserRole.PATIENT])
+    async def get_user(self) -> dict:
         if not self._current_user:
-            return None, "User is not logged in"
-        user = await self._user_repo.get(query=GetUserQuery(
-            self._current_user.get('sub'), None))
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User is not logged in"
+            )
+        user, err = await self._user_repo.get(
+            QueryUserModel(id=self._current_user.id())
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=str(err)
+            )
         if not user:
-            return None, "Nonexistent user"
-        user = UserDetail.model_validate(
-            {c.name: str(getattr(user, c.name)) for c in user.__table__.columns})
-        return user, None
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        return UserDetail.model_validate({
+            c.name: str(getattr(user, c.name)) for c in user.__table__.columns
+        })
 
     async def logout(self) -> str:
         try:
-            if self._current_user:
-                await self._rc.delete(self._current_user.get('sub'))
-                return None
-            return "User is not logged in"
-        except Exception as e:
-            return e
+            user_id = self._current_user.id()
+            if not user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="User is not logged in"
+                )
+            self._rc.delete(user_id)
+            return None
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Failed to logout user"
+            )
 
-    @Permission.permit([UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.PATIENT])
-    async def change_password(self, old_password: str, new_password: str) -> str:
-        user = await self._user_repo.get(query=GetUserQuery(
-            self._current_user.get('sub'), None))
-        if not user:
-            return "Nonexistent user"
+    @Permission.permit([UserRole.EMPLOYEE, UserRole.PATIENT])
+    async def change_password(
+        self,
+        old_password: str,
+        new_password: str
+    ) -> dict:
+        user, err = await self._user_repo.get(
+            QueryUserModel(id=self._current_user.id())
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
         if not PasswordContext(old_password, user.username).verify(user.password):
-            return "Invalid password"
-        user_update = await self._user_repo.update(query=GetUserQuery(
-            self._current_user.get('sub'), None), update_item={
-            "password": PasswordContext(new_password, user.username).hash()
-        })
-        if not user_update:
-            return "Failed to update password"
-        return None
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid password"
+            )
+        user_update, err = await self._user_repo.update(
+            QueryUserModel(id=self._current_user.id()),
+            PatchUserPrivateInfoModel(
+                password=PasswordContext(new_password, user.username).hash()
+            )
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to update password"
+            )
+        return UserDetail.model_validate({
+            c.name: str(getattr(user_update, c.name)) for c in user_update.__table__.columns
+        }).model_dump()

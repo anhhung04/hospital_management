@@ -1,12 +1,6 @@
 import HuyButton from "../../../../Button/Huy_Button";
 import LuuButton from "../../../../Button/Luu_Button";
 import { useState } from "react";
-import PropTypes from 'prop-types';
-
-AddResult.propTypes = {
-    setAddResult: PropTypes.func,
-    setSuccess: PropTypes.func,
-};
 
 
 function AddResult(props) {
