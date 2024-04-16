@@ -1,6 +1,7 @@
 import TableList from "../TableList";
 import Shortcurt from "../Shortcurt";
 import PatientAdd from "./PatientsAdd/PatientsAdd";
+import apiCall from "../../utils/api";
 
 
 import { useEffect, useState } from "react";
@@ -27,15 +28,13 @@ function PatientsList() {
 
 
   useEffect(() => {
-    fetch("api/patients/list", {
+    apiCall({
+      endpoint: "/api/patient/list",
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
     })
-      .then((response) => response.json())
       .then((data) => {
-        setListPatient_Info(data);
+        console.log("Mydata",data)
+        setListPatient_Info(data.data);
         setCheckedState(new Array(data.length).fill(false));
       })
       .catch((error) => console.error('Error fetching patient data:', error));
@@ -82,16 +81,16 @@ function PatientsList() {
                       onChange={() => handleCheckboxChange(index)}  
                     />
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[43px] h-[24px] text-right ">
-                      {info.id}
+                      {index}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[116px] h-[24px] text-right">
-                      {info.id}
+                      {info.medical_record_id}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right">
-                      {info.name}
+                      {info.full_name}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[125px] h-[24px] text-right">
-                      {info.phone}
+                      {info.phone_number}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[130px] h-[24px] text-right">
                       {info.date}
@@ -100,7 +99,7 @@ function PatientsList() {
                       {info.time}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right">
-                      {info.detail}
+                      Hồ sơ ↗
                     </p>
                   </div>
                 ))}
@@ -111,7 +110,7 @@ function PatientsList() {
     );
   }else{
     return(
-      <div className="flex justify-center items-center h-full w-full bg-[#EFF7FE]">
+      <div className="w-full bg-[#EFF7FE] flex justify-center items-center ">
         <PatientAdd  CloseAdd={()=>setIsAdd(false)} setStore={setStore} closeAlert={closeAlert} isStore={isStore} />
       </div>
     )

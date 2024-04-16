@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiCall from "../utils/api"
 import Alert from "../components/Alert";
 
 function Login() {
@@ -13,10 +14,11 @@ function Login() {
   const [isForget, setIsForget] = useState(false);
   const [isHidden, setIsHidden] = useState(true);
 
+
   const handleData = (data) => {
     // console.log("success", data);
     if (data.status_code === 200) {
-      // console.log("accessToken", data.data.access_token);
+      console.log("accessToken", data.data.access_token);
       document.cookie = `access_token=${data.data.access_token};max-age=0.5;path=/`;
       navigate("/");
     } else {
@@ -60,16 +62,13 @@ function Login() {
   };
 
   function PostData(userData) {
-    fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    })
-      .then((response) => response.json())
-      .then((data) => handleData(data))
-      .catch((error) => console.error("Error:", error));
+      apiCall({
+        endpoint: "/api/auth/login",
+        method: "POST",
+        requestData: userData,
+      }).then((data) => {
+        handleData(data);
+      });
   }
 
   function closeAlert() {

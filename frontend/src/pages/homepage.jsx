@@ -10,6 +10,7 @@ function Homepage() {
     useEffect(() => {
         fetch("/api/generalinfo")
             .then((response) => response.json())
+        // apiCall({endpoint: "/api/generalinfo"})
             .then((data) => {
                 setGeneralinfo(data);
                 // console.log(data);

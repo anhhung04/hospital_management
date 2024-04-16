@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Alert from "./Alert";
 import PropTypes from 'prop-types';
-
+import apiCall from "../utils/api";
 ChangePassword.propTypes = {
   closeChangePassword: PropTypes.func,
 };
@@ -17,6 +17,7 @@ function ChangePassword(props) {
   const [isAlert, setIsAlert] = useState(false);
   const [successAlert, setSuccessAlert] = useState(false);
   const [failAlert, setFailAlert] = useState(false);
+
 
   function toggleHiddenOldPassword() {
     setIsHiddenOldPassword(pre => !pre);
@@ -47,19 +48,14 @@ function ChangePassword(props) {
     if (new1Password !== new2Password) {
       setIsAlert(true);
     } else {
-        fetch("/api/auth/password/change", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            "old_password": oldPassword,
-            "new_password": new1Password,
-          }),
-        })
-          .then((response) => response.json())
+        apiCall({
+            endpoint: "/api/auth/password/change",
+            method: "POST",
+            requestData: { old_password: oldPassword, new_password: new1Password },
+          })
           .then((data) => {
-            if (data.status === 200) {
+            console.log("MyDAta",data);
+            if (data.status_code === 200) {
               setSuccessAlert(true);
             } else {
               setFailAlert(true);
