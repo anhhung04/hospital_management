@@ -29,35 +29,37 @@ function PatientAdd(props) {
 
   var [numMedicineAdded, setNumMedicineAdded] = useState(0);
 
-  const [isSubmitFailed, setIsSubmitFailed] = useState(false);
+  
 
   const [isFinishInfo, setIsFinishInfo] = useState(false);
   const [isAlertWarning, setIsAlertWarning] = useState(false);
   const [isSuccesAlert, setIsSuccesAlert] = useState(false);
 
-  function handleSubmitFailed() {
-    setIsSubmitFailed(true);
-  }
+  
 
   const [isPostSubmit, setIsPostSubmit] = useState(false);
   const [isPatientSubmit, setIsPatientSubmit] = useState(false);
   const [isProgressSubmit, setIsProgressSubmit] = useState(false);
+  const [isSubmitFailed, setIsSubmitFailed] = useState(false);
 
 
-  const [resDataInfo, setResDataInfo] = useState({});
+  const [resDataInfo, setResDataInfo] = useState({status_code: 500, data: {}});
 
   function getDataInfo(res_data){
     console.log("res_data:",res_data);
-    setResDataInfo(res_data);
+    console.log("resDataInfo:",resDataInfo);
     if(res_data.status_code === 200){
       // console.log("resDataInfo",resDataInfo);
+      setResDataInfo(res_data);
       props.setStore();
       setIsFinishInfo(true);
       document.cookie = `user_id=${res_data.data.user_id};max-age=0.5;path=/`;
-    }else{
+    }
+    else if(resDataInfo.status_code === 500){
       setIsSubmitFailed(true);
     }
   }
+
 
 
   function getDataProgress(res_data){
@@ -131,6 +133,10 @@ function PatientAdd(props) {
       setIsProgressSubmit(false);
       setIsSubmitFailed(false);
     }
+  }
+
+  function handleSubmitFailed(){
+    setIsSubmitFailed(true);
   }
 
   function handleNumMedicineRemove() {

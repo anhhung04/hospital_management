@@ -57,11 +57,11 @@ function PatientContent(props) {
         setMedical_history(e.target.value)
     }
 
-    function checkInfoItem() {
-        if (patient_id === "" || signup_date === "" || height === "" || weight === "") {
-            props.handleSubmitFailed();
-        }
-    }
+    // function checkInfoItem() {
+    //     if (patient_id === "" || signup_date === "" || height === "" || weight === "") {
+    //         props.handleSubmitFailed();
+    //     }
+    // }
 
     
 
@@ -75,8 +75,6 @@ function PatientContent(props) {
 
     useEffect(() => {
         if (props.isPatientSubmit) {
-            checkInfoItem();
-            // console.log("api_patient_id",api_patient_id)
             const data = {
                 "medical_record": {
                     "weight": weight,
@@ -98,7 +96,7 @@ function PatientContent(props) {
                 props.setResDataPatient(res_data);
             });
         }
-    }, [props.isPatientSubmit]);
+    }, [props, api_patient_id, weight, height, current_treatment, drug_allergies, food_allergies, medical_history]);
 
     return ( <div className="w-[1080px] h-[836px] px-[60px] py-[40px] flex flex-col gap-[40px] items-start">
         <div className=" h-[208px] w-full grid grid-cols-2 gap-x-[60px] gap-y-[40px] content-start">

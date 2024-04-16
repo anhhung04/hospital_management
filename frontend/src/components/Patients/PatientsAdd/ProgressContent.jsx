@@ -87,7 +87,7 @@ const api_patient_id = getCookie('user_id');
         props.getDataProgress(res_data);
       });
     }
-  }, [props.isProgressSubmit]);
+  }, [props, date_performance, date_finished, time_performance, time_finished, status, sick, api_patient_id, progress]);
 
 
   return (
