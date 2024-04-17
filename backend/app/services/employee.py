@@ -185,7 +185,7 @@ class EmployeeService:
             begin_date=str(event.begin_date),
             end_date=str(event.end_date) if event.end_date else None,
             is_recurring=event.is_recurring,
-            frequency=event.frequency.value if event.frequency else None,
+            frequency=str(event.frequency.value),
             occurence=[date.strftime("%Y-%m-%d") for date in list(rrule(
                 freq=freq_map[event.frequency.value],
                 dtstart=event.begin_date,
@@ -223,7 +223,7 @@ class EmployeeService:
                 begin_date=str(event_in_db.begin_date),
                 end_date=str(event_in_db.end_date) if event_in_db.end_date else None,
                 is_recurring=event_in_db.is_recurring,
-                frequency=event_in_db.frequency.value if event_in_db.frequency else None
+                frequency=event_in_db.frequency.value
             ).model_dump()
         except Exception as e:
             logger.error('Error in creating event', reason=e)
@@ -256,7 +256,7 @@ class EmployeeService:
             begin_date=str(event.begin_date),
             end_date=str(event.end_date) if event.end_date else None,
             is_recurring=event.is_recurring,
-            frequency=event.frequency.value if event.frequency else None
+            frequency=event.frequency.value
         ).model_dump()
     
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
@@ -283,7 +283,9 @@ class EmployeeService:
             begin_time=event.begin_time.strftime("%H:%M"),
             end_time=event.end_time.strftime("%H:%M"),
             begin_date=str(event.begin_date),
-            end_date=str(event.end_date)
+            end_date=str(event.end_date) if event.end_date else None,
+            is_recurring=event.is_recurring,
+            frequency=event.frequency.value
         ).model_dump()
     
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])

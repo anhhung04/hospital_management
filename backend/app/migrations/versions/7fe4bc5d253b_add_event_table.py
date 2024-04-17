@@ -9,7 +9,6 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-import uuid
 
 # revision identifiers, used by Alembic.
 revision: str = '7fe4bc5d253b'
@@ -29,7 +28,7 @@ def upgrade() -> None:
     sa.Column('begin_date', sa.Date(), nullable=False),
     sa.Column('end_date', sa.Date(), nullable=True),
     sa.Column('is_recurring', sa.Boolean(), nullable=False),
-    sa.Column('frequency', sa.Enum('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', name='frequency'), nullable=True),
+    sa.Column('frequency', sa.Enum('SINGLE', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', name='frequency'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_events_id'), 'events', ['id'], unique=False)

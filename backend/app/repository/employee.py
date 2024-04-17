@@ -14,7 +14,6 @@ from models.employee import(
   PatchEmployeeModel
 )
 from models.event import(
-  EventRequestModel, 
   PatchEventRequestModel, 
   AddEventModel
 )
@@ -150,7 +149,7 @@ class EmployeeRepo:
                 begin_date=event_info.begin_date,
                 end_date=event_info.end_date,
                 is_recurring=event_info.is_recurring,
-                frequency=Frequency(event_info.frequency) if event_info.frequency else None
+                frequency=Frequency(event_info.frequency)
             )
             employee = self._sess.query(Employee).filter(
                 Employee.user_id == employee_id

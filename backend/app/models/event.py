@@ -5,6 +5,7 @@ from dateutil.rrule import(
 )
 from repository.schemas.employees import Frequency, DayOfWeek 
 from typing import Optional
+from datetime import datetime
 
 day_of_week_map = {
   "MONDAY": MO,
@@ -34,7 +35,7 @@ class ListEventModel(BaseModel):
     begin_time: str
     end_time: str
     is_recurring: bool = False
-    frequency: Optional[Frequency | None] = None
+    frequency: Frequency
     occurence: list[str]
 
     @validator('occurence')
@@ -45,15 +46,7 @@ class ListEventModel(BaseModel):
         elif not is_recurring_value and len(v) == 1:
             return v
         raise ValueError("Occurence and is_recurring value mismatched")
-    
-    @validator('frequency')
-    def required_frequency_if_is_recurring(cls, v, values):
-        is_recurring_value = values.get('is_recurring')
-        if is_recurring_value and v is not None:
-            return v
-        elif not is_recurring_value and v is None:
-            return v
-        raise ValueError("Frequency is required for recurring events")
+
 
 class ListEventResponseModel(BaseModel):
     data: list[ListEventModel]
@@ -69,7 +62,7 @@ class EventModel(BaseModel):
     begin_time: str
     end_time: str
     is_recurring: bool
-    frequency: Optional[Frequency | None] = None
+    frequency: Frequency
 
 class EventReponseModel(BaseModel):
     data: EventModel
@@ -82,26 +75,38 @@ class EventRequestModel(BaseModel):
     begin_time: str
     end_time: str
     begin_date: str
-    end_date: Optional[str | None] = None
     is_recurring: bool = False
-    frequency: Optional[Frequency | None] = None
+    end_date: Optional[str | None] = None
+    frequency: Frequency = Frequency.SINGLE
 
     @validator('frequency')
-    def required_frequency_if_recurring(cls, v, values):
+    def required_frequency_if_is_recurring(cls, v, values):
         is_recurring_value = values.get('is_recurring')
-        if is_recurring_value and v is not None:
+        if is_recurring_value and v != Frequency.SINGLE.value:
             return v
-        elif not is_recurring_value and v is None:
+        elif not is_recurring_value and v == Frequency.SINGLE.value:
             return v
-        raise ValueError("Frequency is required for recurring events")
+        raise ValueError("Frequency and is_recurring value mismatched")
     
-    @validator('end_date')
+    @validator('end_date', pre=False)
     def required_end_date_if_recurring(cls, v, values):
         is_recurring_value = values.get('is_recurring')
+        print(is_recurring_value)
         if is_recurring_value:
             return v
         if v is None:
             return values.get('begin_date')
+        return v
+    
+    @validator('end_time')
+    def match_begin_and_end_time(cls, v, values):
+        begin_time = values.get('begin_time')
+        time_format = "%H:%M:%S"
+        begin = datetime.strptime(begin_time, time_format).time()
+        end = datetime.strptime(v, time_format).time()
+        if begin < end:
+            return v
+        raise ValueError("End time must be greater than begin time")
     
 class AddEventModel(EventRequestModel):
     id: str
@@ -113,11 +118,14 @@ class PatchEventRequestModel(BaseModel):
     begin_time: Optional[str | None] = None
     end_time: Optional[str | None] = None
     end_date: Optional[str | None] = None
-    is_recurring: Optional[bool | None] = None
-    frequency: Optional[Frequency | None] = None
 
-    # @validator('frequency')
-    # def required_frequency_if_recurring(cls, v, values):
-    #     if values.get('is_recurring') and v is None:
-    #         raise ValueError("Frequency is required for recurring events")
-    #     return v
+    @validator('end_time')
+    def match_begin_and_end_time(cls, v, values):
+        begin_time = values.get('begin_time')
+        if begin_time and v:
+            time_format = "%H:%M:%S"
+            begin = datetime.strptime(begin_time, time_format).time()
+            end = datetime.strptime(v, time_format).time()
+            if begin < end:
+                return v
+            raise ValueError("End time must be greater than begin time")

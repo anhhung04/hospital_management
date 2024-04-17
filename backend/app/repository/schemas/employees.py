@@ -1,11 +1,10 @@
-from sqlalchemy import String, Date, ForeignKey, Time, Integer, Boolean, Table, Column
+from sqlalchemy import String, Date, ForeignKey, Time, Boolean, Table, Column
 from sqlalchemy import Enum as DBEnum
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from enum import Enum
 from permissions.user import EmployeeType
 from repository.schemas import Base, ObjectID
 from typing import List
-import uuid
 
 class EducateLevel(Enum):
     BACHELOR = 'BACHELOR'
@@ -32,6 +31,7 @@ class DayOfWeek(Enum):
     SUNDAY = 'SUNDAY'
 
 class Frequency(Enum):
+    SINGLE= 'SINGLE'
     DAILY = 'DAILY'
     WEEKLY = 'WEEKLY'
     MONTHLY = 'MONTHLY'
