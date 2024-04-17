@@ -185,6 +185,7 @@ class EmployeeService:
             begin_date=str(event.begin_date),
             end_date=str(event.end_date) if event.end_date else None,
             is_recurring=event.is_recurring,
+            frequency=event.frequency.value if event.frequency else None,
             occurence=[date.strftime("%Y-%m-%d") for date in list(rrule(
                 freq=freq_map[event.frequency.value],
                 dtstart=event.begin_date,

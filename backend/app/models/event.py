@@ -34,16 +34,26 @@ class ListEventModel(BaseModel):
     begin_time: str
     end_time: str
     is_recurring: bool = False
+    frequency: Optional[Frequency | None] = None
     occurence: list[str]
 
     @validator('occurence')
     def get_occurence(cls, v, values):
         is_recurring_value = values.get('is_recurring')
-        if is_recurring_value and len(v) > 1:
+        if is_recurring_value and len(v) >= 1:
             return v
         elif not is_recurring_value and len(v) == 1:
             return v
         raise ValueError("Occurence and is_recurring value mismatched")
+    
+    @validator('frequency')
+    def required_frequency_if_is_recurring(cls, v, values):
+        is_recurring_value = values.get('is_recurring')
+        if is_recurring_value and v is not None:
+            return v
+        elif not is_recurring_value and v is None:
+            return v
+        raise ValueError("Frequency is required for recurring events")
 
 class ListEventResponseModel(BaseModel):
     data: list[ListEventModel]
@@ -84,6 +94,14 @@ class EventRequestModel(BaseModel):
         elif not is_recurring_value and v is None:
             return v
         raise ValueError("Frequency is required for recurring events")
+    
+    @validator('end_date')
+    def required_end_date_if_recurring(cls, v, values):
+        is_recurring_value = values.get('is_recurring')
+        if is_recurring_value:
+            return v
+        if v is None:
+            return values.get('begin_date')
     
 class AddEventModel(EventRequestModel):
     id: str
