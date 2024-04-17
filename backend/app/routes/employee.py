@@ -19,6 +19,7 @@ from models.request import IdPath
 from permissions.user import EmployeeType
 from typing import Annotated
 from datetime import date
+from uuid import UUID
 
 router = APIRouter(tags=["employee"])
 
@@ -115,13 +116,13 @@ async def list_events(
 @router.get("/{employee_id}/event/{event_id}", response_model=EventReponseModel)
 async def get_event(
     employee_id: IdPath,
-    event_id: int,
+    event_id: IdPath,
     service: EmployeeService = Depends(EmployeeService)
 ):
     try:
         event = await service.get_event(
             id=str(employee_id),
-            event_id=event_id
+            event_id=str(event_id)
         )
     except HTTPException as e:
         return APIResponse.as_json(
@@ -153,14 +154,14 @@ async def create_event(
 @router.patch("/{employee_id}/event/{event_id}/update", response_model=EventReponseModel)
 async def update_event(
     employee_id: IdPath,
-    event_id: int,
+    event_id: IdPath,
     patch_event: PatchEventRequestModel,
     service: EmployeeService = Depends(EmployeeService)
 ):
     try:
         event = await service.update_event(
             id=str(employee_id),
-            event_id=event_id,
+            event_id=str(event_id),
             patch_event=patch_event
         )
     except HTTPException as e:
@@ -174,13 +175,13 @@ async def update_event(
 @router.delete("/{employee_id}/event/{event_id}/delete")
 async def delete_event(
     employee_id: IdPath,
-    event_id: int,
+    event_id: IdPath,
     service: EmployeeService = Depends(EmployeeService)
 ):
     try:
         await service.delete_event(
             id=str(employee_id),
-            event_id=event_id
+            event_id=str(event_id)
         )
     except HTTPException as e:
         return APIResponse.as_json(

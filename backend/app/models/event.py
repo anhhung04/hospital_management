@@ -4,7 +4,6 @@ from dateutil.rrule import(
     DAILY, WEEKLY, MONTHLY, YEARLY
 )
 from repository.schemas.employees import Frequency, DayOfWeek 
-from datetime import date
 from typing import Optional
 
 day_of_week_map = {
@@ -27,7 +26,7 @@ freq_map = {
 class ListEventModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
     
-    id: int
+    id: str
     title: str
     begin_date: str
     end_date: Optional[str | None] = None
@@ -52,7 +51,7 @@ class ListEventResponseModel(BaseModel):
 class EventModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
 
-    id: int
+    id: str
     title: str
     begin_date: str
     end_date: Optional[str | None] = None
@@ -85,6 +84,9 @@ class EventRequestModel(BaseModel):
         elif not is_recurring_value and v is None:
             return v
         raise ValueError("Frequency is required for recurring events")
+    
+class AddEventModel(EventRequestModel):
+    id: str
 
 class PatchEventRequestModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)

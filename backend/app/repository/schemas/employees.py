@@ -5,6 +5,7 @@ from enum import Enum
 from permissions.user import EmployeeType
 from repository.schemas import Base, ObjectID
 from typing import List
+import uuid
 
 class EducateLevel(Enum):
     BACHELOR = 'BACHELOR'
@@ -45,8 +46,7 @@ class ScheduleStatus(Enum):
 
 class Event(Base):
     __tablename__ = 'events'
-    id = mapped_column(Integer, primary_key=True,
-                       index=True, autoincrement=True)
+    id = mapped_column(ObjectID, primary_key=True, autoincrement=False, nullable=False)
     title = mapped_column(String)
     day_of_week = mapped_column(DBEnum(DayOfWeek))
     begin_time = mapped_column(Time)
@@ -60,7 +60,7 @@ class Event(Base):
 schedule = Table(
     "schedules", Base.metadata,
     Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
-    Column("event_id", Integer, ForeignKey("events.id")),
+    Column("event_id", ObjectID, ForeignKey("events.id")),
     extend_existing=True
 )
     

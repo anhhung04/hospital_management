@@ -13,7 +13,11 @@ from models.employee import(
   AddEmployeeModel,
   PatchEmployeeModel
 )
-from models.event import EventRequestModel, PatchEventRequestModel
+from models.event import(
+  EventRequestModel, 
+  PatchEventRequestModel, 
+  AddEventModel
+)
 from repository.schemas.employees import(
   EmployeeStatus, EducateLevel, 
   Event, DayOfWeek, Frequency
@@ -133,11 +137,12 @@ class EmployeeRepo:
     
     async def create_event(
         self,
-        event_info: EventRequestModel,
+        event_info: AddEventModel,
         employee_id: str
     ) -> Tuple[Event, Exception | None]:
         try:
             event = Event(
+                id=event_info.id,
                 title=event_info.title,
                 day_of_week=DayOfWeek(event_info.day_of_week),
                 begin_time=event_info.begin_time,
@@ -157,14 +162,13 @@ class EmployeeRepo:
             self._sess.rollback()
             return None, e
         except Exception as e:
-            print(e)
             return None, e
         return event, None
         
     async def get_event(
         self,
         query: QueryEmployeeModel,
-        event_id: int
+        event_id: str
     ) -> Tuple[Event, Exception | None]:
         try:
             event = self._sess.query(Event).join(schedule).filter(
@@ -178,7 +182,7 @@ class EmployeeRepo:
     async def update_event(
         self,
         query: QueryEmployeeModel,
-        event_id: int,
+        event_id: str,
         patch_event: PatchEventRequestModel
     ) -> Tuple[Event, Exception | None]:
         try:
@@ -208,7 +212,7 @@ class EmployeeRepo:
     async def delete_event(
         self,
         query: QueryEmployeeModel,
-        event_id: int
+        event_id: str
     ) -> Exception | None:
         try:
             event = self._sess.query(Event).join(schedule).filter(

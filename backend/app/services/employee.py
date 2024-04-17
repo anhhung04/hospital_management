@@ -15,7 +15,8 @@ from models.event import(
   freq_map,
   EventRequestModel,
   ListEventModel,
-  PatchEventRequestModel
+  PatchEventRequestModel,
+  AddEventModel
 )
 from permissions import Permission
 from permissions.user import UserRole, EmployeeType
@@ -201,8 +202,10 @@ class EmployeeService:
     ):
         try:
             event_info = event.model_dump()
+            event_id = str(uuid4())
+            event_info.update({"id": event_id})
             event_in_db, error = await self._employee_repo.create_event(
-                EventRequestModel.model_validate(event_info),
+                AddEventModel.model_validate(event_info),
                 employee_id=id
             )
             if error or not event_in_db:
@@ -228,7 +231,7 @@ class EmployeeService:
             )
         
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
-    async def get_event(self, id: str, event_id: int):
+    async def get_event(self, id: str, event_id: str):
         event, error = await self._employee_repo.get_event(
             query=QueryEmployeeModel(user_id=id),
             event_id=event_id
@@ -250,14 +253,16 @@ class EmployeeService:
             begin_time=event.begin_time.strftime("%H:%M"),
             end_time=event.end_time.strftime("%H:%M"),
             begin_date=str(event.begin_date),
-            end_date=str(event.end_date)
+            end_date=str(event.end_date) if event.end_date else None,
+            is_recurring=event.is_recurring,
+            frequency=event.frequency.value if event.frequency else None
         ).model_dump()
     
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
     async def update_event(
         self,
         id: str,
-        event_id: int,
+        event_id: str,
         patch_event: PatchEventRequestModel
     ):
         event, error = await self._employee_repo.update_event(
@@ -281,7 +286,7 @@ class EmployeeService:
         ).model_dump()
     
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
-    async def delete_event(self, id: str, event_id: int):
+    async def delete_event(self, id: str, event_id: str):
         error = await self._employee_repo.delete_event(
             QueryEmployeeModel(user_id=id),
             event_id=event_id
