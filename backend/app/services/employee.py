@@ -11,10 +11,8 @@ from models.employee import (
 )
 from models.event import(
   EventModel,
-  day_of_week_map,
   freq_map,
   EventRequestModel,
-  ListEventModel,
   PatchEventRequestModel,
   AddEventModel,
   RawEvent
@@ -26,7 +24,7 @@ from repository.user import UserRepo
 from middleware.user_ctx import UserContext
 from util.crypto import PasswordContext
 from uuid import uuid4
-from datetime import date, timedelta
+from datetime import timedelta, datetime, date
 from dateutil.rrule import rrule
 from util.date import DateProcessor
 
@@ -155,29 +153,23 @@ class EmployeeService:
         ).model_dump()
     
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
-    async def list_events(self, id: str, begin_date: date, end_date: date):
-        if not begin_date:
-            current_date = date.today()
-            days_to_monday = current_date.weekday()
-            begin_date = current_date - timedelta(days=days_to_monday)
-            end_date = begin_date + timedelta(days=6)
-        if not end_date:
-            end_date = begin_date + timedelta(days=6)
+    async def list_events(self, id: str, begin_date: date | None = None, end_date: date | None = None):
+        begin_date, end_date = DateProcessor.handle_param_date(begin_date, end_date)
         if begin_date > end_date:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Begin date must be less than or equal end date"
             )
         events, error = await self._employee_repo.list_events(
-            query=QueryEmployeeModel(user_id=id),
-            begin_date=begin_date, 
-            end_date=end_date
+            query=QueryEmployeeModel(user_id=id)
         )
         if error:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error in fetching employee events"
             )
+        begin_dt = datetime.combine(begin_date, datetime.min.time())
+        end_dt = datetime.combine(end_date, datetime.max.time())
         raw_events = [RawEvent(
             id=event.id,
             title=event.title,
@@ -188,14 +180,12 @@ class EmployeeService:
             end_date=str(event.end_date) if event.end_date else None,
             is_recurring=event.is_recurring,
             frequency=str(event.frequency.value),
-            occurence=[date.strftime("%Y-%m-%d") for date in list(rrule(
+            occurence=[date.strftime("%Y-%m-%d") for date in rrule(
                 freq=freq_map[event.frequency.value],
-                dtstart=event.begin_date,
-                until=min(end_date, event.end_date) if event.end_date and end_date else end_date,
-                byweekday=day_of_week_map[event.day_of_week.value]
-            ))] if event.is_recurring else [str(event.begin_date)]
+                dtstart=datetime.combine(event.begin_date, event.begin_time),
+            ).between(begin_dt, end_dt)] if event.is_recurring 
+            else [str(event.begin_date)] if event.begin_date >= begin_date and event.begin_date <= end_date else []
         ).model_dump() for event in events]
-
         events = {}
         for date_base_event in raw_events:
             for date in date_base_event.get("occurence", []):

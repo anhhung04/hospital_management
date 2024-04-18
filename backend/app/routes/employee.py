@@ -92,7 +92,7 @@ async def update_employee(
         code=status.HTTP_200_OK, message="Employee updated successfully", data=employee
     )
 
-@router.get("/{employee_id}/event", response_model=ListEventResponseModel)
+@router.get("/{employee_id}/event/list", response_model=ListEventResponseModel)
 async def list_events(
     employee_id: IdPath,
     begin_date: Annotated[date | None, Query] = None,

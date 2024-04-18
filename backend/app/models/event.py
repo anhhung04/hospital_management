@@ -8,16 +8,6 @@ from models.response import BaseResponseModel
 from typing import Optional
 from datetime import datetime
 
-day_of_week_map = {
-  "MONDAY": MO,
-  "TUESDAY": TU,
-  "WEDNESDAY": WE,
-  "THURSDAY": TH,
-  "FRIDAY": FR,
-  "SATURDAY": SA,
-  "SUNDAY": SU
-}
-
 freq_map = {
   "DAILY": DAILY,
   "WEEKLY": WEEKLY,
