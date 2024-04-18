@@ -4,6 +4,7 @@ from dateutil.rrule import(
     DAILY, WEEKLY, MONTHLY, YEARLY
 )
 from repository.schemas.employees import Frequency, DayOfWeek 
+from models.response import BaseResponseModel
 from typing import Optional
 from datetime import datetime
 
@@ -24,32 +25,32 @@ freq_map = {
   "YEARLY": YEARLY
 }
 
+class RawEvent(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
+    
+    id: str
+    title: str
+    day_of_week: DayOfWeek
+    begin_time: str
+    end_time: str
+    begin_date: str
+    end_date: Optional[str | None] = None
+    is_recurring: bool
+    frequency: Frequency
+    occurence: list[str]
+
 class ListEventModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
     
     id: str
     title: str
-    begin_date: str
-    end_date: Optional[str | None] = None
     day_of_week: DayOfWeek
     begin_time: str
     end_time: str
-    is_recurring: bool = False
-    frequency: Frequency
-    occurence: list[str]
-
-    @validator('occurence')
-    def get_occurence(cls, v, values):
-        is_recurring_value = values.get('is_recurring')
-        if is_recurring_value and len(v) >= 1:
-            return v
-        elif not is_recurring_value and len(v) == 1:
-            return v
-        raise ValueError("Occurence and is_recurring value mismatched")
 
 
-class ListEventResponseModel(BaseModel):
-    data: list[ListEventModel]
+class ListEventResponseModel(BaseResponseModel):
+    data: dict[str, list[ListEventModel]]
 
 class EventModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
@@ -64,7 +65,7 @@ class EventModel(BaseModel):
     is_recurring: bool
     frequency: Frequency
 
-class EventReponseModel(BaseModel):
+class EventReponseModel(BaseResponseModel):
     data: EventModel
 
 class EventRequestModel(BaseModel):
@@ -91,7 +92,6 @@ class EventRequestModel(BaseModel):
     @validator('end_date', pre=False)
     def required_end_date_if_recurring(cls, v, values):
         is_recurring_value = values.get('is_recurring')
-        print(is_recurring_value)
         if is_recurring_value:
             return v
         if v is None:

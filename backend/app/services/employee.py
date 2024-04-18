@@ -16,7 +16,8 @@ from models.event import(
   EventRequestModel,
   ListEventModel,
   PatchEventRequestModel,
-  AddEventModel
+  AddEventModel,
+  RawEvent
 )
 from permissions import Permission
 from permissions.user import UserRole, EmployeeType
@@ -27,6 +28,7 @@ from util.crypto import PasswordContext
 from uuid import uuid4
 from datetime import date, timedelta
 from dateutil.rrule import rrule
+from util.date import DateProcessor
 
 class EmployeeService:
     def __init__(
@@ -176,7 +178,7 @@ class EmployeeService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error in fetching employee events"
             )
-        events = [ListEventModel(
+        raw_events = [RawEvent(
             id=event.id,
             title=event.title,
             day_of_week=str(event.day_of_week.value),
@@ -193,6 +195,21 @@ class EmployeeService:
                 byweekday=day_of_week_map[event.day_of_week.value]
             ))] if event.is_recurring else [str(event.begin_date)]
         ).model_dump() for event in events]
+
+        events = {}
+        for date_base_event in raw_events:
+            for date in date_base_event.get("occurence", []):
+                event = {
+                    "id": date_base_event.get("id"),
+                    "title": date_base_event.get("title"),
+                    "day_of_week": DateProcessor.get_day_of_week(date),
+                    "begin_time": date_base_event.get("begin_time"),
+                    "end_time": date_base_event.get("end_time")
+                }
+                if events.get(date):
+                    events[date].append(event)
+                else:
+                    events.update({date: [event]})
         return events
     
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])
