@@ -24,7 +24,7 @@ from repository.user import UserRepo
 from middleware.user_ctx import UserContext
 from util.crypto import PasswordContext
 from uuid import uuid4
-from datetime import timedelta, datetime, date
+from datetime import datetime, date
 from dateutil.rrule import rrule
 from util.date import DateProcessor
 
@@ -188,18 +188,18 @@ class EmployeeService:
         ).model_dump() for event in events]
         events = {}
         for date_base_event in raw_events:
-            for date in date_base_event.get("occurence", []):
+            for _date in date_base_event.get("occurence", []):
                 event = {
                     "id": date_base_event.get("id"),
                     "title": date_base_event.get("title"),
-                    "day_of_week": DateProcessor.get_day_of_week(date),
+                    "day_of_week": DateProcessor.get_day_of_week(_date),
                     "begin_time": date_base_event.get("begin_time"),
                     "end_time": date_base_event.get("end_time")
                 }
-                if events.get(date):
-                    events[date].append(event)
+                if events.get(_date):
+                    events[_date].append(event)
                 else:
-                    events.update({date: [event]})
+                    events.update({_date: [event]})
         return events
     
     @Permission.permit([EmployeeType.MANAGER], acl=[UserRole.EMPLOYEE])

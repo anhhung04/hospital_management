@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from services.employee import EmployeeService
 from fastapi import HTTPException, status
-from pydantic import ValidationError
 from util.response import APIResponse
 from models.employee import(
   ListEmployeeModel, 
@@ -20,7 +19,6 @@ from models.request import IdPath
 from permissions.user import EmployeeType
 from typing import Annotated
 from datetime import date
-from uuid import UUID
 
 router = APIRouter(tags=["employee"])
 

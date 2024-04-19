@@ -1,6 +1,5 @@
 from pydantic import BaseModel, ConfigDict, validator
 from dateutil.rrule import(
-    MO, TU, WE, TH, FR, SA, SU,
     DAILY, WEEKLY, MONTHLY, YEARLY
 )
 from repository.schemas.employees import Frequency, DayOfWeek 

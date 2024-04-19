@@ -1,8 +1,6 @@
 from collections import namedtuple
-from repository.schemas.employees import Employee 
 from repository.user import UserRepo
 from repository.schemas.user import User
-from repository.schemas.employees import Event, schedule
 from typing import Tuple
 from fastapi import Depends
 from repository import Storage
@@ -18,11 +16,11 @@ from models.event import(
   AddEventModel
 )
 from repository.schemas.employees import(
+  Employee, 
   EmployeeStatus, EducateLevel, 
-  Event, DayOfWeek, Frequency
+  Event, DayOfWeek, Frequency, schedule
 )
 from permissions.user import EmployeeType
-from datetime import date
 
 GetEmployeeQuery = namedtuple("GetEmployeeQuery", ["id", "username"])
 
@@ -188,7 +186,7 @@ class EmployeeRepo:
                 return None, error
             new_event_dict = patch_event.model_dump()
             for attr, value in new_event_dict.items():
-                if not value is None:
+                if value is not None:
                     if attr == "frequency":
                         value = Frequency(value)
                     setattr(
