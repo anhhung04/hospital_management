@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from services.employee import EmployeeService
 from fastapi import HTTPException, status
+from pydantic import ValidationError
 from util.response import APIResponse
 from models.employee import(
   ListEmployeeModel, 
@@ -142,7 +143,7 @@ async def create_event(
         event = await service.create_event(
             id=str(employee_id),
             event=event_request
-        ) 
+        )
     except HTTPException as e:
         return APIResponse.as_json(
             code=e.status_code, message=str(e.detail), data={}
