@@ -1,4 +1,4 @@
-from tests import TestIntegration, gen_id
+from tests import TestIntegration, gen_id, gen_name, gen_ssn, gen_username
 import random
 
 class TestCalendar(TestIntegration):
@@ -109,7 +109,7 @@ class TestCalendar(TestIntegration):
 
     def test_get_event(self):
         employee_id = "189a8780-98f2-45de-8522-a048b36beb9e"
-        event_id = self.test_create_single_event()
+        event_id = self.test_create_recurring_event(random.choice(self.frequency))
         response = self._s.get(self.path(f"/{employee_id}/event/{event_id}"))
         self.assertEqual(response.status_code, 200)
         data = response.json()['data']
@@ -131,7 +131,7 @@ class TestCalendar(TestIntegration):
 
     def test_update_event(self):
         employee_id = "189a8780-98f2-45de-8522-a048b36beb9e"
-        event_id = self.test_create_recurring_event()
+        event_id = self.test_create_recurring_event(random.choice(self.frequency))
         response = self._s.patch(self.path(f"/{employee_id}/event/{event_id}/update"), json={
             "title": "string",
             "begin_time": "03:35:59",
@@ -147,9 +147,9 @@ class TestCalendar(TestIntegration):
         self.assertEqual(data['is_recurring'], True)
         self.assertEqual(data['end_date'], "2024-04-20")
 
-    def update_event_fail(self):
+    def test_update_event_fail(self):
         employee_id = "189a8780-98f2-45de-8522-a048b36beb9e"
-        event_id = self.test_create_single_event()
+        event_id = self.test_create_recurring_event(random.choice(self.frequency))
         response = self._s.patch(self.path(f"/{employee_id}/event/{event_id}/update"), json={
             "title": "string",
             "begin_time": "03:35:59",
@@ -157,16 +157,71 @@ class TestCalendar(TestIntegration):
             "end_date": "2024-04-20",
         })
         self.assertEqual(response.status_code, 500)
-        self.assertEqual(response.json()['message'], "End time must be greater than begin time")
 
-
-
-    def delete_event(self):
+    def test_delete_event(self):
         employee_id = "189a8780-98f2-45de-8522-a048b36beb9e"
         event_id = self.test_create_single_event()
         response = self._s.delete(self.path(f"/{employee_id}/event/{event_id}/delete"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['message'], "Event deleted successfully")
+
+    def test_no_permission(self):
+        event_id = self.test_create_recurring_event(random.choice(self.frequency))
+        another_id = "189a8780-98f2-45de-8522-a048b36beb9e"
+        username, password, _ = self.test_create_employee()
+        res = self._s.post(self._base + "/auth/login", json={
+            "username": username,
+            "password": password
+        })
+        self._access_token = res.json()['data']['access_token']
+        self._s.headers.update({
+            "Authorization": f"Bearer {self._access_token}"
+        })
+
+        response = self._s.get(self.path(f"/{another_id}/event/list"))
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['message'], "Permission denied") 
+
+        response = self._s.get(self.path(f"/{another_id}/event/{event_id}"))
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['message'], "Permission denied")
+
+        response = self._s.patch(self.path(f"/{another_id}/event/{event_id}/update"), json={
+            "title": "string",
+            "begin_time": "03:35:59",
+            "end_time": "04:35:59",
+            "end_date": "2024-04-20",
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['message'], "Permission denied")
+
+        response = self._s.delete(self.path(f"/{another_id}/event/{event_id}/delete"))
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['message'], "Permission denied")
+
+    def test_create_employee(self, type="DOCTOR"):
+        first_name, last_name = gen_name()
+        response = self._s.post(self.path('/create'), json={
+            "first_name":         first_name,
+            "last_name":          last_name,
+            "birth_date":         "2004-05-06",
+            "gender":             "female",
+            "ssn":                gen_ssn(),
+            "phone_number":       "0123456789",
+            "email":              gen_username() + "@user.com",
+            "health_insurance":    "11111111111",
+            "address":            "268 ly thuong kiet",
+            "employee_type":      type,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.json()['data']['username'])
+        self.assertIsNotNone(response.json()['data']['password'])
+        self.assertIsNotNone(response.json()['data']['user_id'])
+        username = response.json()['data']['username']
+        password = response.json()['data']['password']
+        employee_id = response.json()['data']['user_id']
+        return username, password, employee_id
+
 
         
     

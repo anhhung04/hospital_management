@@ -17,6 +17,7 @@ from models.event import(
   AddEventModel,
   RawEvent
 )
+from repository.schemas.employees import Frequency
 from permissions import Permission
 from permissions.user import UserRole, EmployeeType
 from repository.employee import EmployeeRepo
@@ -167,7 +168,7 @@ class EmployeeService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error in fetching employee events"
-            )
+            )        
         begin_dt = datetime.combine(begin_date, datetime.min.time())
         end_dt = datetime.combine(end_date, datetime.max.time())
         raw_events = [RawEvent(
@@ -183,7 +184,7 @@ class EmployeeService:
             occurence=[date.strftime("%Y-%m-%d") for date in rrule(
                 freq=freq_map[event.frequency.value],
                 dtstart=datetime.combine(event.begin_date, event.begin_time),
-            ).between(begin_dt, end_dt)] if event.is_recurring 
+            ).between(begin_dt, end_dt)] if event.is_recurring and event.frequency != Frequency.SINGLE
             else [str(event.begin_date)] if event.begin_date >= begin_date and event.begin_date <= end_date else []
         ).model_dump() for event in events]
         events = {}
