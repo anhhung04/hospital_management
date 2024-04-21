@@ -4,7 +4,9 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped
 from enum import Enum
 from permissions.user import EmployeeType
 from repository.schemas import Base, ObjectID
+from repository.schemas.warehouse import employee_manage_container, Container
 from typing import List
+
 
 class EducateLevel(Enum):
     BACHELOR = 'BACHELOR'
@@ -77,4 +79,5 @@ class Employee(Base):
     status = mapped_column(DBEnum(EmployeeStatus))
     personal_info = relationship("User", primaryjoin="Employee.user_id == User.id", uselist=False)
     event: Mapped[List["Event"]] = relationship("Event", secondary="schedules", back_populates="employee", lazy="select")
+    container_management: Mapped[List["Container"]] = relationship(secondary=employee_manage_container)
     __table_args__ = {"extend_existing": True}

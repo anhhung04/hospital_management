@@ -258,7 +258,7 @@ class EmployeeService:
         return EventModel(
             id=event.id,
             title=event.title,
-            day_of_week=str(event.day_of_week.value),
+            day_of_week=DateProcessor.get_day_of_week(str(event.begin_date)),
             begin_time=event.begin_time.strftime("%H:%M"),
             end_time=event.end_time.strftime("%H:%M"),
             begin_date=str(event.begin_date),
