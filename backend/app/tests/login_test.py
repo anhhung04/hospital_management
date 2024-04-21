@@ -23,7 +23,7 @@ class TestDemo(TestCase):
         res = client.post("/api/auth/login",
                           json={"username": gen_username(), "password": gen_password()})
         self.assertEqual(res.status_code, 404)
-        self.assertEqual(res.json()['message'], "User not found")
+        self.assertEqual(res.json()['message'], "Nonexistent user")
 
     def test_verify_token(self):
         res, user = login(next(override_get_db()))

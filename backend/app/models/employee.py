@@ -54,7 +54,8 @@ class NewEmployeeResponseModel(BaseResponseModel):
     data: NewEmployeeModel
 
 class QueryEmployeeModel(BaseModel):
-    user_id: str
+    user_id: Optional[str | None] = None
+    employee_email: Optional[str | None] = None
 
 class PatchEmployeeModel(BaseModel):
     model_config = ConfigDict(use_enum_values=True)    

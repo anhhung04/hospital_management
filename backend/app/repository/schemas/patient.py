@@ -11,7 +11,7 @@ from enum import Enum
 
 class ProgressType(Enum):
     SCHEDULING = 'SCHEDULING'
-    PROCESSINT = 'PROCESSING'
+    PROCESSING = 'PROCESSING'
     FINISHED = 'FINISHED'
 
 class Patient(Base):
@@ -44,13 +44,22 @@ class MedicalRecord(Base):
     __table_args__ = {"extend_existing": True}
 
 
-employee_handle_patient = Table(
-    "in_charge_of_patients", Base.metadata,
-    Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
-    Column("progress_id", Integer, ForeignKey("patient_progresses.id")),
-    Column("action", String, default=""),
-    extend_existing=True
-)
+class EmployeeHandlePatient(Base):
+    __tablename__ = 'in_charge_of_patients'
+    employee_id = mapped_column(ForeignKey(
+        'employees.user_id'), primary_key=True)
+    progress_id = mapped_column(ForeignKey(
+        'patient_progresses.id'), primary_key=True)
+    employee = relationship(
+        "Employee",
+        primaryjoin="EmployeeHandlePatient.employee_id == Employee.user_id"
+    )
+    progress = relationship(
+        "PatientProgress",
+        primaryjoin="PatientProgress.id == EmployeeHandlePatient.progress_id"
+    )
+    action = mapped_column(String, default='')
+
 
 class PatientProgress(Base):
     __tablename__ = 'patient_progresses'
@@ -58,16 +67,18 @@ class PatientProgress(Base):
     id = mapped_column(Integer, primary_key=True,
                        index=True, autoincrement=True)
     created_at = mapped_column(DateTime, default=func.now())
-    treatment_schedule = mapped_column(String)
-    duration = mapped_column(Integer)
-    treatment_type = mapped_column(String)
+    start_treatment = mapped_column(DateTime, default=func.now())
+    end_treatment = mapped_column(DateTime)
     patient_condition = mapped_column(String)
     patient_id = mapped_column(ForeignKey('patients.user_id'))
     status = mapped_column(DBEnum(ProgressType),
                            default=ProgressType.SCHEDULING)
     medical_record_id = mapped_column(ForeignKey('medical_records.id'))
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="progress")
-    lead_employee: Mapped[List["Employee"]] = relationship(secondary=employee_handle_patient)
+    lead_employee: Mapped[List["EmployeeHandlePatient"]] = relationship(
+        "EmployeeHandlePatient",
+        primaryjoin="PatientProgress.id == EmployeeHandlePatient.progress_id"
+    )
 
     __table_args__ = {"extend_existing": True}
 

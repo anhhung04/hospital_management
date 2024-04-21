@@ -4,9 +4,13 @@ from typing import Annotated
 from util.response import APIResponse
 from models.patient import (
     ListPatientsModel, AddPatientRequestModel, NewPatientReponseModel,
-    PatientDetailResponseModel, QueryPatientModel, PatchPatientModel
+    PatientDetailResponseModel, QueryPatientModel, PatchPatientModel, DeleteLeadEmployeeModel
 )
-from models.patient_progress import NewPatientProgressModel, QueryPatientProgressModel, PatientProgressResponseModel
+from models.patient_progress import (
+    NewPatientProgressModel, QueryPatientProgressModel, PatientProgressResponseModel,
+    PatientProgressDetailResponseModel, PatchPatientProgressModel
+)
+from models.employee import QueryEmployeeModel
 from models.request import IdPath
 
 router = APIRouter()
@@ -109,4 +113,87 @@ async def add_new_patient_progress(
         code=status.HTTP_200_OK,
         data=new_progress,
         message="Progress added successfully"
+    )
+
+
+@router.patch(
+    "/{patient_id}/progress/{progress_id}/update",
+    tags=["patient"],
+    response_model=PatientProgressDetailResponseModel
+)
+async def update_patient_progress(
+    patient_id: IdPath,
+    progress_id: int,
+    progress: PatchPatientProgressModel,
+    service: PatientService = Depends(PatientService),
+):
+    try:
+        updated_progress = await service.update_progress(
+            QueryPatientProgressModel(
+                patient_id=patient_id, progress_id=progress_id),
+            progress
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=updated_progress,
+        message="Progress updated successfully"
+    )
+
+
+@router.get(
+    "/{patient_id}/progress/{progress_id}",
+    tags=["patient"],
+    response_model=PatientProgressDetailResponseModel
+)
+async def get_patient_progress(
+    patient_id: IdPath,
+    progress_id: int,
+    service: PatientService = Depends(PatientService),
+):
+    try:
+        progress = await service.get_progress(
+            QueryPatientProgressModel(
+                patient_id=patient_id, progress_id=progress_id
+            )
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=progress,
+        message="Progress fetched successfully"
+    )
+
+
+@router.delete(
+    "/{patient_id}/progress/{progress_id}/lead_employee",
+    tags=["patient"],
+    response_model=PatientProgressDetailResponseModel
+)
+async def delete_lead_employee(
+    patient_id: IdPath,
+    progress_id: int,
+    deleteEmployee: DeleteLeadEmployeeModel,
+    service: PatientService = Depends(PatientService)
+):
+    try:
+        progress = await service.delete_lead_employee(
+            QueryPatientProgressModel(
+                patient_id=patient_id, progress_id=progress_id
+            ), QueryEmployeeModel(employee_email=deleteEmployee.employee_email)
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=progress,
+        message="Lead employee deleted successfully"
     )

@@ -15,11 +15,10 @@ JWTPayload = namedtuple("JWTPayload", ["username", "id", "role"])
 class JWTHandler:
     def __init__(
         self,
-        expire_minutes: int = 1440,
         redis_client: Redis = Depends(RedisStorage.get)
     ):
         self._rc = redis_client
-        self._expire_minutes = expire_minutes
+        self._expire_minutes = 1440
 
     def create(self, payload: JWTPayload) -> Tuple[str, Exception]:
         secret_key: str = PasswordContext.rand_key()
