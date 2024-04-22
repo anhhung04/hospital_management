@@ -33,7 +33,7 @@ function PatientsList() {
       method: "GET",
     })
       .then((data) => {
-        console.log("Mydata",data)
+        // console.log("Mydata",data)
         setListPatient_Info(data.data);
         setCheckedState(new Array(data.length).fill(false));
       })
@@ -70,7 +70,7 @@ function PatientsList() {
   
             <TableList handleClick={handleClick} handleCheckedAll = {handleCheckAll} >
               <div className="w-[1032px] h-[716px] inline-flex flex-col items-start gap-[12px]">
-                {listPatient_Info.map((info, index) => (
+                {listPatient_Info.length!=0&&listPatient_Info.map((info, index) => (
                   <div
                     key={index}
                     className="w-[1032px] h-[44px] flex items-center gap-[12px] bg-[#EFF7FE] py-[10px] px-[20px]"
