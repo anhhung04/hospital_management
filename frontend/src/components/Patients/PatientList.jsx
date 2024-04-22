@@ -34,7 +34,7 @@ function PatientsList() {
     })
       .then((data) => {
         // console.log("Mydata",data)
-        if(data!=null&&data.data!=[]){
+        if(data && data?.data && data.data?.length > 0){
           setListPatient_Info(data.data);
           setCheckedState(new Array(data.length).fill(false));
         }
