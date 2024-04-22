@@ -34,8 +34,10 @@ function PatientsList() {
     })
       .then((data) => {
         // console.log("Mydata",data)
-        setListPatient_Info(data.data);
-        setCheckedState(new Array(data.length).fill(false));
+        if(data!=null&&data.data!=[]){
+          setListPatient_Info(data.data);
+          setCheckedState(new Array(data.length).fill(false));
+        }
       })
       .catch((error) => console.error('Error fetching patient data:', error));
   }, []);
