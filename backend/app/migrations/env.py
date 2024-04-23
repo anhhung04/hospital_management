@@ -21,7 +21,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", f"postgresql://{os.getenv('POSTGRES_USER', 'dev_user')}:{os.getenv('POSTGRES_PASSWORD', 'secret')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'dev_hospital_management')}")
+config.set_main_option("sqlalchemy.url", f"postgresql://{os.getenv('POSTGRES_USER', 'dev_user')}:{os.getenv('POSTGRES_PASSWORD', 'secret')}@{os.getenv('POSTGRES_HOST', 'database')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'dev_hospital_management')}")
 print(config.get_main_option("sqlalchemy.url"))
 
 # add your model's MetaData object here
