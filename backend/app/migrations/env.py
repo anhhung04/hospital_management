@@ -6,9 +6,6 @@ from sqlalchemy import pool
 from alembic import context
 
 from repository.schemas import Base # noqa
-from repository.schemas.user import User # noqa
-from repository.schemas.patient import Patient, MedicalRecord, PatientProgress, EmployeeHandlePatient  # noqa
-from repository.schemas.employees import Employee # noqa
 
 import os
 from dotenv import load_dotenv

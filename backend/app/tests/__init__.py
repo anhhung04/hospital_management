@@ -145,8 +145,23 @@ def insert_patient(db, id=None, username=None, password=None):
     db.commit()
     return patient
 
+
 def insert_employee(db, id=None, username=None, password=None):
     employee = Employee(user_id=id)
+    db.add(employee)
+    db.commit()
+    return employee
+
+def insert_employee_full(db, user_id, employee_type, education_level, begin_date, end_date, faculty, status):
+    employee = Employee(
+        user_id=user_id,
+        employee_type=employee_type,
+        education_level=education_level,
+        begin_date=begin_date,
+        end_date=end_date,
+        faculty=faculty,
+        status=status
+    )
     db.add(employee)
     db.commit()
     return employee
