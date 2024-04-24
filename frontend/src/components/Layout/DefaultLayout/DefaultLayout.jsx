@@ -1,8 +1,9 @@
 import Header from "./Header";
-import Footer from "./Footer";
 import Sidebar from "./SideBar";
+import Footer from "./Footer";
 import { useState } from "react";
 import PropTypes from 'prop-types';
+import apiCall from "../../../utils/api";
 
 DefaultLayout.propTypes = {
     children: PropTypes.node,
@@ -11,8 +12,6 @@ DefaultLayout.propTypes = {
 function DefaultLayout({children}) {
 
     const [isLogin, setIsLogin] = useState(false);
-
-
     // This function gets the value of a named cookie
     function getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -20,16 +19,6 @@ function DefaultLayout({children}) {
         if (parts.length === 2) return parts.pop().split(';').shift();
       }
 
-    // function setCookie(name, value, seconds) {
-    //   let expires = "";
-    //   if (seconds) {
-    //       const date = new Date();
-    //       date.setTime(date.getTime() + (seconds* 1000));
-    //       expires = "; expires=" + date.toUTCString();
-    //   }
-    //   document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    // }
-      
 
     function verifyToken() {
         const access_token = getCookie('access_token');
@@ -37,21 +26,16 @@ function DefaultLayout({children}) {
           // console.log('No access token found');
           return;
         }
-        // console.log('Access token found:', access_token);
-        fetch('/api/auth/verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ access_token: access_token })
+       
+        apiCall({
+            endpoint: "/api/auth/verify",
+            method: "POST",
+            requestData: { access_token: access_token },
         })
-        .then(response => response.json())
         .then(data => {
-            if(data.data.isLogin === true){
+          console.log('Data:', data);
+            if(data.data.is_login === true){
                 setIsLogin(true);
-                // const newToken = "" 
-                // const SecondsToRefresh = 30; 
-                // setCookie('access_token', newToken, SecondsToRefresh);
             }else{
                 setIsLogin(false);
             }

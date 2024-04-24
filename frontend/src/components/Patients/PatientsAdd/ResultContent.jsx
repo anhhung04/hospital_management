@@ -1,7 +1,6 @@
-import AddResult from "./AddResult/addresult";
-import Alert from "../../../Alert";
+import AddResult from "./addresult";
+import Alert from "../../Alert";
 import { useState } from "react";
-
 import PropTypes from 'prop-types';
 
 ResultContent.propTypes = {

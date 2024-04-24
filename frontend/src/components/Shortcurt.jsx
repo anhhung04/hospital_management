@@ -1,3 +1,11 @@
+import PropTypes from 'prop-types';
+
+Shortcurt.propTypes = {
+    source: PropTypes.string,
+    value: PropTypes.number,
+    title: PropTypes.string,
+};
+
 function Shortcurt(props) {
     return ( <div className="w-[240px] h-[98px] bg-[#FFFF] rounded-full shadow-2xl gap-[7px] inline-flex flex-start justify-center items-center">
     <div className="w-[50px] h-[50px] flex justify-center items-center"><img src= {props.source} alt="logo" className="hover:size-[50px]" /></div>

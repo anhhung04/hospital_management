@@ -42,7 +42,7 @@ export function makeServer({ environment, namespace } =
                     return JSON.stringify(wrap_response(401, "Invalid credentials", {}));
                 }
             });
-            this.get('/patients/list', (schema, request) => {
+            this.get('/patients/list', () => {
                 return [
                         {
                             id: 1,

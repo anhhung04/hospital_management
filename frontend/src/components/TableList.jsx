@@ -1,7 +1,38 @@
-import { useState } from "react";
-import React from 'react';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
 
-function TableList({children,handleClick, handleCheckedAll}) {
+TableList.propTypes = {
+    children: PropTypes.node,
+    handleClick: PropTypes.func,
+    handleCheckedAll: PropTypes.func,
+    activeButton: PropTypes.number,
+    setActiveButton: PropTypes.func,
+    isCheckedAll: PropTypes.bool,
+    checkedCount: PropTypes.number
+};
+
+function TableList({children,handleClick, handleCheckedAll,isCheckedAll, activeButton, setActiveButton,checkedCount}) {
+
+
+const handleButtonClick = (value) => {
+    setActiveButton(value);
+  };
+
+  const [array, setArray] = useState([1, 2, 3, 4]);
+
+
+  function handleIncrease() {  
+    setArray(array.map((value) => value + 4 ));
+  }
+
+  function handleDecrease() { 
+    if(array[0] === 1) return;
+    setArray(array.map((value) => value - 4 ));
+  }
+  
+  
+
+
     return ( <div className="w-[1080px] h-[978px] inline-flex flex-col items-end gap-[26px]  ">
         <div className="flex flex-col items-center w-[1080px] h-[908px] bg-[#FFF] shadow-xl rounded-[47px] py-[28px] px-[24px]">
             <div className="w-[1032px] h-[44px] flex items-center content-center self-stretch mb-[26px] gap-[293px]">
@@ -15,7 +46,7 @@ function TableList({children,handleClick, handleCheckedAll}) {
                 </div>
                 <div className="w-[573px] h-[44px] gap-[16px] flex items-center content-end">
                     <div className="w-[203px] h-[44px] bg-[#EFF7FE] flex shrink-0 items-center justify-center rounded-full">
-                        <h6 className="font-sans text-[20px] font-medium leading-[32px] text-[#000] mx-[15px]">10 Selected</h6>
+                        <h6 className="font-sans text-[20px] font-medium leading-[32px] text-[#000] mx-[15px]">{checkedCount} Selected</h6>
                         <div className="w-[3px] h-[44px] bg-[#FFF] flex items-center justify-center"></div>
                         <div className="w-[65px] h-[44px] flex items-center justify-center">
                             <div className="w-[24px] h-[24px] flex shrink-0 items-center justify-center">
@@ -33,6 +64,7 @@ function TableList({children,handleClick, handleCheckedAll}) {
             <div className="w-[1032px] h-[56px] flex shrink-0 bg-[#CDDBFE] rounded-lg items-center justify-start mb-[20px]">
                 <div className=" w-[956px] h-[32px] flex items-center gap-[19px] shrink-0 ml-[20px]">
                     <input type="checkbox"
+                        checked={isCheckedAll}
                         onChange={handleCheckedAll}
                     />
                     <div className="flex justify-center items-end gap-[87px]">
@@ -53,22 +85,21 @@ function TableList({children,handleClick, handleCheckedAll}) {
                 <p className="font-sans text-[18px] font-medium leading-[24px]">Tổng số lượng: 1</p>
             </div>
             <div className="w-[212px] h-[32px] flex justify-center items-center gap-[10px]">
-                <p className="font-sans text-[20px] font-normal leading-normal text-[#BEC6CF]">←</p>
+                <button className="font-sans text-[20px] font-normal leading-normal text-[#BEC6CF]" onClick={handleDecrease}>←</button>
                 <div className="w-[152px] h-[32px] flex items-start gap-[8px]">
-                    <div className="w-[32px] h-[32px] py-[2px] px-[11px] flex flex-col justify-center items-center gap-[10px] bg-[#F9FBFF] rounded-lg shadow-lg">
-                        <button className="font-sans text-[14px] font-medium leading-[24px] text-[#000]">1</button>
-                    </div>
-                    <div className="w-[32px] h-[32px] py-[2px] px-[11px] flex flex-col justify-center items-center gap-[10px] bg-[#F9FBFF] rounded-lg shadow-lg">
-                        <button className="font-sans text-[14px] font-medium leading-[24px] text-[#000]">2</button>
-                    </div>
-                    <div className="w-[32px] h-[32px] py-[2px] px-[11px] flex flex-col justify-center items-center gap-[10px] bg-[#F9FBFF] rounded-lg shadow-lg">
-                        <button className="font-sans text-[14px] font-medium leading-[24px] text-[#000]">3</button>
-                    </div>
-                    <div className="w-[32px] h-[32px] py-[2px] px-[11px] flex flex-col justify-center items-center gap-[10px] bg-[#F9FBFF] rounded-lg shadow-lg">
-                        <button className="font-sans text-[14px] font-medium leading-[24px] text-[#000]">4</button>
-                    </div>
-                </div>
-                <p className="font-sans text-[20px] font-normal leading-normal text-[#BEC6CF]">→</p>
+                    {array.map((value) => (
+                        <div key={value}>
+                        <button
+                            className={`w-[32px] h-[32px] py-[2px] px-[11px] flex flex-col justify-center items-center gap-[10px] bg-${activeButton === value ? '[#032B91]' : '[#FFF]'}
+                            text-${activeButton !== value ? '[#032B91]' : '[#FFF]'} rounded-lg shadow-lg`}
+                            onClick={() => handleButtonClick(value)}
+                        >
+            {value}
+          </button>
+        </div>
+      ))}
+    </div>
+                <button className="font-sans text-[20px] font-normal leading-normal text-[#BEC6CF]" onClick={handleIncrease}>→</button>
 
             </div>
         </div>

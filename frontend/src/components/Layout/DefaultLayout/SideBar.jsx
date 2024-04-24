@@ -1,4 +1,13 @@
 import { useNavigate } from "react-router-dom";
+import Alert from "../../Alert";
+import { useState } from "react";
+import PropTypes from 'prop-types';
+
+Sidebar.propTypes = {
+  current_content: PropTypes.string,
+  handleClick: PropTypes.func,
+  isLogin: PropTypes.bool,
+};
 
 const content_nav = {
   general: {
@@ -34,8 +43,16 @@ function Sidebar(props) {
     }
   }
 
+  const [isAlert, setAlert] = useState(false);
   return (
-    <div className="w-[210px] h-full bg-[#032B91] border-[2px] border-solid border-black shadow-blue-600">
+    <>
+    {isAlert && ( <Alert
+                   message= "Vui lòng đăng nhập để xem chi tiết thông tin"
+                    isAlert= {true}
+                    icon_type="warning"
+                    closeAlert={() => setAlert(false)}
+                />)}
+    <div className="w-[210px] bg-[#032B91] border-[2px] border-solid border-black shadow-blue-600">
       <div className="w-[174px] h-[358px] mt-[40px] mx-[18px] mb-[934px] inline-flex flex-col gap-[40px]">
         {Object.keys(content_nav).map((contentKey) => (
           <div
@@ -45,8 +62,24 @@ function Sidebar(props) {
               contentKey
             )}`}
             onClick={() => {
-              navigate(content_nav[contentKey].path);
-              props.handleClick(contentKey);
+              if(props.isLogin === false && contentKey !== 'general'){
+                // <Alert
+                //   message= "Bạn cần đăng nhập để sử dụng chức năng này!"
+                //   isAlert= {true}
+                //   icon_type="error"
+                // />
+                // navigate(content_nav[contentKey].path);
+                setAlert(true);
+              }
+              // }else{
+              //   navigate(content_nav[contentKey].path);
+              //   props.handleClick(contentKey);
+              // }
+              if(props.isLogin === true){
+                navigate(content_nav[contentKey].path);
+                props.handleClick(contentKey);
+              }
+              
             }}
           >
             <h4 className="text-[#FFF] truncate hover:text-clip font-sans text-[20px] font-medium leading-[32px]">
@@ -56,6 +89,7 @@ function Sidebar(props) {
         ))}
       </div>
     </div>
+    </>
   );
 }
 
