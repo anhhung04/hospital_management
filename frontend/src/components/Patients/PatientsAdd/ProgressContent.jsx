@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Datepicker } from "flowbite-react";
 import apiCall from "../../../utils/api";
 import ProgressInfo from "../../ProgressInfo";
@@ -17,15 +17,14 @@ ProgressContent.propTypes = {
 function ProgressContent(props) {
 
   const [date_performance, setDate_performance] = useState("");
+  const [time_performance, setTime_performance] = useState("");
+  const [time_finished, setTime_finished] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [date_finished, setDate_finished] = useState("");
   const [showDatePickerFinished, setShowDatePickerFinished] = useState(false);
-  const [time_performance, setTime_performance] = useState("");
-  const [time_finished, setTime_finished] = useState("");
-  const [status, setStatus] = useState("");
-  const [sick, setSick] = useState("");
   const [ishaveProgress, setIshaveProgress] = useState(false);
   const [progress, setProgress] = useState([]);
+  const [objProgress, setObjProgress] = useState({});
 
   
 
@@ -43,6 +42,7 @@ function ProgressContent(props) {
     const day = selectedDate.getDate();
     const year = selectedDate.getFullYear();
     setDate_performance(`${year}-${month}-${day}`);
+    setObjProgress({...objProgress,"start_treatment":`${year}-${month}-${day} ${time_performance}:00`});
     setShowDatePicker(false);
   }
 
@@ -52,6 +52,7 @@ function ProgressContent(props) {
     const day = selectedDate.getDate();
     const year = selectedDate.getFullYear();
     setDate_finished(`${year}-${month}-${day}`);
+    setObjProgress({...objProgress,"end_treatment":`${year}-${month}-${day} ${time_finished}:00`});
     setShowDatePickerFinished(false);
   }
 
@@ -62,33 +63,36 @@ function ProgressContent(props) {
   }
 const api_patient_id = getCookie('user_id');
 
+const progressRef = useRef(progress);
+useEffect(() => {
+  progressRef.current = progress;
+}, [progress]);
 
+const propsRef = useRef(props.getDataProgress);
+useEffect(() => {
+  propsRef.current = props.getDataProgress;
+}, [props.getDataProgress]);
 
   useEffect(() => {
     if (props.isProgressSubmit) {
-      const data = {
-        "start_treatment": `${date_performance} ${time_performance}:00`,
-        "end_treatment": `${date_finished} ${time_finished}:00`,
-        "status": status,
-        "patient_condition": sick,
-      };
       apiCall({
         endpoint: `/api/patient/${api_patient_id}/progress/create`,
         method: "POST",
-        requestData: data,
+        requestData: objProgress,
       }).then((res_data) => {
         console.log(res_data);
         if (res_data.status_code === 200) {
-          const newprogress = [...progress, res_data.data];
+          const newprogress = [...progressRef.current, res_data.data];
           setProgress(newprogress);
           console.log(newprogress);
           setIshaveProgress(true);
         }
-        props.getDataProgress(res_data);
+        propsRef.current(res_data);
       });
     }
-  }, [props, date_performance, date_finished, time_performance, time_finished, status, sick, api_patient_id, progress]);
+  }, [props.isProgressSubmit,objProgress,api_patient_id]);
 
+  console.log("progress",objProgress);
 
   return (
     <>
@@ -186,7 +190,6 @@ const api_patient_id = getCookie('user_id');
                     type="text" 
                     placeholder="10/03/2024" 
                     value={date_performance} 
-                    onChange={(e) => setDate_performance(e.target.value)}
                 />
                     <img src="/images/Patient_calender.png" alt="" onClick={toggleDatePicker}/>
                     {showDatePicker && (
@@ -210,7 +213,7 @@ const api_patient_id = getCookie('user_id');
                     className="w-[450px] h-[48px] py-[12px] px-[8px]  flex items-center self-stretch rounded-[5px]"
                     type="text"
                     placeholder="10:00"
-                    onChange={(e) => setTime_performance(e.target.value)}
+                    onChange={(e) => {setTime_performance(e.target.value);setObjProgress({...objProgress,"start_treatment":`${date_performance} ${e.target.value}:00`})}}
                   />
               </div>
 
@@ -226,7 +229,6 @@ const api_patient_id = getCookie('user_id');
                     type="text" 
                     placeholder="10/03/2024" 
                     value={date_finished} 
-                    onChange={(e) => setDate_finished(e.target.value)}
                 />
                     <img src="/images/Patient_calender.png" alt="" onClick={toggleDatePickerFinished}/>
                     {showDatePickerFinished && (
@@ -248,7 +250,7 @@ const api_patient_id = getCookie('user_id');
                     className="w-[450px] h-[48px] py-[12px] px-[8px]  flex items-center self-stretch rounded-[5px]"
                     type="text"
                     placeholder="20:00"
-                    onChange={(e) => setTime_finished(e.target.value)}
+                    onChange={(e) => {setTime_finished(e.target.value);setObjProgress({...objProgress,"end_treatment":`${date_finished} ${e.target.value}:00`})}}
                   />
               </div>
 
@@ -265,7 +267,8 @@ const api_patient_id = getCookie('user_id');
                   className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]"
                   type="text"
                   placeholder="Đau lưng"
-                  onChange={(e) => setSick(e.target.value)}
+                  value={objProgress.patient_condition}
+                  onChange={(e) => setObjProgress({...objProgress,"patient_condition":e.target.value})}
                 />
               </div>
 
@@ -280,7 +283,7 @@ const api_patient_id = getCookie('user_id');
                 </div>
                 <div className="w-[450px] gap-[8px] h-[48px] py-[12px] flex items-center self-stretch rounded-[5px]">
                 <select className="block appearance-none w-full text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state"
-                    type="text" placeholder="SCHEDULING" onChange={(e)=>setStatus(e.target.value)}>
+                    type="text" placeholder="SCHEDULING" value={objProgress.status} onChange={(e) => setObjProgress({...objProgress,"status":e.target.value})}>
                         <option>SCHEDULING</option>
                         <option>PROCESSING</option>
                         <option>FINISHED</option>

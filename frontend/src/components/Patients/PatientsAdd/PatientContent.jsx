@@ -11,23 +11,9 @@ PatientContent.propTypes = {
 };
 
 function PatientContent(props) {
-    const [patient_id, setPatient_id] = useState("");
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [signup_date, setSignup_date] = useState("");
-    const [height, setHeight] = useState("");
-    const [weight, setWeight] = useState("");
-    const [current_treatment, setCurrent_treatment] = useState("");
-    const [drug_allergies, setDrug_allergies] = useState("");
-    const [food_allergies, setFood_allergies] = useState("");
-    const [medical_history, setMedical_history] = useState("");
-    // console.log("patient",patient_id)
-    // console.log("signup",signup_date)
-    // console.log("height",height)
-    // console.log("weight",weight) 
-    // console.log("current_treatment",current_treatment)
-    // console.log("drug_allergies",drug_allergies)
-    // console.log("food_allergies",food_allergies)
-    // console.log("medical_history",medical_history)
+    const [patientObj, setPatientObj] = useState({});
+ 
       
     function toggleDatePicker() {
         setShowDatePicker(pre => !pre);
@@ -37,33 +23,27 @@ function PatientContent(props) {
         const month = selectedDate.getMonth() + 1; // Months are zero-based, so add 1
         const day = selectedDate.getDate();
         const year = selectedDate.getFullYear();
-        setSignup_date(`${year}-${month}-${day}`);
+        setPatientObj({...patientObj, signup_date: `${year}-${month}-${day}`});
         setShowDatePicker(false);
     };
 
     function handlecurrent_treatment(e){
-        setCurrent_treatment(e.target.value)
+        setPatientObj({...patientObj, current_treatment: e.target.value})
     }
 
     function handledrug_allergies(e){
-        setDrug_allergies(e.target.value)
+        setPatientObj({...patientObj, drug_allergies: e.target.value})
     }
 
     function handlefood_allergies(e){   
-        setFood_allergies(e.target.value) 
+        setPatientObj({...patientObj, food_allergies: e.target.value}) 
     }
 
     function handlemedical_history(e){
-        setMedical_history(e.target.value)
+        setPatientObj({...patientObj, medical_history: e.target.value})
     }
 
-    // function checkInfoItem() {
-    //     if (patient_id === "" || signup_date === "" || height === "" || weight === "") {
-    //         props.handleSubmitFailed();
-    //     }
-    // }
-
-    
+   
 
     function getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -75,28 +55,17 @@ function PatientContent(props) {
 
     useEffect(() => {
         if (props.isPatientSubmit) {
-            const data = {
-                "medical_record": {
-                    "weight": weight,
-                    "height": height,
-                    "note": "",
-                    "current_treatment": current_treatment,
-                    "drug_allergies": drug_allergies,
-                    "food_allergies": food_allergies,
-                    "medical_history": medical_history
-                  }
-            };
             console.log("my api patient:",`/api/patient/${api_patient_id}/update`)
             apiCall({
                 endpoint: `/api/patient/${api_patient_id}/update`,
                 method: "PATCH",
-                requestData: data,
+                requestData: patientObj,
             }).then((res_data) => {
                 console.log(res_data);
                 props.setResDataPatient(res_data);
             });
         }
-    }, [props, api_patient_id, weight, height, current_treatment, drug_allergies, food_allergies, medical_history]);
+    }, [props, api_patient_id,patientObj]);
 
     return ( <div className="w-[1080px] h-[836px] px-[60px] py-[40px] flex flex-col gap-[40px] items-start">
         <div className=" h-[208px] w-full grid grid-cols-2 gap-x-[60px] gap-y-[40px] content-start">
@@ -108,8 +77,8 @@ function PatientContent(props) {
                     className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]"
                     type="text" 
                     placeholder="#0000001" 
-                    value={patient_id}
-                    onChange={(e) => setPatient_id(e.target.value)}
+                    value={patientObj.patient_id}
+                    onChange={(e) => setPatientObj({...patientObj, patient_id: e.target.value})}
                 />
 
             </div>
@@ -123,10 +92,8 @@ function PatientContent(props) {
                     className="w-[402px] h-[24px] py-[12px] px-[8px] border-0  flex items-center self-stretch rounded-[5px]" 
                     type="text" 
                     placeholder="10/03/2024" 
-                    value={signup_date} 
-                    onChange={(e) => setSignup_date(e.target.value)}
+                    value={patientObj.signup_date} 
                 />
-
                     <img src="/images/Patient_calender.png" alt="" onClick={toggleDatePicker}/>
                     {showDatePicker && (
                             <div style={{ position: "relative" }}>
@@ -145,8 +112,8 @@ function PatientContent(props) {
                     className="w-[402px] h-[24px] py-[12px] px-[8px] border-0  flex items-center self-stretch rounded-[5px]" 
                     type="text" 
                     placeholder="170" 
-                    value={height} 
-                    onChange={(e) => setHeight(e.target.value)}
+                    value={patientObj.height} 
+                    onChange={(e) => setPatientObj({...patientObj, height: e.target.value})}
                 />
                     <div className="w-[24px] h-[24px] flex justify-center items-center ">
                         <h3 className="font-sans text-[14px] font-medium leading-[24px] text-[#6E7F94] ">cm</h3>
@@ -163,8 +130,8 @@ function PatientContent(props) {
                     className="w-[402px] h-[24px] py-[12px] px-[8px] border-0  flex items-center self-stretch rounded-[5px]" 
                     type="text" 
                     placeholder="55" 
-                    value={weight} 
-                    onChange={(e) => setWeight(e.target.value)}
+                    value={patientObj.weight} 
+                    onChange={(e) => setPatientObj({...patientObj, weight: e.target.value})}
                 />
                     <div className="w-[24px] h-[24px] flex justify-center items-center ">
                         <h3 className="font-sans text-[14px] font-medium leading-[24px] text-[#6E7F94] ">kg</h3>
@@ -234,7 +201,7 @@ function PatientContent(props) {
                 <h6 className="font-sans text-[20px] font-medium leading-[32px]">Lưu ý khác</h6>
             </div>
             <div className="h-[167px] w-full  flex items-center gap-[8px] shrink-0 self-stretch rounded-[5px] border-[1px] border-solid border-black">
-                <input type="text" className=" inline-block align-text-top self-stretch h-full w-full border-0  leading-normal rounded-[5px]" placeholder=""></input>
+                <input type="text" className=" inline-block align-text-top self-stretch h-full w-full border-0  leading-normal rounded-[5px]" placeholder="" onChange={(e) => setPatientObj({...patientObj, note: e.target.value})} ></input>
             </div>
         </div>
     </div> );

@@ -13,16 +13,8 @@
 
 
         function InfoContent({ isSubmit, setResDataInfo }) {
-            const [first_name, setFirst_name] = useState("");
-            const [last_name, setLast_name] = useState("");
-            const [birth_date, setBirth_date] = useState("");
-            const [gender, setGender] = useState("");
-            const [id_card, setId_card] = useState("");
-            const [phone, setPhone] = useState("");
-            const [address, setAddress] = useState("");
-            const [email, setEmail] = useState("");
-            const [health_insurance, setHealth_insurance] = useState("");
             const [showDatePicker, setShowDatePicker] = useState(false);
+            const [patchObj,setPatchObj] = useState({});
 
 
             function toggleDatePicker() {
@@ -34,7 +26,7 @@
                 const month = selectedDate.getMonth() + 1; // Months are zero-based, so add 1
                 const day = selectedDate.getDate();
                 const year = selectedDate.getFullYear();
-                setBirth_date(`${year}-${month}-${day}`);
+                setPatchObj({...patchObj,"birth_date":`${year}-${month}-${day}`})
                 setShowDatePicker(false);
             };
 
@@ -42,31 +34,18 @@
 
             useEffect(() => {
                 if (isSubmit) {
-                    const data = {
-                        "first_name": first_name,
-                        "last_name": last_name,
-                        "birth_date": birth_date,
-                        "gender": gender,
-                        "ssn": id_card,
-                        "phone_number": phone,
-                        "address": address,
-                        "email": email,
-                        "health_insurance": health_insurance
-                    };
-                    // if (first_name === "" || last_name === "" || birth_date === "" || gender === "" || id_card === "" || phone === "" || address === "") {
-                    // } else 
                     {
                         apiCall({
                             endpoint: "/api/patient/create",
                             method: "POST",
-                            requestData: data,
+                            requestData: patchObj,
                         }).then((res_data) => {
                             console.log(res_data);
                             setResDataInfo(res_data);
                         });
                     }
                 }
-            }, [isSubmit, first_name, last_name, birth_date, gender, id_card, phone, address, email, health_insurance,setResDataInfo]);
+            }, [isSubmit, patchObj,setResDataInfo]);
             
 
             
@@ -79,7 +58,7 @@
                             <h6 className="font-sans text-[20px] font-medium leading-[32px]">Họ <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
                         </div>
                         <input className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]" 
-                        type="text" placeholder="Nguyễn" value={first_name} onChange={(e)=>setFirst_name(e.target.value)}/>
+                        type="text" placeholder="Nguyễn" value={patchObj.first_name} onChange={(e)=>setPatchObj({...patchObj,"first_name":e.target.value})}/>
                     </div>
 
                     <div className="w-[450px] h-[84px] flex flex-col items-start gap-[4px]">
@@ -87,7 +66,7 @@
                             <h6 className="font-sans text-[20px] font-medium leading-[32px]">Tên <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
                         </div>
                         <input className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]"
-                        type="text" placeholder="Văn A" value={last_name} onChange={(e)=>setLast_name(e.target.value)}/>
+                        type="text" placeholder="Văn A" value={patchObj.last_name} onChange={(e)=>setPatchObj({...patchObj,"last_name":e.target.value})}/>
                     </div>
 
                     <div className="w-[450px] h-[84px] flex flex-col items-start gap-[4px]">
@@ -96,7 +75,7 @@
                         </div>
                         <div className="w-[450px] gap-[8px] h-[48px] py-[12px] px-[8px] flex items-center self-stretch rounded-[5px] border-[1px] border-black border-solid">
                             <input className="w-[402px] h-[24px] py-[12px] px-[8px] border-0  flex items-center self-stretch rounded-[5px]"
-                            type="text" placeholder="10/03/2024" value={birth_date} onChange={(e)=>setBirth_date(e.target.value)}/>
+                            type="text" placeholder="10/03/2024" value={patchObj.birth_date} />
                             <img src="/images/Patient_calender.png" alt="" onClick={toggleDatePicker} />
                             {showDatePicker && (
                                     <div style={{ position: "relative" }}>
@@ -115,7 +94,7 @@
                             type="text" placeholder="Nam" onChange={(e)=>setGender(e.target.value)}/>
                             <img src="/images/Patient_Trailing_icon.png" alt="" /> */}
                             <select className="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state"
-                            type="text" placeholder="Nam" value={gender} onChange={(e)=>setGender(e.target.value)}>
+                            type="text" placeholder="Nam" value={patchObj.gender} onChange={(e)=>setPatchObj({...patchObj,"gender":e.target.value})}>
                                 <option>Nam</option>
                                 <option>Nữ</option>
                                 <option>Khác</option>
@@ -128,7 +107,7 @@
                             <h6 className="font-sans text-[20px] font-medium leading-[32px]">CCCD <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
                         </div>
                         <input className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]"
-                        type="text" placeholder="0123456789" value={id_card} onChange={(e)=>setId_card(e.target.value)}/>
+                        type="text" placeholder="0123456789" value={patchObj.ssn} onChange={(e)=>setPatchObj({...patchObj,"ssn":e.target.value})}/>
                     </div>
 
                     <div className="w-[450px] h-[84px] flex flex-col items-start gap-[4px]">
@@ -136,7 +115,7 @@
                             <h6 className="font-sans text-[20px] font-medium leading-[32px]">Số điện thoại <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
                         </div>
                         <input className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-solid border-black flex items-center self-stretch rounded-[5px]"
-                        type="text" placeholder="0903812312" value={phone} onChange={(e)=>setPhone(e.target.value)}/>
+                        type="text" placeholder="0903812312" value={patchObj.phone_number} onChange={(e)=>setPatchObj({...patchObj,"phone_number":e.target.value})}/>
                     </div>
 
                     <div className="w-[960px] h-[84px] col-span-2">
@@ -145,7 +124,7 @@
                         </div>
                         <div className="w-[960px] h-[48px] col-span-2">
                         <input type="text" className="w-[960px] h-[48px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]"
-                        placeholder="268 Lý Thường Kiệt, Phường 14, Quận 10, Thành phố Hồ Chí Minh, Việt Nam" value={address} onChange={(e)=>setAddress(e.target.value)}/>
+                        placeholder="268 Lý Thường Kiệt, Phường 14, Quận 10, Thành phố Hồ Chí Minh, Việt Nam" value={patchObj.address} onChange={(e)=>setPatchObj({...patchObj,"address":e.target.value})}/>
                     </div>
                     </div>
 
@@ -154,7 +133,7 @@
                             <h6 className="font-sans text-[20px] font-medium leading-[32px]">Email</h6>
                         </div>
                         <input className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]"
-                        type="text" placeholder="nguyenvana@gmail.com" value={email} onChange={(e)=>setEmail(e.target.value)}/>
+                        type="text" placeholder="nguyenvana@gmail.com" value={patchObj.email} onChange={(e)=>setPatchObj({...patchObj,"email":e.target.value})}/>
                     </div>
 
                     <div className="w-[450px] h-[84px] flex flex-col items-start gap-[4px]">
@@ -162,7 +141,7 @@
                             <h6 className="font-sans text-[20px] font-medium leading-[32px]">Thẻ bảo hiểm y tế</h6>
                         </div>
                         <input className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-solid border-black flex items-center self-stretch rounded-[5px]"
-                        type="text" placeholder="HS0123456789" value={health_insurance} onChange={(e)=>setHealth_insurance(e.target.value)}/>
+                        type="text" placeholder="HS0123456789" value={patchObj.health_insurance} onChange={(e)=>setPatchObj({...patchObj,"health_insurance":e.target.value})}/>
                     </div>
                 </div>
             </div> );
