@@ -2,8 +2,9 @@ from repository.schemas.patient import Patient, MedicalRecord, PatientProgress
 from repository.schemas.user import User
 from sqlalchemy.sql import text
 from repository.user import UserRepo
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import and_
 from typing import Tuple
 from models.patient import QueryPatientModel, PatchPatientModel, AddPatientModel
 from models.patient_progress import NewPatientProgressModel, QueryPatientProgressModel, PatchPatientProgressModel
@@ -27,15 +28,34 @@ class PatientRepo:
         try:
             patient = self._sess.query(Patient).filter(
                 Patient.user_id == query.user_id
-            ).outerjoin(
-                self._sess.query(MedicalRecord).filter(
-                    MedicalRecord.id == Patient.medical_record_id
-                ).outerjoin(
-                    self._sess.query(PatientProgress).filter(
-                        PatientProgress.medical_record_id == MedicalRecord.id
-                    ).limit(query.max_progress).subquery()
-                ).subquery()
+            ).options(
+                noload(Patient.medical_record)
             ).first()
+            medical_record = self._sess.query(MedicalRecord).filter(
+                MedicalRecord.id == patient.medical_record_id
+            ).options(
+                noload(MedicalRecord.progress)
+            ).first()
+            progress = self._sess.query(PatientProgress).filter(
+                PatientProgress.patient_id == query.user_id
+            ).order_by(PatientProgress.id.desc()).subquery().alias("progress")
+            progress = self._sess.query(progress).filter(
+                progress.c.patient_id == query.user_id
+            ).limit(
+                query.page_limit
+            ).offset(
+                (query.progress_page - 1) * query.page_limit
+            ).all()
+            progress = [
+                PatientProgress(
+                    **{
+                        c: getattr(p, c) for c in p._fields
+                    }
+                )
+                for p in progress
+            ]
+            setattr(medical_record, "progress", progress)
+            setattr(patient, "medical_record", medical_record)
         except Exception as err:
             return None, err
         return patient, None
@@ -64,9 +84,11 @@ class PatientRepo:
         patient_update: PatchPatientModel
     ) -> Tuple[Patient, Exception | None]:
         try:
-            patient, err = await self.get(query)
-            if err:
-                return None, err
+            patient = self._sess.query(Patient).filter(
+                Patient.user_id == query.user_id
+            ).first()
+            if not patient:
+                return None, Exception("Patient not found")
             dump_update_patient = patient_update.model_dump()
             if dump_update_patient.get("personal_info"):
                 for attr, value in dump_update_patient.get("personal_info", {}).items():
@@ -143,8 +165,10 @@ class PatientRepo:
     ):
         try:
             patient_progress = self._sess.query(PatientProgress).filter(
-                PatientProgress.id == query.progress_id
-                and PatientProgress.patient_id == query.patient_id
+                and_(
+                    PatientProgress.id == query.progress_id,
+                    PatientProgress.patient_id == query.patient_id
+                )
             ).first()
             if not patient_progress:
                 raise Exception("Patient progress not found")
@@ -176,8 +200,10 @@ class PatientRepo:
     ):
         try:
             patient_progress = self._sess.query(PatientProgress).filter(
-                PatientProgress.id == query.progress_id
-                and PatientProgress.patient_id == query.patient_id
+                and_(
+                    PatientProgress.id == query.progress_id,
+                    PatientProgress.patient_id == query.patient_id
+                )
             ).first()
         except Exception as err:
             return None, err

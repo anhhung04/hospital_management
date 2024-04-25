@@ -58,7 +58,8 @@ class PatchPatientModel(BaseModel):
 
 class QueryPatientModel(BaseModel):
     user_id: Optional[str | None] = None
-    max_progress: int = 1
+    progress_page: int = 1
+    page_limit: int = 1
 
 
 class DeleteLeadEmployeeModel(BaseModel):

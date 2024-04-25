@@ -73,10 +73,11 @@ class PatientService:
         return patients
 
     @Permission.permit([UserRole.EMPLOYEE], acl=[UserRole.PATIENT])
-    async def get(self, id: str, max_progress: int = 5):
+    async def get(self, id: str, progress_page: int = 1, page_limit: int = 1):
         patient, err = await self._patient_repo.get(query=QueryPatientModel(
             user_id=id,
-            max_progress=abs(max_progress)
+            progress_page=abs(progress_page),
+            page_limit=abs(page_limit)
         ))
         if err:
             raise HTTPException(
@@ -90,7 +91,6 @@ class PatientService:
             )
         appointment_date = None
         if patient.medical_record:
-            patient.medical_record.progress = patient.medical_record.progress[-max_progress:]
             appointment_date = PatientService.find_appointment_date(
                 patient.medical_record
             )
