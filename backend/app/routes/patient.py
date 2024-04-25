@@ -38,12 +38,13 @@ async def list_patients(
 @router.get("/{patient_id}", tags=["patient"], response_model=PatientDetailResponseModel)
 async def get_patient(
     patient_id: IdPath,
-    max_progress: int = Query(lt=10, gt=0, default=1),
+    progress_page: Annotated[int, Query(gt=0)] = 1,
+    page_limit: Annotated[int, Query(gt=0)] = 1,
     service: PatientService = Depends(PatientService),
 ):
     try:
         patient = await service.get(
-            id=str(patient_id), max_progress=max_progress
+            id=str(patient_id), progress_page=progress_page, page_limit=page_limit
         )
     except HTTPException as e:
         return APIResponse.as_json(

@@ -152,7 +152,7 @@ class TestPatient(TestIntegration):
             self.assertEqual(res.status_code, 200)
         max_progress = random.randint(1, 8)
         res = self._s.get(self.path(f"/{patient_id}"), params={
-            "max_progress": max_progress
+            "page_limit": max_progress
         })
         print(res.json())
         self.assertEqual(res.status_code, 200)
