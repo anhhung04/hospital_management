@@ -1,6 +1,6 @@
 from repository.schemas.patient import Patient, MedicalRecord, PatientProgress
 from repository.schemas.user import User
-from sqlalchemy.sql import text
+from sqlalchemy.sql import text, between
 from repository.user import UserRepo
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -9,6 +9,7 @@ from models.patient import QueryPatientModel, PatchPatientModel, AddPatientModel
 from models.patient_progress import NewPatientProgressModel, QueryPatientProgressModel, PatchPatientProgressModel
 from repository import Storage
 from fastapi import Depends
+from datetime import datetime, timedelta
 
 class PatientRepo:
     def __init__(
@@ -201,3 +202,24 @@ class PatientRepo:
         except Exception as err:
             self._sess.rollback()
             return None, err
+
+    async def count(self):
+        try:
+            return self._sess.query(Patient).count(), None
+        except Exception as err:
+            return 0, err
+
+    async def count_per_day(self, days: int):
+        try:
+            current_date = datetime.now()
+            dates = [current_date - timedelta(days=i) for i in range(days)]
+            counts = []
+            for date in dates:
+                count = self._sess.query(PatientProgress).filter(
+                    between(PatientProgress.created_at,
+                            date, date + timedelta(days=1))
+                ).count()
+                counts.append(count)
+            return counts, None
+        except Exception as err:
+            return [], err
