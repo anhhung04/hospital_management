@@ -220,3 +220,12 @@ class EmployeeRepo:
             self._sess.rollback()
             return e
         return None
+
+    async def count(self, type: EmployeeType | None = None):
+        try:
+            query = self._sess.query(Employee)
+            if type:
+                query = query.filter(Employee.employee_type == type)
+            return query.count(), None
+        except Exception as err:
+            return 0, err
