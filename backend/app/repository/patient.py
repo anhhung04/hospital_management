@@ -1,13 +1,12 @@
-from repository.schemas.patient import Patient, MedicalRecord, PatientProgress
+from repository.schemas.patient import Patient, MedicalRecord, PatientProgress, EmployeeHandlePatient, ProgressType
 from repository.schemas.user import User
-from sqlalchemy.sql import text, between
+from sqlalchemy.sql import text, between, and_
 from repository.user import UserRepo
 from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import and_
 from typing import Tuple
 from models.patient import QueryPatientModel, PatchPatientModel, AddPatientModel
-from models.patient_progress import NewPatientProgressModel, QueryPatientProgressModel, PatchPatientProgressModel
+from models.patient_progress import NewPatientProgressModel, QueryPatientProgressModel, PatchPatientProgressModel, PatientProgressInChargeModel
 from repository import Storage
 from fastapi import Depends
 from datetime import datetime, timedelta
@@ -247,5 +246,35 @@ class PatientRepo:
                 ).count()
                 counts.append(count)
             return counts, None
+        except Exception as err:
+            return [], err
+
+    async def get_progress_in_charge(self, patient_id, doctor_id, limit):
+        try:
+            progress = self._sess.query(PatientProgress).filter(
+                and_(
+                    PatientProgress.patient_id == patient_id,
+                    PatientProgress.lead_employee.any(
+                        EmployeeHandlePatient.employee_id == doctor_id
+                    ),
+                    PatientProgress.status != ProgressType.FINISHED
+                )
+            ).order_by(PatientProgress.id.desc()).limit(limit).all()
+            progress = [
+                PatientProgressInChargeModel(
+                    patient_id=p.patient_id,
+                    employee_id=doctor_id,
+                    patient_name=" ".join([
+                        p.medical_record.patient.personal_info.first_name,
+                        p.medical_record.patient.personal_info.last_name
+                    ]),
+                    status=str(p.status),
+                    patient_condition=p.patient_condition,
+                    start_treatment=p.start_treatment,
+                    end_treatment=p.end_treatment
+                )
+                for p in progress
+            ]
+            return progress, None
         except Exception as err:
             return [], err

@@ -205,6 +205,36 @@ class TestPatient(TestIntegration):
         print(res.json())
         self.assertEqual(res.json()['data']['lead_employee'][0]['employee_email'], "nguyenvana@gmail.com")
 
+    def test_progress_in_charge(self):
+        res = self._s.get(self._base + "/auth/me")
+        data = res.json()['data']
+        doctor_id = data['id']
+        doctor_email = data['email']
+        _, _, patient_id = self.test_create_patient()
+        res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
+            "start_treatment": "2024-05-06 00:00:00",
+            "end_treatment": "2024-06-06 00:00:00",
+            "patient_condition": "good"
+        })
+        progress_id = res.json()['data']['id']
+        res = self._s.patch(self.path(f"/{patient_id}/progress/{progress_id}/update"), json={
+            "lead_employee": [
+                {
+                    "employee_email": doctor_email,
+                    "action": "do something"
+                }
+            ]
+        })
+        res = self._s.get(self.path(f"/{patient_id}/progress/in-charge"), params={
+            "doctor_id": doctor_id
+        })
+        data = res.json()
+        self.assertEqual(res.status_code, 200)
+        print(res.json())
+        data = res.json()['data']
+        print(data)
+        self.assertTrue(len(data) > 0)
+
     def test_delete_lead_employee(self):
         _, _, patient_id = self.test_create_patient()
         res = self._s.post(self.path(f"/{patient_id}/progress/create"), json={
