@@ -8,7 +8,8 @@ from models.patient import (
 )
 from models.patient_progress import (
     NewPatientProgressModel, QueryPatientProgressModel, PatientProgressResponseModel,
-    PatientProgressDetailResponseModel, PatchPatientProgressModel
+    PatientProgressDetailResponseModel, PatchPatientProgressModel,
+    PatientProgressInChargeResponseModel
 )
 from models.employee import QueryEmployeeModel
 from models.request import IdPath
@@ -144,6 +145,31 @@ async def update_patient_progress(
         message="Progress updated successfully"
     )
 
+
+@router.get(
+    "/{patient_id}/progress/in-charge",
+    tags=["patient"],
+    response_model=PatientProgressInChargeResponseModel
+)
+async def get_patient_progress_in_charge(
+    patient_id: IdPath,
+    doctor_id: Annotated[str, Query()],
+    limit: Annotated[int, Query(gt=0)] = 10,
+    service: PatientService = Depends(PatientService),
+):
+    try:
+        progresses = await service.get_progress_in_charge(
+            patient_id, doctor_id, limit
+        )
+    except HTTPException as e:
+        return APIResponse.as_json(
+            code=e.status_code, message=str(e.detail), data={}
+        )
+    return APIResponse.as_json(
+        code=status.HTTP_200_OK,
+        data=progresses,
+        message="Progress fetched successfully"
+    )
 
 @router.get(
     "/{patient_id}/progress/{progress_id}",

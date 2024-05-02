@@ -14,7 +14,8 @@ from models.patient_progress import (
     QueryPatientProgressModel,
     ProgressRecordModel,
     PatchPatientProgressModel,
-    PatientProgressDetailModel
+    PatientProgressDetailModel,
+    PatientProgressInChargeModel
 )
 from models.employee import QueryEmployeeModel
 from permissions import Permission
@@ -346,6 +347,28 @@ class PatientService:
         return PatientProgressDetailModel.model_validate(
             dump_progress
         ).model_dump()
+
+    @Permission.permit([UserRole.EMPLOYEE])
+    async def get_progress_in_charge(self, patient_id, doctor_id, limit):
+        if not doctor_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Doctor id is required'
+            )
+
+        progress, err = await self._patient_repo.get_progress_in_charge(
+            patient_id, doctor_id, limit
+        )
+        if err:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=err
+            )
+        return [
+            PatientProgressInChargeModel.model_validate(
+                obj=p, strict=False, from_attributes=True
+            ).model_dump() for p in progress
+        ]
 
     @staticmethod
     def find_appointment_date(media_record: MedicalRecord | None) -> str | None:
