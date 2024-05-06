@@ -6,7 +6,7 @@ from util.response import APIResponse
 router = APIRouter()
 
 
-@router.get("/", response_model=MetricResponseModel, tags=["metrics"])
+@router.get("/", response_model=MetricResponseModel)
 async def fetch_system_metrics(
     service: MetricService = Depends(MetricService),
 ):
