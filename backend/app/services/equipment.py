@@ -2,10 +2,9 @@ from uuid import uuid4
 from fastapi import HTTPException, Depends, status
 from middleware.user_ctx import UserContext
 from repository.user import UserRepo
-from middleware.user_ctx import UserContext
 from repository.warehouse import EquipmentRepo
 from permissions import Permission
-from permissions.user import UserRole, EmployeeType
+from permissions.user import EmployeeType
 from util.log import logger
 from models.equipment import(
   EquipmentModel,

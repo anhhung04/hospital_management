@@ -3,7 +3,6 @@ from repository import Storage
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from repository.user import UserRepo
-from repository.schemas.user import User
 from models.medicine import(
   AddMedicineModel,
   AddMedicineBatchModel,
