@@ -11,9 +11,9 @@ from models.medicine import(
   MedicineModel,
   MedicineRequestModel,
   AddMedicineModel,
-  BatchModel,
-  BatchRequestModel,
-  AddBatchModel,
+  MedicineBatchModel,
+  MedicineBatchRequestModel,
+  AddMedicineBatchModel,
 )
 
 class MedicineService:
@@ -63,7 +63,6 @@ class MedicineService:
     
     # @Permission.permit([EmployeeType.OTHER], acl=[UserRole.EMPLOYEE])
     async def create(self, medicine: MedicineRequestModel):
-        print("test")
         medicine_info = medicine.model_dump()
         medicine_id = str(uuid4())
         medicine_info.update({"id": medicine_id})
@@ -93,7 +92,7 @@ class MedicineService:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                                 detail="Error in fetching medicine")
         try:
-            batches = [BatchModel(
+            batches = [MedicineBatchModel(
                 id=batch.id,
                 import_date=str(batch.import_date),
                 quantity=batch.import_quantity,
@@ -110,20 +109,20 @@ class MedicineService:
         return batches
     
     # @Permission.permit([EmployeeType.OTHER], acl=[UserRole.EMPLOYEE])
-    async def create_batch(self, medicine_id: str, batch: BatchRequestModel):
+    async def create_batch(self, medicine_id: str, batch: MedicineBatchRequestModel):
         batch_info = batch.model_dump()
         batch_id = str(uuid4())
         batch_info.update({"id": batch_id})
         batch_info.update({"price_per_unit": batch_info.get("price") / batch_info.get("quantity")})
         batch, error = await self._medicine_repo.create_batch(
             medicine_id,
-            AddBatchModel.model_validate(batch_info)
+            AddMedicineBatchModel.model_validate(batch_info)
         )
         if error:
             print(error)
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                                 detail="Error in adding batch")
-        return BatchModel(
+        return MedicineBatchModel(
             id=batch.id,
             quantity=batch.import_quantity,
             expiration_date=str(batch.expiration_date),
@@ -143,7 +142,7 @@ class MedicineService:
         if not batch:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                                 detail="Batch not found")
-        return BatchModel(
+        return MedicineBatchModel(
             id=batch.id,
             quantity=batch.import_quantity,
             expiration_date=str(batch.expiration_date),

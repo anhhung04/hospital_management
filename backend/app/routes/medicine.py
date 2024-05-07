@@ -7,9 +7,9 @@ from models.medicine import(
     MedicineModel,
     MedicineRequestModel,
     MedicineListResponseModel,
-    BatchModel,
-    BatchRequestModel,
-    BatchListResponseModel,
+    MedicineBatchModel,
+    MedicineBatchRequestModel,
+    MedicineBatchListResponseModel,
 )
 from models.request import IdPath
 
@@ -65,7 +65,7 @@ async def create_medicine(
         code=status.HTTP_200_OK, data=medicine, message="Medicine created successfully"
     )
 
-@router.get("/{medicine_id}/batch/list", response_model=BatchListResponseModel)
+@router.get("/{medicine_id}/batch/list", response_model=MedicineBatchListResponseModel)
 async def get_batches(
     medicine_id: IdPath,
     page: Annotated[int, Query(gt=0)] = 1,
@@ -86,7 +86,7 @@ async def get_batches(
         code=status.HTTP_200_OK, data=batches, message="Batches fetched successfully"
     )
 
-@router.get("/{medicine_id}/batch/{batch_id}", response_model=BatchModel)
+@router.get("/{medicine_id}/batch/{batch_id}", response_model=MedicineBatchModel)
 async def get_batch(
     medicine_id: IdPath,
     batch_id: IdPath,
@@ -106,10 +106,10 @@ async def get_batch(
     )
 
 
-@router.post("/{medicine_id}/batch/create", response_model=BatchModel)
+@router.post("/{medicine_id}/batch/create", response_model=MedicineBatchModel)
 async def create_batch(
     medicine_id: IdPath,
-    new_batch_request: BatchRequestModel,
+    new_batch_request: MedicineBatchRequestModel,
     service: MedicineService = Depends(MedicineService)
 ):
     try:

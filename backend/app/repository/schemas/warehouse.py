@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, Date, ForeignKey, Column, Table
+from sqlalchemy import String, Integer, Date, ForeignKey, Boolean
 from sqlalchemy import Enum as DBEnum
 from sqlalchemy.orm import mapped_column, relationship
 from repository.schemas import Base, ObjectID
@@ -76,6 +76,9 @@ class Equipment(Base):
 
     id = mapped_column(ObjectID, primary_key=True, index=True)
     name = mapped_column(String)
-    availability = mapped_column(Integer)
+    availability = mapped_column(Boolean)
     maintanance_history = mapped_column(String)
+    description = mapped_column(String)
+    status = mapped_column(String)
+    quantity = mapped_column(Integer)
     batches = relationship("EquipmentBatch", back_populates="equipment")

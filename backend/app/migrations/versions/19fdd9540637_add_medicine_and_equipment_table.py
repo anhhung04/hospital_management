@@ -46,8 +46,11 @@ def upgrade() -> None:
     op.create_table('equipments',
         sa.Column('id', sa.String(), nullable=False),
         sa.Column('name', sa.String(), nullable=True),
-        sa.Column('availability', sa.Integer(), nullable=True),
+        sa.Column('availability', sa.Boolean(), nullable=True),
         sa.Column('maintanance_history', sa.String(), nullable=True),
+        sa.Column('status', sa.String(), nullable=True),
+        sa.Column('description', sa.String(), nullable=True),
+        sa.Column('quantity', sa.Integer(), nullable=True),
         sa.PrimaryKeyConstraint('id')
     )
 

@@ -19,7 +19,7 @@ class MedicineRequestModel(BaseModel):
 class AddMedicineModel(MedicineRequestModel):
     id: str
 
-class BatchModel(BaseModel):
+class MedicineBatchModel(BaseModel):
     id: str
     import_date: str
     expiration_date: str
@@ -29,7 +29,7 @@ class BatchModel(BaseModel):
     manufacturer: str
     details: str
 
-class BatchRequestModel(BaseModel):
+class MedicineBatchRequestModel(BaseModel):
     import_date: str
     expiration_date: str
     quantity: int = Field(gt=0)
@@ -38,8 +38,8 @@ class BatchRequestModel(BaseModel):
     manufacturer: str
     details: str
 
-class AddBatchModel(BatchRequestModel):
+class AddMedicineBatchModel(MedicineBatchRequestModel):
     id: str
 
-class BatchListResponseModel(BaseResponseModel):
-    data: list[BatchModel]
+class MedicineBatchListResponseModel(BaseResponseModel):
+    data: list[MedicineBatchModel]

@@ -1,5 +1,4 @@
-from tests import TestIntegration, gen_id, gen_name, gen_ssn, gen_username
-import random
+from tests import TestIntegration
 
 class TestMedicine(TestIntegration):
     def __init__(self, methodName: str = "runTest") -> None:
