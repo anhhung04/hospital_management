@@ -249,11 +249,10 @@ class PatientRepo:
         except Exception as err:
             return [], err
 
-    async def get_progress_in_charge(self, patient_id, doctor_id, limit):
+    async def get_progress_in_charge(self, doctor_id, limit):
         try:
             progress = self._sess.query(PatientProgress).filter(
                 and_(
-                    PatientProgress.patient_id == patient_id,
                     PatientProgress.lead_employee.any(
                         EmployeeHandlePatient.employee_id == doctor_id
                     ),
