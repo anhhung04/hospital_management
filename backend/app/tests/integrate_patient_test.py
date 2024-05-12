@@ -225,7 +225,7 @@ class TestPatient(TestIntegration):
                 }
             ]
         })
-        res = self._s.get(self.path(f"/{patient_id}/progress/in-charge"), params={
+        res = self._s.get(self.path(f"/progress/in-charge"), params={
             "doctor_id": doctor_id
         })
         data = res.json()

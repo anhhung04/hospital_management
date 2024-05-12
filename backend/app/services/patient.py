@@ -349,7 +349,7 @@ class PatientService:
         ).model_dump()
 
     @Permission.permit([UserRole.EMPLOYEE])
-    async def get_progress_in_charge(self, patient_id, doctor_id, limit):
+    async def get_progress_in_charge(self, doctor_id, limit):
         if not doctor_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -357,7 +357,7 @@ class PatientService:
             )
 
         progress, err = await self._patient_repo.get_progress_in_charge(
-            patient_id, doctor_id, limit
+            doctor_id, limit
         )
         if err:
             raise HTTPException(
