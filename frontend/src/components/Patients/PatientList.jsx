@@ -29,20 +29,20 @@ function PatientsList() {
   }
 
 
-  useEffect(() => {
-    fetch("api/patients/list", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setListPatient_Info(data);
-        setCheckedState(new Array(data.length).fill(false));
-      })
-      .catch((error) => console.error('Error fetching patient data:', error));
-  }, []);
+  // useEffect(() => {
+  //   fetch("api/patients/list", {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setListPatient_Info(data);
+  //       setCheckedState(new Array(data.length).fill(false));
+  //     })
+  //     .catch((error) => console.error('Error fetching patient data:', error));
+  // }, []);
 
   function handleClick() {
       setIsAdd(true);

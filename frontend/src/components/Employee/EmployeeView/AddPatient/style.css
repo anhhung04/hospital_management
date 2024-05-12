@@ -1,0 +1,9 @@
+.Add-button:hover .cir {
+    fill: #BEE1F9;
+    stroke:none;
+}
+
+.Add-button:hover .plus {
+    fill: #F9FBFF;
+}
+

@@ -8,7 +8,7 @@ function DefaultLayout({children}) {
     function handleClick(content) {
         setCurrent_content(content);
     }
-    return (<div className="flex flex-col h-full w-full justify-between mb-0">
+    return (<div className="flex flex-col w-full justify-between mb-0">
         <Header/>
         <div className="flex flex-row">
             <Sidebar current_content={current_content} handleClick={handleClick}/>
