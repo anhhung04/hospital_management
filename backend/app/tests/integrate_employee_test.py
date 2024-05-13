@@ -10,7 +10,7 @@ class TestEmployee(TestIntegration):
             self.test_create_employee()
         response = self._s.get(self.path('/list'), params={
             "page": 1,
-            "employee_per_page": 5
+            "limit": 5
         })
         data = response.json()['data']
         self.assertEqual(response.status_code, 200)
@@ -21,7 +21,7 @@ class TestEmployee(TestIntegration):
             self.test_create_employee()
         response = self._s.get(self.path('/list'), params={
             "page": 1,
-            "employee_per_page": 5,
+            "limit": 5,
             "type": "DOCTOR"
         })
         print(response.json())
@@ -34,7 +34,7 @@ class TestEmployee(TestIntegration):
             self.test_create_employee(type="NURSE")
         response = self._s.get(self.path('/list'), params={
             "page": 1,
-            "employee_per_page": 5,
+            "limit": 5,
             "type": "NURSE"
         })
         print(response.json())
@@ -47,7 +47,7 @@ class TestEmployee(TestIntegration):
             self.test_create_employee(type=None)
         response = self._s.get(self.path('/list'), params={
             "page": 1,
-            "employee_per_page": 5,
+            "limit": 5,
             "type": "OTHER"
         })
         data = response.json()['data']

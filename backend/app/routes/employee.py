@@ -24,14 +24,14 @@ router = APIRouter(tags=["employee"])
 
 @router.get("/list", response_model=ListEmployeeModel)
 async def list_employees(
-    type: Annotated[EmployeeType | None, Query] = None,
+    type: Annotated[EmployeeType | None, Query(description="If None: Get all Employees")] = None,
     page: Annotated[int, Query(gt=0)] = 1,
-    employee_per_page: Annotated[int, Query(gt=0)] = 10,
+    limit: Annotated[int, Query(gt=0)] = 10,
     service: EmployeeService = Depends(EmployeeService)
 ):
     try:
         employees = await service.get_employees(
-            type, page, employee_per_page
+            type, page, limit
         )
     except HTTPException as error:
         return APIResponse.as_json(
