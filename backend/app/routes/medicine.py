@@ -18,12 +18,12 @@ router = APIRouter(tags=["medicine"])
 @router.get("/list", response_model=MedicineListResponseModel)
 async def list_medicines(
     page: Annotated[int, Query(gt=0)] = 1,
-    medicine_per_page: Annotated[int, Query(gt=0)] = 10,
+    limit: Annotated[int, Query(gt=0)] = 10,
     service: MedicineService = Depends(MedicineService)
 ):
     try:
         medicines = await service.list_medicines(
-            page, medicine_per_page
+            page, limit
         )
     except HTTPException as error:
         return APIResponse.as_json(
@@ -69,14 +69,14 @@ async def create_medicine(
 async def get_batches(
     medicine_id: IdPath,
     page: Annotated[int, Query(gt=0)] = 1,
-    batches_per_page: Annotated[int, Query(gt=0)] = 10,
+    limit: Annotated[int, Query(gt=0)] = 10,
     service: MedicineService = Depends(MedicineService)
 ):
     try:
         batches = await service.list_batches(
             medicine_id=str(medicine_id),
             page=page,
-            batches_per_page=batches_per_page
+            batches_per_page=limit
         )
     except HTTPException as e:
         return APIResponse.as_json(

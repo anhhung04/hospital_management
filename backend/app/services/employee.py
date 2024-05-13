@@ -55,7 +55,11 @@ class EmployeeService:
                 full_name=" ".join(
                     [employee.personal_info.last_name, employee.personal_info.first_name]),
                 faculty=employee.faculty,
-                status=employee.status
+                status=employee.status,
+                employee_type=employee.employee_type,
+                educational_level=employee.education_level,
+                begin_date=str(employee.begin_date),
+                end_date=str(employee.end_date)
             ).model_dump() for employee in employees]
         except Exception as e:
             logger.error('Error in converting employee list', reason=e)

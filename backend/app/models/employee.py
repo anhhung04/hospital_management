@@ -12,6 +12,10 @@ class EmployeeModel(BaseModel):
     full_name: str
     faculty: Optional[str | None] = None
     status: Optional[EmployeeStatus | None] = None
+    employee_type: Optional[EmployeeType | None] = None
+    education_level: Optional[EducateLevel | None] = None
+    begin_date: Optional[str | None] = None
+    end_date: Optional[str | None] = None
 
 class ListEmployeeModel(BaseResponseModel):
     data: list[EmployeeModel]
@@ -65,4 +69,4 @@ class PatchEmployeeModel(BaseModel):
     end_date: Optional[str | None] = None
     faculty: Optional[str | None] = None
     status: Optional[EmployeeStatus | None] = None
-    personal_info: Optional[PatchUserDetailModel | None] = None
+    personal_info: Optional[PatchUserDetailModel | None] = None    
