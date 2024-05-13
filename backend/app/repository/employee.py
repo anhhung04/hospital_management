@@ -41,7 +41,6 @@ class EmployeeRepo:
 
     async def list_employees(self, employee_type: EmployeeType | None, page: int, employee_per_page: int) -> Tuple[list[Employee], Exception | None]:
         try:
-            print(employee_type)
             query = self._sess.query(Employee)
             if employee_type is not None:
                 query = query.filter(Employee.employee_type == employee_type)
