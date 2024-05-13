@@ -2,23 +2,35 @@ import redis
 from config import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi import Request
+from fastapi import HTTPException
 
 engine = create_engine(config['POSTGRES_SQL_URL'])
-
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-redis_client = redis.Redis(
-    host=config['REDIS_HOST'], port=config['REDIS_PORT'], db=0)
+redis_pool: redis.ConnectionPool = redis.ConnectionPool(host=config["REDIS_HOST"], port=int(
+    config["REDIS_PORT"]), max_connections=config["MAX_CONNECTIONS_REDIS"], db=0)
 
 
-def get_db(request: Request):
-    return request.state.db
+class Storage:
+    @staticmethod
+    def get():
+        db = SessionLocal()
+        try:
+            yield db
+        except Exception as e:
+            raise HTTPException(
+                status_code=500, detail=str(e))
+        finally:
+            db.close()
 
 
-def get_redis():
-    r = redis_client
-    try:
-        yield r
-    finally:
-        pass
+class RedisStorage:
+    @staticmethod
+    def get():
+        r = redis.Redis(connection_pool=redis_pool)
+        try:
+            yield r
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            pass

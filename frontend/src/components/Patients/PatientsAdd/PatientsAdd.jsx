@@ -1,12 +1,20 @@
-import InfoContent from "./info_content";
-import { useState } from "react";
-import ProgressContent from "./progress_content";
-import PatientContent from "./patient_content";
-import ResultContent from "./result_content/ResultContent";
-import MedicineContent from "./medicine_content";
+import InfoContent from "./InfoContent";
+import { useState} from "react";
+import ProgressContent from "./ProgressContent";
+import PatientContent from "./PatientContent";
+import ResultContent from "./ResultContent";
+import MedicineContent from "./MedicineContent";
 import HuyButton from "../../Button/Huy_Button";
 import LuuButton from "../../Button/Luu_Button";
 import Alert from "../../Alert";
+import PropTypes from 'prop-types';
+
+PatientAdd.propTypes = {
+    isStore: PropTypes.bool,
+    closeAlert: PropTypes.func,
+    CloseAdd: PropTypes.func,
+    setStore: PropTypes.func,
+};
 
 function PatientAdd(props) {
   const [current_content, setCurrent_content] = useState("info");
@@ -21,6 +29,61 @@ function PatientAdd(props) {
 
   var [numMedicineAdded, setNumMedicineAdded] = useState(0);
 
+  
+
+  const [isFinishInfo, setIsFinishInfo] = useState(false);
+  const [isAlertWarning, setIsAlertWarning] = useState(false);
+  const [isSuccesAlert, setIsSuccesAlert] = useState(false);
+
+  
+
+  const [isPostSubmit, setIsPostSubmit] = useState(false);
+  const [isPatientSubmit, setIsPatientSubmit] = useState(false);
+  const [isProgressSubmit, setIsProgressSubmit] = useState(false);
+  const [isSubmitFailed, setIsSubmitFailed] = useState(false);
+
+
+  const [resDataInfo, setResDataInfo] = useState({status_code: 500, data: {}});
+
+  function getDataInfo(res_data){
+    console.log("res_data:",res_data);
+    console.log("resDataInfo:",resDataInfo);
+    if(res_data.status_code === 200){
+      // console.log("resDataInfo",resDataInfo);
+      setResDataInfo(res_data);
+      props.setStore();
+      setIsFinishInfo(true);
+      document.cookie = `user_id=${res_data.data.user_id};max-age=0.5;path=/`;
+    }
+    else if(resDataInfo.status_code === 500){
+      setIsSubmitFailed(true);
+    }
+  }
+
+
+
+  function getDataProgress(res_data){
+    console.log("res_data11111111111111111:",res_data);
+    if(res_data.status_code === 200){
+      console.log("resDataInfo");
+      setIsSuccesAlert(true);
+    }else{
+      setIsSubmitFailed(true);
+    }
+  }
+
+
+  function getDataPatient(res_data){
+    console.log("res_data11111111111111111:",res_data);
+    if(res_data.status_code === 200){
+      console.log("resDataInfo");
+      setIsSuccesAlert(true);
+    }else{
+      setIsSubmitFailed(true);
+    }
+    
+  }
+
   function setAdd() {
     setIsAdd((pre) => !pre);
   }
@@ -34,8 +97,46 @@ function PatientAdd(props) {
   }
 
   function handleNumMedicineAdded() {
-    console.log("click");
+    // console.log("click");
     setNumMedicineAdded((pre) => pre + 1);
+  }
+
+
+  function closeWarningAlert() {
+    setIsAlertWarning(false)
+  }
+
+
+  function closeSuccesAlert() {
+    if(current_content === "info"){
+      props.closeAlert();
+      setIsPostSubmit(false);
+      setCurrent_content("patient");
+    }else if(current_content === "patient"){
+      setIsSuccesAlert(false)
+      setIsPatientSubmit(false);
+      setCurrent_content("progress");
+    }else if(current_content === "progress"){
+      setIsSuccesAlert(false)
+      setIsProgressSubmit(false);
+    }
+  }
+
+  function closeSubmitFailed() {
+    if(current_content === "info"){
+      setIsPostSubmit(false);
+      setIsSubmitFailed(false);
+    }else if(current_content === "patient"){
+      setIsPatientSubmit(false);
+      setIsSubmitFailed(false);
+    }else if(current_content === "progress"){
+      setIsProgressSubmit(false);
+      setIsSubmitFailed(false);
+    }
+  }
+
+  function handleSubmitFailed(){
+    setIsSubmitFailed(true);
   }
 
   function handleNumMedicineRemove() {
@@ -49,6 +150,19 @@ function PatientAdd(props) {
       return "";
     }
   }
+
+  function handleSubmit(){
+    if(current_content === "info"){
+      // console.log("info page"); 
+      setIsPostSubmit(true);
+    }else if(current_content === "patient"){
+      // console.log("patient page");
+      setIsPatientSubmit(true);
+    }else if (current_content === "progress"){
+      setIsProgressSubmit(true);
+    }
+  }
+
   function handleClickText(content, key_content) {
     if (key_content === content) {
       return "text-[#F9FBFF]";
@@ -86,15 +200,39 @@ function PatientAdd(props) {
     }
     return heightStyle;
   }
-
   return (
     <>
       {props.isStore && (
+  <Alert
+    message={`Thêm kết quả mới được thêm thành công<br />Username: ${resDataInfo.data.username}<br />Password: ${resDataInfo.data.password}`}
+    icon_type="success"
+    closeAlert={closeSuccesAlert}
+    type="Lưu thành công"
+  />
+)}
+{isAlertWarning && (
+  <Alert
+    message={`Bạn cần phải điền thông tin bệnh nhân trước khi điền thông tin bệnh án`}
+    icon_type="warning"
+    closeAlert={closeWarningAlert}
+    type="Cảnh báo"
+  />
+)}
+{isSuccesAlert && (
+  <Alert
+    message={`Cập nhật thông tin bệnh án thành công`}
+    icon_type="success"
+    closeAlert={closeSuccesAlert}
+    type="Thành công"
+  />
+)}
+
+      {isSubmitFailed && (
         <Alert
-          message="Thêm kết quả mới được thêm thành công"
-          icon_type="success"
-          closeAlert={props.closeAlert}
-          type="Lưu thành công"
+          message="Thông tin không hợp lệ vui vòng điền lại"
+          icon_type="error"
+          closeAlert={closeSubmitFailed}
+          type="Lưu không thành công"
         />
       )}
       <div
@@ -141,7 +279,9 @@ function PatientAdd(props) {
                   current_content,
                   "patient"
                 )}`}
-                onClick={() => setCurrent_content("patient")}
+                onClick={() => {
+                  isFinishInfo ? setCurrent_content("patient") : setIsAlertWarning(true)
+              }}
               >
                 <p
                   className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
@@ -157,7 +297,9 @@ function PatientAdd(props) {
                   current_content,
                   "progress"
                 )}`}
-                onClick={() => setCurrent_content("progress")}
+                onClick={() => {
+                  isFinishInfo ? setCurrent_content("progress") : setIsAlertWarning(true)
+              }}
               >
                 <p
                   className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
@@ -173,7 +315,9 @@ function PatientAdd(props) {
                   current_content,
                   "result"
                 )}`}
-                onClick={() => setCurrent_content("result")}
+                onClick={() => {
+                  isFinishInfo ? setCurrent_content("result") : setIsAlertWarning(true)
+              }}
               >
                 <p
                   className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
@@ -189,7 +333,9 @@ function PatientAdd(props) {
                   current_content,
                   "medicine"
                 )}`}
-                onClick={() => setCurrent_content("medicine")}
+                onClick={() => {
+                  isFinishInfo ? setCurrent_content("medicine") : setIsAlertWarning(true)
+              }}
               >
                 <p
                   className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[27px] py-[8px] ${handleClickText(
@@ -202,8 +348,8 @@ function PatientAdd(props) {
               </div>
             </div>
           </div>
-          {current_content === "info" && <InfoContent />}
-          {current_content === "patient" && <PatientContent />}
+          {current_content === "info" && <InfoContent isSubmit={isPostSubmit} setResDataInfo={getDataInfo} handleSubmitFailed={handleSubmitFailed} />}
+          {current_content === "patient" && <PatientContent isPatientSubmit={isPatientSubmit} resDataInfo={resDataInfo} handleSubmitFailed={handleSubmitFailed} setResDataPatient={getDataPatient}/>}
           {current_content === "progress" && (
             <ProgressContent
               setAdd={setAdd}
@@ -211,6 +357,8 @@ function PatientAdd(props) {
               addStaff={handleClickAddStaff}
               removeStaffAdded={handleClickRemoveStaff}
               numStaffAdded={numStaffAdded}
+              isProgressSubmit={isProgressSubmit}
+              getDataProgress={getDataProgress}
             />
           )}
           {current_content === "result" && (
@@ -234,7 +382,7 @@ function PatientAdd(props) {
             <HuyButton />
           </div>
 
-          <div onClick={props.setStore}>
+          <div onClick={handleSubmit}>
             <LuuButton />
           </div>
         </div>

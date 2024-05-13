@@ -15,12 +15,20 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY ./app .
+RUN pip install debugpy
 
 ENV POSTGRES_USER=dev_user
 ENV POSTGRES_PASSWORD=secret
 ENV POSTGRES_DB=dev_hospital_management
 
-RUN pip install debugpy
+ENV REDIS_HOST=redis
+ENV REDIS_PORT=6379
+ENV POSTGRES_HOST=database
+ENV POSTGRES_PORT=5432
 
-CMD ["python3", "-m","debugpy","--listen","8888","app.py"]
+COPY ./app .
+
+COPY dev-entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+CMD ["./entrypoint.sh"]

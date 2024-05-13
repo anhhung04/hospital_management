@@ -1,7 +1,7 @@
 .PHONY: setup_env up down log db clean_db test deps redis clean_redis 
 setup_env:
-	pip3 install virtualenv
-	virtualenv hostpital_management_backend
+	pip3 install virtualenv --break-system-packages
+	python3 -m virtualenv .venv
 
 deps:
 	pip3 install -r requirements-dev.txt
@@ -26,7 +26,7 @@ test:
 	cd ./app && PYTHONPATH=./ pytest  --disable-warnings
 
 migrate-all:
-	cd ./app && alembic upgrade head
+	cd ./app && PYTHONPATH=./ alembic upgrade head
 
 migrate-new:
 	@echo "Enter migration message: "; \
@@ -50,6 +50,8 @@ up: db redis
 
 down: clean_db clean_redis
 	docker rm -f hospital_management_backend
+
+rebuild: down up
 
 dev: deps db redis
 

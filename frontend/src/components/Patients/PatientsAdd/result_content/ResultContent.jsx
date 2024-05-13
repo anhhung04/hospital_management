@@ -2,6 +2,13 @@ import AddResult from "./AddResult/addresult";
 import Alert from "../../../Alert";
 import { useState } from "react";
 
+import PropTypes from 'prop-types';
+
+ResultContent.propTypes = {
+  isAddResult: PropTypes.bool,
+  setAddResult: PropTypes.func,
+};
+
 function ResultContent(props) {
 
   const [isSuccess, setIsSuccess] = useState(false);

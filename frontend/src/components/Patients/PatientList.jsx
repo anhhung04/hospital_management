@@ -1,12 +1,9 @@
 import TableList from "../TableList";
 import Shortcurt from "../Shortcurt";
 import PatientAdd from "./PatientsAdd/PatientsAdd";
-
+import apiCall from "../../utils/api";
 
 import { useEffect, useState } from "react";
-
-
-
 
 function PatientsList() {
 
@@ -20,6 +17,10 @@ function PatientsList() {
 
   const [isStore, setIsStore] = useState(false);
 
+  const [currentpage, setCurrentPage] = useState(1);
+
+  const [checkedCount, setCheckedCount] = useState(0);
+
   function closeAlert() {
     setIsStore(false);
   }
@@ -27,22 +28,22 @@ function PatientsList() {
   function setStore() {
     setIsStore(true);
   }
-
-
-  // useEffect(() => {
-  //   fetch("api/patients/list", {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setListPatient_Info(data);
-  //       setCheckedState(new Array(data.length).fill(false));
-  //     })
-  //     .catch((error) => console.error('Error fetching patient data:', error));
-  // }, []);
+  
+  console.log("currentpage",currentpage)
+  useEffect(() => {
+    apiCall({
+      endpoint: `/api/patient/list?page=${currentpage}&limit=13`,
+      method: "GET",
+    })
+      .then((data) => {
+        console.log("Mydata",data)
+        if(data && data?.data && data.data?.length > 0){
+          setListPatient_Info(data.data);
+          setCheckedState(new Array(data.data.length).fill(false));
+        }
+      })
+      .catch((error) => console.error('Error fetching patient data:', error));
+  }, [currentpage]);
 
   function handleClick() {
       setIsAdd(true);
@@ -51,16 +52,33 @@ function PatientsList() {
   function handleCheckAll() {
     setIsCheckedAll(prev => !prev);
     setCheckedState(checkedState.map(() => !isCheckedAll));
+    if(isCheckedAll){
+      setCheckedCount(0);}
+    else{
+      setCheckedCount(13);
+    }
+}
+
+function checkedTrue(value) {
+  return value === true;
 }
 
   function handleCheckboxChange(position) {
     const updatedCheckedState = checkedState.map((item, index) =>
         index === position ? !item : item
     );
+    // if(isCheckedAll){
+    //   setCheckedCount(13);
+    // }
     setCheckedState(updatedCheckedState);
     const isAllChecked = updatedCheckedState.every(Boolean);
     setIsCheckedAll(isAllChecked);
+
+    const count = updatedCheckedState.filter(checkedTrue).length;
+    setCheckedCount(count);
 }
+
+console.log("checkedCount",checkedCount)
 
   if(!isAdd){
     return (
@@ -72,9 +90,9 @@ function PatientsList() {
               source="/images/Patient_HeartRateMonitor.png"
             />
   
-            <TableList handleClick={handleClick} handleCheckedAll = {handleCheckAll} >
+            <TableList handleClick={handleClick} handleCheckedAll = {handleCheckAll} isCheckedAll={isCheckedAll} activeButton={currentpage} setActiveButton={setCurrentPage} checkedCount={checkedCount} >
               <div className="w-[1032px] h-[716px] inline-flex flex-col items-start gap-[12px]">
-                {listPatient_Info.map((info, index) => (
+                {listPatient_Info.length!=0&&listPatient_Info.map((info, index) => (
                   <div
                     key={index}
                     className="w-[1032px] h-[44px] flex items-center gap-[12px] bg-[#EFF7FE] py-[10px] px-[20px]"
@@ -85,25 +103,25 @@ function PatientsList() {
                       onChange={() => handleCheckboxChange(index)}  
                     />
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[43px] h-[24px] text-right ">
-                      {info.id}
+                      {index}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[116px] h-[24px] text-right">
-                      {info.id}
+                      {info.medical_record_id}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right">
-                      {info.name}
+                      {info.full_name}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[125px] h-[24px] text-right">
-                      {info.phone}
+                      {info.phone_number}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[130px] h-[24px] text-right">
-                      {info.date}
+                      {info.appointment_date}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[146px] h-[24px] text-right">
                       {info.time}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right">
-                      {info.detail}
+                      Hồ sơ ↗
                     </p>
                   </div>
                 ))}
@@ -114,7 +132,7 @@ function PatientsList() {
     );
   }else{
     return(
-      <div className="flex justify-center items-center h-full w-full bg-[#EFF7FE]">
+      <div className="w-full bg-[#EFF7FE] flex justify-center items-center ">
         <PatientAdd  CloseAdd={()=>setIsAdd(false)} setStore={setStore} closeAlert={closeAlert} isStore={isStore} />
       </div>
     )

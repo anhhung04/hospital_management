@@ -1,9 +1,17 @@
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 
-def wrap_response(code, message, data):
-    return JSONResponse(status_code=code, content={
-        "status_code": code,
-        "message": message,
-        "data": data
-    })
+class APIResponse:
+    @staticmethod
+    def as_json(code: int, message: str, data: dict = {}) -> JSONResponse:
+        content = {
+            "status_code": code,
+            "message": message,
+        }
+        if data:
+            content.update({"data": data})
+        return JSONResponse(status_code=code, content=content)
+
+    @staticmethod
+    def as_text(code: int, message: str) -> PlainTextResponse:
+        return PlainTextResponse(status_code=code, content=message)
