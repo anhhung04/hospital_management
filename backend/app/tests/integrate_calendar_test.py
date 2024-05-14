@@ -15,6 +15,8 @@ class TestCalendar(TestIntegration):
             "end_date": "2024-04-19"
         })
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(type(response.json()['data']), dict)
+        self.assertIsNotNone(response.json()['data']['2024-04-19'])
 
     def test_list_events_fail(self):
         employee_id = "189a8780-98f2-45de-8522-a048b36beb9e"

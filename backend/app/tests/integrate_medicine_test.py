@@ -42,8 +42,14 @@ class TestMedicine(TestIntegration):
             "Authorization": f"Bearer {self._access_token}"
         })
 
-        response = self._s.get(self.path("/list"))
+        for _ in range(5):
+            self.test_create_medicine()
+        response = self._s.get(self.path("/list"), params={
+            "page": 1,
+            "limit": 5
+        })
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['data']), 5)
 
     def test_get_medicine(self):
         self._access_token = self._s.post(self._base + "/auth/login", json={
@@ -115,23 +121,22 @@ class TestMedicine(TestIntegration):
         })
       
         medicine_id = self.test_create_medicine()
-        response = self._s.get(self.path(f"/{medicine_id}/batch/list"))
-        self.assertEqual(response.status_code, 200)
-
-        response = self._s.post(self.path(f"/{medicine_id}/batch/create"), json={
-            "import_date": "2024-05-06",
-            "expiration_date": "2024-05-30",
-            "quantity": 2,
-            "price": 2,
-            "price_per_unit": 1,
-            "manufacturer": "test",
-            "details": "test"
+        for _ in range(5):
+            response = self._s.post(self.path(f"/{medicine_id}/batch/create"), json={
+                "import_date": "2024-05-06",
+                "expiration_date": "2024-05-30",
+                "quantity": 2,
+                "price": 2,
+                "price_per_unit": 1,
+                "manufacturer": "test",
+                "details": "test"
+            })
+        response = self._s.get(self.path(f"/{medicine_id}/batch/list"), params={
+            "page": 1,
+            "limit": 5
         })
         self.assertEqual(response.status_code, 200)
-        response = self._s.get(self.path(f"/{medicine_id}/batch/list"))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['data']), 1)
-
+        self.assertEqual(len(response.json()['data']), 5)
 
     def test_get_batch(self):
         self._access_token = self._s.post(self._base + "/auth/login", json={

@@ -101,4 +101,4 @@ class PatientProgressInChargeModel(BaseModel):
 
 
 class PatientProgressInChargeResponseModel(BaseResponseModel):
-    data: list[ProgressRecordModel | None] | None
+    data: list[PatientProgressInChargeModel | None] | None
