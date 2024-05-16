@@ -2,11 +2,24 @@ import { useState } from "react";
 import "./style.css"
 import Degree from "./Degree";
 
-function AddSpecialist({handleChangeValue, handleRemoveDegree}) {
+function AddSpecialist({handleChangeValue, handleRemoveDegree, empInfo, viewEmp, currentEmp}) {
     const arrSpecialist = ['Khám bệnh', 'Hồi sức cấp cứu', 'Tổng hợp', 'Tim mạch', 'Tiêu hóa', 'Cơ - Xương - Khớp', 'Thận - Tiết niệu',
                             'Nội tiết', 'Da liễu', 'Truyền nhiễm', 'Thần kinh', 'Phụ sản'];
 
-    const arrTitle = ['Tiến sĩ', 'Giáo sư', 'Phó giáo sư', 'Khác']
+    const arrTitle = ['Cử nhân', 'Thạc sĩ', 'Tiến sĩ', 'Chưa tốt nghiệp', 'Khác'];
+    const enumTitle = ['BACHELOR', 'MASTER', 'DOCTOR', 'UNDERGRADUATE', 'UNKNOWN'];
+
+    let position = null;
+
+    if (Object.keys(empInfo).length !== 0) {
+        if (empInfo.employee_type === "MANAGER") {
+            position = "MANAGER";
+        }
+        else {
+            position = "EMPLOYEE";
+        }
+    }
+
 
     const [numDegree, setNumDegree] = useState(0);
 
@@ -26,21 +39,11 @@ function AddSpecialist({handleChangeValue, handleRemoveDegree}) {
             <form className="my-[40px]" id="myForm" encType="multipart/form-data">
                 <div className="first-section mt-[40px] flex justify-between items-center px-[60px]">
                     <div>
-                        <label htmlFor="text" className="text text-black text-xl font-medium leading-8">Loại nhân viên
-                            <span className="text text-[#F00]">*</span>
-                        </label><br/>
-                        <select className="w-[450px] rounded-[5px] mt-[4px]" id="genders" name="genders" onChange={(e) => handleChangeValue("type", e.target.value)}>
-                            <option value="" disabled selected>Chọn loại nhân viên</option>
-                            <option value="Bác sĩ">Bác sĩ</option>
-                            <option value="Y tá">Y tá</option>
-                            <option value="Khác">Khác</option>
-                        </select>
-                    </div>
-                    <div>
                         <label htmlFor="text" className="text text-black text-xl font-medium leading-8">Khoa
                             <span className="text text-[#F00]">*</span>
                         </label><br/>
-                        <select className="w-[450px] rounded-[5px] mt-[4px]" id="faculty" name="faculty" onChange={(e) => handleChangeValue("faculty", e.target.value)}>
+                        <select className="w-[960px] rounded-[5px] mt-[4px]" id="faculty" name="faculty" onChange={(e) => handleChangeValue("faculty", e.target.value)}
+                            value = {Object.keys(empInfo).length === 0 ? null : currentEmp.faculty}>
                             <option value="" disabled selected>Chọn khoa</option>
                             {arrSpecialist.map(value => 
                                 <option value = {value}>{value}</option>
@@ -53,20 +56,22 @@ function AddSpecialist({handleChangeValue, handleRemoveDegree}) {
                         <label htmlFor="text" className="text text-black text-xl font-medium leading-8">Chức vụ
                             <span className="text text-[#F00]">*</span>
                         </label><br/>
-                        <select className="w-[450px] rounded-[5px] mt-[4px]" id="position" name="position" onChange={(e) => handleChangeValue("position", e.target.value)}>
+                        <select className="w-[450px] rounded-[5px] mt-[4px]" id="position" name="position" disabled={viewEmp} onChange={(e) => handleChangeValue("position", e.target.value)}
+                            value= {position}>
                             <option value="" disabled selected>Chọn chức vụ</option>
-                            <option value="Nhân viên">Nhân viên</option>
-                            <option value="Trưởng khoa">Trưởng khoa</option>
+                            <option value="EMPLOYEE">Nhân viên</option>
+                            <option value="MANAGER">Trưởng khoa</option>
                         </select>
                     </div>
                     <div>
                         <label htmlFor="text" className="text text-black text-xl font-medium leading-8">Chức danh
                             <span className="text text-[#F00]">*</span>
                         </label><br/>
-                        <select className="w-[450px] rounded-[5px] mt-[4px]" id="title" name="title" onChange={(e) => handleChangeValue("jobTitle", e.target.value)}>
+                        <select className="w-[450px] rounded-[5px] mt-[4px]" id="title" name="title" onChange={(e) => handleChangeValue("education_level", e.target.value)}
+                            value = {Object.keys(empInfo).length === 0 ? null : currentEmp.education_level}>
                             <option value="" disabled selected>Chọn chức danh</option>
-                            {arrTitle.map(value => 
-                                <option value={value}>{value}</option>
+                            {enumTitle.map((value, index) => 
+                                <option value={value}>{arrTitle[index]}</option>
                             )}
                         </select>
                     </div>
@@ -76,12 +81,14 @@ function AddSpecialist({handleChangeValue, handleRemoveDegree}) {
                         <label htmlFor="dob" className="text text-black text-xl font-medium leading-8">Ngày ký hợp đồng lao động
                             <span className="dob text-[#F00]">*</span>
                         </label><br/>
-                        <input className="w-[450px] rounded-[5px] mt-[4px]" type="date" id="dob" name="dob" onChange={(e) => handleChangeValue("dateBegin", e.target.value)}/><br/>
+                        <input className="w-[450px] rounded-[5px] mt-[4px]" type="date" id="dob" name="dob" onChange={(e) => handleChangeValue("begin_date", e.target.value)}
+                            value= {Object.keys(empInfo).length === 0 ? "" : currentEmp.begin_date || ""}/><br/>
                     </div>
                     <div>
                         <label htmlFor="dob" className="text text-black text-xl font-medium leading-8">Ngày hết hạn hợp đồng lao động
                         </label><br/>
-                        <input className="w-[450px] rounded-[5px] mt-[4px]" type="date" id="dob" name="dob" onChange={(e) => handleChangeValue("dateEnd", e.target.value)}/><br/>
+                        <input className="w-[450px] rounded-[5px] mt-[4px]" type="date" id="dob" name="dob"  onChange={(e) => handleChangeValue("end_date", e.target.value)}
+                            value= {Object.keys(empInfo).length === 0 ? "" : currentEmp.end_date || ""}/><br/>
                     </div>
                 </div>
                 <div className="fourth-section mt-[40px] flex flex-col justify-between px-[60px]">
@@ -89,7 +96,8 @@ function AddSpecialist({handleChangeValue, handleRemoveDegree}) {
                         <label htmlFor="text" className="text text-black text-xl font-medium leading-8">Bằng cấp / Chứng chỉ
                         </label><br/>
                         <div className="flex justify-between items-center mb-[20px]">
-                            <input className="w-[902px] rounded-[5px] mt-[4px]" type="text" id="text" name="text" placeholder="Bằng cấp / Chứng chỉ" onChange={(e) => handleChangeValue("degree", "0" + e.target.value)}/><br/>
+                            <input className="w-[902px] rounded-[5px] mt-[4px]" type="text" id="text" name="text" placeholder="Bằng cấp / Chứng chỉ" 
+                                value = {Object.keys(empInfo).length === 0 ? null : "Bằng bác sĩ"}/><br/>
                             <button className="Delete-button mt-[4px] w-[48px] h-[42px] flex justify-center items-center border-[1px] rounded-[5px] border-solid border-[#6E7F94] bg-[#eff7fe] text-[#6E7F94] font-medium leading-6"onClick={(e) => { e.preventDefault(); }}>
                                 <div className="px-[2px]">
                                     <img src="/images/trashbin.png" className="trashbin opacity-50" />

@@ -6,6 +6,7 @@ function EmployeeCard({emp, handleView}) {
     const statusBorder = ["border-[#00F40A]", "border-[#FFD602]", "border-[#FF2727]"];
     let indexColor = 2;
     let status = 'Khác';
+    let type = 'Bác sĩ';
 
     if (emp.status === "INACTIVE") {
         indexColor = 0;
@@ -18,6 +19,16 @@ function EmployeeCard({emp, handleView}) {
     else if (emp.status === "PENDING") {
         indexColor = 2;
         status = 'Khác';
+    }
+
+    if (emp.employee_type === "DOCTOR" || emp.employee_type === "MANAGER") {
+        type = "Bác sĩ";
+    }
+    else if (emp.employee_type === "NURSE") {
+        type = "Y tá";
+    }
+    else {
+        type = "Khác";
     }
     
     return (
@@ -33,8 +44,8 @@ function EmployeeCard({emp, handleView}) {
             </div>
             <div className='content-section flex flex-col py-2.5 justify-between'>
                 <div className='row-container flex justify-between px-9'>
-                    <p className='text-black text-sm not-italic font-medium leading-6'>{emp.employee_type || "Bác sĩ"}</p>
-                    <p className='text-black text-xs not-italic font-normal leading-[18px]'>Khoa {emp.faculty}</p>
+                    <p className='text-black text-sm not-italic font-medium leading-6'>{type}</p>
+                    <p className='text-black text-xs not-italic font-normal leading-[18px]'>Khoa {emp.faculty? emp.faculty : "Chưa xếp"}</p>
                 </div>
                 <div className='row-container flex justify-between px-9'>
                     <p className='text-black text-sm not-italic font-medium leading-6'>{emp.full_name}</p>

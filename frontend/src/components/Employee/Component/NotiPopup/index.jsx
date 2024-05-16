@@ -1,4 +1,4 @@
-function NotiPopup({content, page, handleCloseNotiPopup, done, handleAddDone, handleCloseAdd}) {
+function NotiPopup({content, handleCloseNotiPopup, done, handleAddDone, handleCloseAdd, viewEmp}) {
     return (
         <div>
             <div className="h-fit w-[623px] rounded-[32px] bg-[#ffffff] shadow-[0px_4px_15px_0px_rgba(216,210,252,0.64)] p-[24px] flex flex-col">
@@ -30,9 +30,14 @@ function NotiPopup({content, page, handleCloseNotiPopup, done, handleAddDone, ha
                         {(content === "warning" || content === "alert") && <img src="/images/Warning.png" className="pb-[24px]"/>}
                     </div>
                     <div>
-                        {content === "success" && done &&
+                        {content === "success" && done && !viewEmp &&
                             <div className="flex flex-col items-center">
                                 <p className="text-black font-medium leading-6">Nhân viên mới được thêm thành công.</p>
+                            </div>
+                        }
+                        {content === "success" && viewEmp &&
+                            <div className="flex flex-col items-center">
+                                <p className="text-black font-medium leading-6">Sửa nhân viên thành công.</p>
                             </div>
                         }
                         {content === "fail" && <p className="text-black font-medium leading-6">Thông tin không hợp lệ. Vui lòng điền lại.</p>}

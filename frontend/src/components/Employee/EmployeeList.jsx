@@ -8,7 +8,6 @@ import EmployeeCard from './Component/EmployeeCard';
 import InfoTag from './Component/InfoTag';
 import ListBar from './Component/ListBar/ListBar';
 import AddNew from './Component/AddNew/AddNew';
-import EmployeeView from './EmployeeView/EmployeeView';
 
 
 function EmployeeList() {  
@@ -28,11 +27,16 @@ function EmployeeList() {
     useEffect(() => {
         if (viewEmpId) {
             setViewEmp(true);
+            setAddNewEmp(true);
         }
     },[viewEmpId])
 
 
       useEffect(() => {
+        if (!addNewEmp) {
+            setViewEmp(false);
+            setViewEmpId(null);
+        }
         apiCall({
           endpoint:  filterType === 'ALL'? `/api/employee/list?page=${pageNumber}&employee_per_page=9`
                                          :  `/api/employee/list?type=${filterType}&page=${pageNumber}&employee_per_page=9`,
@@ -51,7 +55,7 @@ function EmployeeList() {
 
       useEffect(() => {
         setPageNumber(1);
-      }, [filterType]);
+      }, [filterType, addNewEmp]);
 
       useEffect(() => {
         apiCall({
@@ -67,11 +71,19 @@ function EmployeeList() {
                 setQuantity({});
           })
           .catch((error) => console.error('Error fetching employee data:', error));
-      }, []);
+      }, [addNewEmp, addDone]);
+
+      useEffect(() => {
+        if (addDone) {
+            setAddNewEmp(false);
+        }
+      }, [addDone])
+
+
+
 
     
       if (!addNewEmp) {
-        if (!viewEmp) {
             return (
                 <div className="w-full bg-[#EFF7FE] flex items-center flex-col">
                     <div className='flex my-[40px] w-[1080px]'>
@@ -116,24 +128,10 @@ function EmployeeList() {
                 </div>
             )
         }
-        else {
-            return (
-                <EmployeeView handleCloseView={() => {setViewEmp(false); setViewEmpId(null);}} handleCloseAdd={() => setAddNewEmp(false)} empId = {viewEmpId} handleAddDone={(done) => setAddDone(done)}/>
-            )
-        }
-    }
     else {
-        if (addDone) {
-            return (
-                <EmployeeView handleCloseView={() => {setViewEmp(false); setViewEmpId(null);}} handleCloseAdd={() => setAddNewEmp(false)} empId = {listEmployee.length+1} handleAddDone={(done) => setAddDone(done)}/>
-            )
-        }
-        else {
-            return (
-                <EmployeeAdd handleCloseAdd={() => setAddNewEmp(false)} handleAddDone = {(done) => setAddDone(done)}/>
-            )
-        }
-        
+        return (
+            <EmployeeAdd handleCloseAdd={() => setAddNewEmp(false)} handleAddDone = {(done) => setAddDone(done)} viewEmp = {viewEmp} viewEmpId={viewEmpId}/>
+        )
     }
     
 }

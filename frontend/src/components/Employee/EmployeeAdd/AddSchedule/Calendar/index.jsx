@@ -1,13 +1,48 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Calendar() {
+    const today = new Date();
+    //This month
+    const [currentDate, setCurentDate] = useState(today);
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    // useEffect(() => {
+    //     const currentYear = currentDate.getFullYear();
+    //     const currentMonth = currentDate.getMonth();
+    //     if (currentMonth !== 0) {
+    //         const firstDayOfThisMonth = new Date(currentYear, currentMonth, 1);
+    //         const firstWeekdayOfThisMonth = firstDayOfThisMonth.getDay();
+    //         //Previous month
+    //         const lastDayOfPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+    //         const datePrevMonth = [];
+    //         for (let i = lastDayOfPrevMonth - firstWeekdayOfThisMonth + 1; i <= lastDayOfPrevMonth; i++) {
+    //             datePrevMonth.push(i);
+    //         }
+    //         console.log("last day of prev month", lastDayOfPrevMonth);
+    //         console.log(datePrevMonth);
+    //     }
+    //     if (currentMonth !== 11) {
+    //         const lastDayOfThisMonth = new Date(currentYear, currentMonth + 1, 0);
+    //         const lastWeekdayOfThisMonth = lastDayOfThisMonth.getDay();
+    //         //Next month
+    //         const firstDayOfNextMonth = new Date(currentYear, currentMonth + 1, 1).getDate();
+    //         const dateNextMonth = [];
+    //         for (let i = firstDayOfNextMonth; i < firstDayOfNextMonth + (6 - lastWeekdayOfThisMonth); i++) {
+    //             dateNextMonth.push(i);
+    //         }
+    //         console.log("first day of next month", firstDayOfNextMonth);
+    //         console.log(dateNextMonth);
+    //     }
+    // }, [currentDate])
+
+
     return (
         <div>
             <div className="container">
                 <div className="calendar">
                     <div className="header flex w-[314px] justify-between mb-[8px] px-[16px]">
-                        <div className="month text-[#032B91] text-xl font-medium leading-8">Tháng 5, 2024</div>
+                        <div className="month text-[#032B91] text-xl font-medium leading-8">{"Tháng " + (currentMonth+1) + ", " + currentYear}</div>
                         <div className="btns flex">
                             <div className="btn today flex justify-center items-center mr-[12px]">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">

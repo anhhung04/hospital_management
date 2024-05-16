@@ -14,7 +14,6 @@ function Degree({handleRemove, handleChangeValue, index}) {
         <div className="flex justify-between items-center mb-[20px]">
             <input className="w-[902px] rounded-[5px] mt-[4px]" type="text" id="text" name="text" placeholder="Bằng cấp / Chứng chỉ"
                 onChange={(e) => {
-                    handleChangeValue("degree", (index+1).toString() + e.target.value);
                     setDegree(e.target.value);
                 }}/>
             <br/>
