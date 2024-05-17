@@ -1,4 +1,28 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
+import PropTypes from 'prop-types';
+
+AddInfo.propTypes = {
+    handleChangeValue: PropTypes.func,
+    viewEmp: PropTypes.bool,
+    empInfo: PropTypes.shape({
+        employee_type: PropTypes.string,
+        personal_info: PropTypes.shape({
+            ssn: PropTypes.string,
+            email: PropTypes.string
+        })
+    }),
+    currentEmp: PropTypes.shape({
+        personal_info: PropTypes.shape({
+            last_name: PropTypes.string,
+            first_name: PropTypes.string,
+            birth_date: PropTypes.string,
+            gender: PropTypes.string,
+            phone_number: PropTypes.string,
+            address: PropTypes.string,
+            health_insurance: PropTypes.string
+        })
+    })
+};
 
 function AddInfo({handleChangeValue, empInfo, viewEmp, currentEmp}) {
     const imgRef = useRef();

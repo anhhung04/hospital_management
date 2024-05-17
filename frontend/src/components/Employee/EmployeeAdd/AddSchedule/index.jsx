@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import Calendar from "./Calendar";
 import ScheduleTable from "./ScheduleTable";
 import apiCall from "../../../../utils/api";
+import PropTypes from 'prop-types';
+
+AddSchedule.propTypes = {
+    empId: PropTypes.string
+};
+
 
 function AddSchedule({empId}) {
     console.log("emp   ", empId);
@@ -44,7 +50,7 @@ function AddSchedule({empId}) {
               .catch((error) => console.error('Error fetching employee data:', error));
         }
         
-      }, [dataDone]);
+      }, [dataDone, empId]);
 
 
     useEffect(() => {
@@ -61,9 +67,10 @@ function AddSchedule({empId}) {
               setEventList({});
           })
           .catch((error) => console.error('Error fetching employee data:', error));
-      }, [dataDone]);
+      }, [dataDone, empId, beginDate, endDate]);
 
-      useEffect(() => {
+
+    useEffect(() => {
         if (eventList) {
             setCurrentEvent(getCurrentEvent(eventList));
         }
@@ -81,16 +88,12 @@ function AddSchedule({empId}) {
         setShowAddPopup(true);
     }
 
-    const handleCloseAddScheduler = () => {
-        setShowAddPopup(false);
-    }
-    
     const handleChangeValue = (field, value) => {
         setNewSche({...newSche, [field]: value});
     }
 
     const handleNoti = () => {
-        if (["begin_time", "end_time", "begin_date", "frequency"].every(value => newSche.value !== null && newSche.value !== "")) {
+        if (["begin_time", "end_time", "begin_date", "frequency"].every(value => newSche[value] !== null && newSche[value] !== "")) {
             setDataDone(true);
             setShowAddPopup(false);
             setNotiPopup(true);
@@ -214,7 +217,7 @@ function AddSchedule({empId}) {
                 </div>
             </div>
             <div className="mx-[60px]">
-                <ScheduleTable handleOpenAddScheduler = {handleOpenAddScheduler} eventList = {eventList}  newSche = {newSche} dataDone = {dataDone} setWeek = {setWeek} empId={empId} setDelete = {setDelete}/>
+                <ScheduleTable handleOpenAddScheduler = {handleOpenAddScheduler} eventList = {eventList} setWeek = {setWeek} empId={empId} setDelete = {setDelete}/>
             </div>
         </div>
 
@@ -226,7 +229,7 @@ function getCurrentEvent(eventList) {
     const today = formatDate(currentDate); 
     const currentTime = currentDate.toTimeString().split(' ')[0].substring(0, 5);
   
-    if (eventList.hasOwnProperty(today)) {
+    if (today in eventList) {
       const eventsToday = eventList[today];
       for (const event of eventsToday) {
         if (currentTime >= event.begin_time && currentTime <= event.end_time) {

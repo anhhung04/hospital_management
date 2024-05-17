@@ -1,5 +1,10 @@
-import { useState } from "react";
-import React from 'react';
+import PropTypes from 'prop-types';
+
+TableEmployee.propTypes = {
+    children: PropTypes.node,
+    filterType: PropTypes.string,
+    handleFilterType: PropTypes.func
+};
 
 
 function TableEmployee({ children, filterType, handleFilterType }) {

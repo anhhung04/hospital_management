@@ -4,6 +4,11 @@ import "./style.css"
 import FormList from "./FormList";
 import ListBar from "../../Component/ListBar/ListBar";
 import apiCall from "../../../../utils/api";
+import PropTypes from 'prop-types';
+
+AddPatient.propTypes = {
+    empId: PropTypes.string
+};
 
 function AddPatient({empId}) {
     // const props = {
@@ -18,6 +23,7 @@ function AddPatient({empId}) {
 
     const navigate = useNavigate();
     const handlePatientDetail = (patientId) => {
+        console.log("Patient Id ", patientId);
         navigate(`/patient`);
     };
     useEffect(() => {
@@ -34,7 +40,7 @@ function AddPatient({empId}) {
               setPatientList([]);
           })
           .catch((error) => console.error('Error fetching employee data:', error));
-      }, []);
+      }, [empId]);
 
     return (
         <div className="table-conttainer w-full px-[60px] py-[40px] h-[530px]">            
@@ -60,7 +66,7 @@ function AddPatient({empId}) {
                     {patientList.length !== 0 && 
                         <div className="w-full flex flex-col gap-[8px]">
                             {patientList.slice((pageNumber - 1)*5, (pageNumber - 1)*5 + 5).map((uniPatient, index) => (
-                                <div className="header flex h-[36px] items-center w-full">
+                                <div key={index} className="header flex h-[36px] items-center w-full">
                                     <div key={index} className={`header-content flex w-full items-center ${uniPatient?.status === "Den lich hen" ? "bg-[#E8FCEC]" : ""}`}>
                                         <p className="text-black font-normal leading-6 flex justify-center w-[70px]">{index + 1}</p>
                                         <p className="text-black font-normal leading-6 flex justify-center w-[210px]">{uniPatient?.patient_name || "Không có"}</p>

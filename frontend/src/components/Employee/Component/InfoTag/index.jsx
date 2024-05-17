@@ -1,3 +1,11 @@
+import PropTypes from 'prop-types';
+
+InfoTag.propTypes = {
+    value: PropTypes.string,
+    source: PropTypes.string,
+    title: PropTypes.string
+};
+
 function InfoTag(props) {
     return ( 
     <div className="w-[240px] h-[98px] ml-[40px] bg-[#FFFF] rounded-full gap-[7px] inline-flex flex-start justify-center items-center shadow-[0px_4px_15px_0px_rgba(216,210,252,0.64)]">

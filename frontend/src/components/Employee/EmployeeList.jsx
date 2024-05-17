@@ -1,5 +1,4 @@
 import {useState, useEffect} from 'react'
-import React from 'react';
 
 import apiCall from '../../utils/api';
 import EmployeeAdd from './EmployeeAdd/EmployeeAdd';

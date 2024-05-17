@@ -1,10 +1,9 @@
 
-import { useEffect, useState } from "react";
 
 function Calendar() {
     const today = new Date();
     //This month
-    const [currentDate, setCurentDate] = useState(today);
+    const currentDate = today;
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
     // useEffect(() => {
@@ -48,9 +47,9 @@ function Calendar() {
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <rect x="3.5" y="5.5" width="17" height="15" rx="1.5" stroke="#032B91"/>
                                 <line x1="4" y1="9.5" x2="20" y2="9.5" stroke="#032B91"/>
-                                <path d="M7 4V7" stroke="#032B91" stroke-linecap="round"/>
-                                <path d="M17 4V7" stroke="#032B91" stroke-linecap="round"/>
-                                <path d="M9 15L11 17L14.5 13.5" stroke="#032B91" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 4V7" stroke="#032B91" strokeLinecap="round"/>
+                                <path d="M17 4V7" stroke="#032B91" strokeLinecap="round"/>
+                                <path d="M9 15L11 17L14.5 13.5" stroke="#032B91" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                             </div>
                             <div className="btn prev">
@@ -82,25 +81,25 @@ function Calendar() {
                         </div>
                         <div className="w-full flex justify-between">
                             {Array.from({ length: 7 }, (_, index) => (
-                                <p className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center">{index+5}</p>
+                                <p key={index} className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center">{index+5}</p>
 
                             ))}
                         </div>
                         <div className="w-full flex justify-between">
                             {Array.from({ length: 7 }, (_, index) => (
-                                <p className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center">{index+12}</p>
+                                <p key={index} className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center">{index+12}</p>
 
                             ))}
                         </div>
                         <div className="w-full flex justify-between">
                             {Array.from({ length: 7 }, (_, index) => (
-                                <p className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center">{index+19}</p>
+                                <p key={index} className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center">{index+19}</p>
 
                             ))}
                         </div>
                         <div className="w-full flex justify-between">
                             {Array.from({ length: 5 }, (_, index) => (
-                                <p className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center">{index+26}</p>
+                                <p key={index} className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center">{index+26}</p>
 
                             ))}
                             <p className="w-[20px] text-[#535353] text-sm not-itali font-semibold leading-8 flex justify-center bg-[#BDBDBD]">31</p>

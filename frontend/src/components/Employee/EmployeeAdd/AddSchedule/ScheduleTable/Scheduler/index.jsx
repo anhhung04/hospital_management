@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react"
 import TimeBox from "../TimeBox";
 import apiCall from "../../../../../../utils/api";
-function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWeek, empId, setDelete}) {
-    const [weekDates, setWeekDates] = useState(getWeekDates(new Date()));
+import PropTypes from 'prop-types';
+Scheduler.propTypes = {
+    handleOpenAddScheduler: PropTypes.func,
+    eventList: PropTypes.object,
+    setWeek: PropTypes.func,
+    empId: PropTypes.string,
+    setDelete: PropTypes.func
+};
+function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete}) {
+    const weekDates = getWeekDates(new Date());
     const [initialDay, setInitialDay] = useState([]);
     const [tue, setTue] = useState(0);
     const [wed, setWed] = useState(0);
@@ -40,7 +48,7 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
             })
         }
 
-    }, [eventId])
+    }, [eventId, empId])
 
     const deleteEvent = () => {
         console.log("empId", empId);
@@ -179,8 +187,8 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
                         <p className="text-[#032B91] text-2xl font-semibold leading-9 w-[35px] flex justify-center">T7</p>
                     </div>
                     <div className="px-[76px] w-[958px] header flex justify-between">
-                        {weekDates.map(date => (
-                            <div className="flex justify-center w-[35px]">
+                        {weekDates.map((date, index) => (
+                            <div key = {index} className="flex justify-center w-[35px]">
                                 <p className="text-[#032B91] text-2xl font-semibold leading-9">{new Date(date).getDate()}</p>
                             </div>
                         ))
@@ -193,7 +201,7 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
                         {
                             (sun > 0) &&  
                             initialDay[0].slice(0,5).map((sche, index) => (
-                                <div className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
+                                <div key={index} className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
                                     <TimeBox inTime = {sche.begin_time} outTime= {sche.end_time} index={index} />
                                 </div>
                             ))
@@ -212,7 +220,7 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
                         {
                             (mon > 0) &&  
                             initialDay[1].slice(0,5).map((sche, index) => (
-                                <div className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
+                                <div key={index} className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
                                     <TimeBox inTime = {sche.begin_time} outTime= {sche.end_time} index={index} />
                                 </div>                       
                             ))
@@ -231,7 +239,7 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
                         {
                             (tue > 0) &&  
                             initialDay[2].slice(0,5).map((sche, index) => (
-                                <div className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
+                                <div key={index} className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
                                     <TimeBox inTime = {sche.begin_time} outTime= {sche.end_time} index={index} />
                                 </div>                         
                                 ))
@@ -250,7 +258,7 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
                         {
                             (wed > 0) &&  
                             initialDay[3].slice(0,5).map((sche, index) => (
-                                <div className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
+                                <div key={index} className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
                                     <TimeBox inTime = {sche.begin_time} outTime= {sche.end_time} index={index} />
                                 </div>                            
                                 ))
@@ -269,7 +277,7 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
                         {
                             (thu > 0) &&  
                             initialDay[4].slice(0,5).map((sche, index) => (
-                                <div className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
+                                <div key={index} className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
                                     <TimeBox inTime = {sche.begin_time} outTime= {sche.end_time} index={index} />
                                 </div>                          
                                  ))
@@ -288,7 +296,7 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
                         {
                             (fri > 0) &&  
                             initialDay[5].slice(0,5).map((sche, index) => (
-                                <div className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
+                                <div key={index} className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
                                     <TimeBox inTime = {sche.begin_time} outTime= {sche.end_time} index={index} />
                                 </div>                          
                                  ))
@@ -307,7 +315,7 @@ function Scheduler({handleOpenAddScheduler, eventList, newSche, dataDone, setWee
                         {
                             (sat > 0) &&  
                             initialDay[6].slice(0,5).map((sche, index) => (
-                                <div className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
+                                <div key={index} className="hover:cursor-pointer" onClick={() => handleOpen(sche.id)}>
                                     <TimeBox inTime = {sche.begin_time} outTime= {sche.end_time} index={index} />
                                 </div>                         ))
 
@@ -350,7 +358,7 @@ function formatDate(date) {
     const eventCounts = [];
     for (const date of weekDates) {
         console.log("date", date);
-    if (weekSche.hasOwnProperty(date)) {
+    if (date in weekSche) {
         eventCounts.push(weekSche[date]);
     } else {
         eventCounts.push([]);

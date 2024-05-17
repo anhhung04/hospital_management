@@ -1,5 +1,16 @@
-import { useState } from 'react';
-import React from 'react';
+
+import PropTypes from 'prop-types';
+
+EmployeeCard.propTypes = {
+    emp: PropTypes.shape({
+        status: PropTypes.string,
+        employee_type: PropTypes.string,
+        faculty: PropTypes.string,
+        full_name: PropTypes.string,
+        id: PropTypes.string
+    }),
+    handleView: PropTypes.func
+};
 
 function EmployeeCard({emp, handleView}) {
     const statusText = ["text-[#00F40A]", "text-[#FFD602]", "text-[#FF2727]"];
@@ -56,5 +67,8 @@ function EmployeeCard({emp, handleView}) {
     )
   
 }
+
+
+
 
 export default EmployeeCard;

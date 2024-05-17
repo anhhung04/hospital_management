@@ -1,8 +1,14 @@
 import "./style.css"
 import { useState } from "react";
+import PropTypes from 'prop-types';
+
+Degree.propTypes = {
+handleRemove: PropTypes.func
+};
 
 
-function Degree({handleRemove, handleChangeValue, index}) {
+
+function Degree({handleRemove}) {
     const [degree, setDegree] = useState();
     const handleRemoveButton = (e) => {
         e.preventDefault();

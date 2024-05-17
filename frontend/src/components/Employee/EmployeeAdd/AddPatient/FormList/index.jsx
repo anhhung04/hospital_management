@@ -1,3 +1,9 @@
+import PropTypes from 'prop-types';
+
+FormList.propTypes = {
+    prop: PropTypes.arrayOf(PropTypes.string)
+};
+
 function FormList({ prop }) {
     return (
         <div className="list-container ">
@@ -5,7 +11,7 @@ function FormList({ prop }) {
                 <div className="header-content flex justify-between w-full mx-[20px] items-center">
                         {
                             prop.map(value => (
-                                <p className="text-black text-xl font-medium leading-8">{value}</p>
+                                <p key = {value} className="text-black text-xl font-medium leading-8">{value}</p>
                             ))
                         }
                 </div>

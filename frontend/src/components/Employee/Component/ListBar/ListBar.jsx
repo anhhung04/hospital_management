@@ -1,3 +1,11 @@
+import PropTypes from 'prop-types';
+
+ListBar.propTypes = {
+    inForm: PropTypes.bool,
+    pageNumber: PropTypes.number,
+    handlePage: PropTypes.func
+};
+
 function ListBar({ inForm, pageNumber, handlePage }) {
     return (
         <div className="flex w-[220px] justify-between">

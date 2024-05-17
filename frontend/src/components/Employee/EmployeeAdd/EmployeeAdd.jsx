@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import PropTypes from 'prop-types';
 
 import apiCall from "../../../utils/api";
 import HuyButton from "../../Button/Huy_Button";
@@ -9,6 +10,15 @@ import AddSpecialist from "./AddSpecialist";
 import AddSchedule from "./AddSchedule";
 import AddPatient from "./AddPatient";
 import NotiPopup from "../Component/NotiPopup";
+
+EmployeeAdd.propTypes = {
+    handleCloseAdd: PropTypes.func,
+    handleAddDone: PropTypes.func,
+    viewEmp: PropTypes.bool,
+    viewEmpId: PropTypes.string
+};
+
+
 
 
 function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
@@ -54,7 +64,6 @@ function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
                     handleSubmitSuccess();
                 }
             }).catch((error) => console.error('Error employee data format:', error));
-            ;
         }
     }, [dataDone]);
 
@@ -73,7 +82,6 @@ function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
                     handleSubmitSuccess();
                 }
             }).catch((error) => console.error('Error employee data format:', error));
-            ;
         }
     }, [update]);
 

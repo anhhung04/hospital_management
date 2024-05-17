@@ -1,3 +1,13 @@
+import PropTypes from 'prop-types';
+
+NotiPopup.propTypes = {
+    content: PropTypes.string,
+    handleCloseNotiPopup: PropTypes.func,
+    done: PropTypes.bool,
+    handleAddDone: PropTypes.func,
+    handleCloseAdd: PropTypes.func,
+    viewEmp: PropTypes.bool
+};
 function NotiPopup({content, handleCloseNotiPopup, done, handleAddDone, handleCloseAdd, viewEmp}) {
     return (
         <div>
@@ -75,13 +85,12 @@ function NotiPopup({content, handleCloseNotiPopup, done, handleAddDone, handleCl
                                 <h5 className="text-2xl font-semibold leading-9 text-[#F9FBFF]">Có</h5>
                             </button>  
                         </div>
-
                         }
                     </div>
                 </div>
             </div>
         </div>
     )
-};
+}
 
 export default NotiPopup;

@@ -1,8 +1,8 @@
 import "./style.css"
 
-function AddNew({ onClick }) {
+function AddNew() {
     return (
-        <div className="wrapper" onClick={onClick}>
+        <div className="wrapper" >
             <div className="default-button w-[98px] h-[98px] bg-[#FFFF] rounded-full gap-[7px] inline-flex flex-start justify-center items-center shadow-[0px_4px_15px_0px_rgba(216,210,252,0.64)]">
                 <img src='/images/AddNewEmployee.png' alt='AddNewEmployee'/>
             </div>
