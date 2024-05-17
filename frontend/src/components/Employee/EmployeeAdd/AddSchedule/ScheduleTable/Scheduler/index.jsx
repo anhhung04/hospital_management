@@ -10,7 +10,7 @@ Scheduler.propTypes = {
     setDelete: PropTypes.func
 };
 function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete}) {
-    const weekDates = getWeekDates(new Date());
+    const [weekDates] = useState(getWeekDates(new Date()));
     const [initialDay, setInitialDay] = useState([]);
     const [tue, setTue] = useState(0);
     const [wed, setWed] = useState(0);
@@ -25,6 +25,7 @@ function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete
     const [deletePopup, setDeletePopup] = useState(false);
     const [eventId, setEventId] = useState();
     const [notiPopup, setNotiPopup] = useState(false);
+    const [deleteSubmit, setDeleteSubmit] = useState(false);
 
     const handleDay = (day) => {
         handleOpenAddScheduler(weekDates[day]);
@@ -37,6 +38,7 @@ function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete
 
 
     useEffect(() => {
+        setDeleteSubmit(false);
         if (eventId) {
             apiCall({            
                 endpoint: `/api/employee/${empId}/event/${eventId}`,
@@ -50,9 +52,9 @@ function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete
 
     }, [eventId, empId])
 
-    const deleteEvent = () => {
-        console.log("empId", empId);
-        console.log("eventId", eventId);
+
+    useEffect(() => {
+        if (deleteSubmit) {
             apiCall({            
                 endpoint: `/api/employee/${empId}/event/${eventId}/delete`,
                 method: "DELETE"
@@ -60,18 +62,20 @@ function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete
             .then((data) => {
                 console.log(data);
             })
-        setDelete(true);
-        setDeletePopup(false);
-        setNotiPopup(true)
 
+            setDelete(true);
+            setDeletePopup(false);
+            setNotiPopup(true);
         }
+    }, [empId, eventId, deleteSubmit, setDelete]);
 
 
     useEffect(() => {
         setWeek(weekDates[0], weekDates[6]);
-    }, [weekDates])
+    }, [weekDates, setWeek]);
 
     useEffect(() => {
+        console.log("event list", eventList);
         setInitialDay(countEventsForWeek(weekDates, eventList));
       }, [weekDates, eventList]);
 
@@ -138,7 +142,7 @@ function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete
                                 <button onClick={() => setDeletePopup(false)} className="w-[120px] h-[52px] flex items-center justify-center gap-[10px] rounded-[20px]">
                                     <h5 className="text-[#032B91] text-2xl font-semibold leading-9">Hủy</h5>
                                 </button>
-                                <button onClick={deleteEvent} className="w-[120px] h-[52px] flex items-center justify-center gap-[10px] rounded-[20px] border-[2px] border-solid bg-[#032B91]">
+                                <button onClick={() => setDeleteSubmit(true)} className="w-[120px] h-[52px] flex items-center justify-center gap-[10px] rounded-[20px] border-[2px] border-solid bg-[#032B91]">
                                     <h5 className="text-2xl font-semibold leading-9 text-[#F9FBFF]">Xóa</h5>
                                 </button>
                         </div>
@@ -154,7 +158,7 @@ function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete
                             <p className="text-black text-2xl font-semibold leading-9">Xóa thành công</p>
                         </div>
                         <div>
-                            <button onClick={() => {setNotiPopup(false); setDelete(false);}} className="w-[32px] h-[32px] bg-white flex justify-center items-center rounded-[10px] shadow-[0px_4px_15px_0px_rgba(216,210,252,0.64)] hover:bg-transparent hover:border-[3px] hover:border-[#032B91] hover:border-solid">
+                            <button onClick={() => {setNotiPopup(false); setDelete(false); setDeleteSubmit(false)}} className="w-[32px] h-[32px] bg-white flex justify-center items-center rounded-[10px] shadow-[0px_4px_15px_0px_rgba(216,210,252,0.64)] hover:bg-transparent hover:border-[3px] hover:border-[#032B91] hover:border-solid">
                                 <img src="/images/xbutton.png"/>
                             </button>
                         </div>
@@ -170,7 +174,7 @@ function Scheduler({handleOpenAddScheduler, eventList, setWeek, empId, setDelete
                         </div>
                     </div>
                     <div className="button-section flex justify-end">
-                        <button className="w-[120px] h-[52px] flex items-center justify-center gap-[10px] rounded-[20px] border-[2px] border-solid bg-[#032B91]" onClick={() => {setNotiPopup(false); setDelete(false);}}>
+                        <button className="w-[120px] h-[52px] flex items-center justify-center gap-[10px] rounded-[20px] border-[2px] border-solid bg-[#032B91]" onClick={() => {setNotiPopup(false); setDelete(false); setDeleteSubmit(false)}}>
                             <h5 className="text-2xl font-semibold leading-9 text-[#F9FBFF]">OK</h5>
                         </button>
                     </div>
@@ -356,6 +360,8 @@ function formatDate(date) {
 
   function countEventsForWeek(weekDates, weekSche) {
     const eventCounts = [];
+    console.log("weekDate", weekDates);
+    console.log("weekSche", weekSche);
     for (const date of weekDates) {
         console.log("date", date);
     if (date in weekSche) {

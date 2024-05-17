@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import PropTypes from 'prop-types';
 
 import apiCall from "../../../utils/api";
@@ -49,6 +49,24 @@ function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
         employee_type: null
     });
 
+    const handleSubmitFail = useCallback(() => {
+        console.log("SUBMIT FAIL");
+        if (!viewEmp) {
+            setDataDone(false);
+        }
+        setSubmitStatus("fail");
+        setShowNotiPopup(true);
+    }, [setDataDone, setSubmitStatus, setShowNotiPopup, viewEmp]);
+
+    const handleSubmitSuccess = useCallback(() => {
+        console.log("SUBMIT SUCCESS");
+        if (!viewEmp) {
+            setDataDone(true);
+        }
+        setSubmitStatus("success");
+        setShowNotiPopup(true);
+    }, [setDataDone, setSubmitStatus, setShowNotiPopup, viewEmp]);
+
     useEffect(() => {
         if (dataDone) {
             apiCall({
@@ -65,7 +83,7 @@ function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
                 }
             }).catch((error) => console.error('Error employee data format:', error));
         }
-    }, [dataDone]);
+    }, [dataDone, handleSubmitFail, handleSubmitSuccess, newEmpInfo]);
 
     useEffect(() => {
         if (viewEmp && update) {
@@ -83,7 +101,7 @@ function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
                 }
             }).catch((error) => console.error('Error employee data format:', error));
         }
-    }, [update]);
+    }, [update, handleSubmitFail, handleSubmitSuccess, updateEmp, viewEmp, viewEmpId]);
 
     useEffect(() => {
         setUpdate(false);
@@ -105,7 +123,7 @@ function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
                 })
                 .catch((error) => console.error('Error fetching employee data:', error));
         }
-    }, [update]);
+    }, [update, viewEmp, viewEmpId]);
 
     const updateCurrentEmp = (data) => {
         setCurrentEmp({
@@ -126,23 +144,8 @@ function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
 
     }
 
-    const handleSubmitFail = () => {
-        console.log("SUBMIT FAIL");
-        if (!viewEmp) {
-            setDataDone(false);
-        }
-        setSubmitStatus("fail");
-        setShowNotiPopup(true);
-    }
 
-    const handleSubmitSuccess = () => {
-        console.log("SUBMIT SUCCESS");
-        if (!viewEmp) {
-            setDataDone(true);
-        }
-        setSubmitStatus("success");
-        setShowNotiPopup(true);
-    }
+
     const handleOpenNotiPopup = () => {
         if (content === "schedule" || content === "patient" || content === "specialist") setSubmitStatus("alert");
         setShowNotiPopup(true);

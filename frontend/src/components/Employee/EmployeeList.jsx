@@ -37,8 +37,8 @@ function EmployeeList() {
             setViewEmpId(null);
         }
         apiCall({
-          endpoint:  filterType === 'ALL'? `/api/employee/list?page=${pageNumber}&employee_per_page=9`
-                                         :  `/api/employee/list?type=${filterType}&page=${pageNumber}&employee_per_page=9`,
+          endpoint:  filterType === 'ALL'? `/api/employee/list?page=${pageNumber}&limit=9`
+                                         :  `/api/employee/list?type=${filterType}&page=${pageNumber}&limit=9`,
           method: "GET",
         })
           .then((data) => {
@@ -86,7 +86,9 @@ function EmployeeList() {
             return (
                 <div className="w-full bg-[#EFF7FE] flex items-center flex-col">
                     <div className='flex my-[40px] w-[1080px]'>
-                            <AddNew onClick={() => setAddNewEmp(true)}/>
+                            <div onClick={() => setAddNewEmp(true)}>
+                                <AddNew />
+                            </div>
                             <InfoTag 
                                 title="Nhân viên"
                                 value={quantity?.num_employee || 0}

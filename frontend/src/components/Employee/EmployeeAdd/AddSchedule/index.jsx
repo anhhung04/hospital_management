@@ -10,7 +10,6 @@ AddSchedule.propTypes = {
 
 
 function AddSchedule({empId}) {
-    console.log("emp   ", empId);
     const [showAddPopup, setShowAddPopup] = useState(false);
     const [newSche, setNewSche] = useState({
         title: "string",
@@ -31,6 +30,7 @@ function AddSchedule({empId}) {
     const [beginDate, setBeginDate] = useState(begin);
     const [endDate, setEndDate] = useState(end);
     const [currentEvent, setCurrentEvent] = useState();
+    const [deleteSubmit, setDeleteSubmit] = useState(false);
 
     const setWeek = (begin_date, end_date) => {
         setBeginDate(begin_date);
@@ -50,7 +50,7 @@ function AddSchedule({empId}) {
               .catch((error) => console.error('Error fetching employee data:', error));
         }
         
-      }, [dataDone, empId]);
+      }, [dataDone, empId, newSche]);
 
 
     useEffect(() => {
@@ -67,7 +67,7 @@ function AddSchedule({empId}) {
               setEventList({});
           })
           .catch((error) => console.error('Error fetching employee data:', error));
-      }, [dataDone, empId, beginDate, endDate]);
+      }, [deleteSubmit, empId, beginDate, endDate, dataDone]);
 
 
     useEffect(() => {
@@ -78,7 +78,7 @@ function AddSchedule({empId}) {
 
     
     const setDelete = (val) => {
-        setDataDone(val);
+        setDeleteSubmit(val);
     }
 
 
