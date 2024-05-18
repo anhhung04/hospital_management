@@ -47,12 +47,12 @@ const handleButtonClick = (value) => {
                 <div className="w-[573px] h-[44px] gap-[16px] flex items-center content-end">
                     <div className="w-[203px] h-[44px] bg-[#EFF7FE] flex shrink-0 items-center justify-center rounded-full">
                         <h6 className="font-sans text-[20px] font-medium leading-[32px] text-[#000] mx-[15px]">{checkedCount} Selected</h6>
-                        <div className="w-[3px] h-[44px] bg-[#FFF] flex items-center justify-center"></div>
+                        {/* <div className="w-[3px] h-[44px] bg-[#FFF] flex items-center justify-center"></div>
                         <div className="w-[65px] h-[44px] flex items-center justify-center">
                             <div className="w-[24px] h-[24px] flex shrink-0 items-center justify-center">
                                 <img src="/images/Patient_Garbage.png" alt="icon" />
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="w-[237px] h-[42px] flex shrink-0 items-center rounded-full bg-[#EFF7FE] px-[20px] py-[12px]">
                         <div className="font-sans text-[12px] font-normal leading-[18px] text-[#000]">Tìm kiếm</div>

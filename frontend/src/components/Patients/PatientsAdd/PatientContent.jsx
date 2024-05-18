@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Datepicker } from "flowbite-react";
 import { useEffect } from "react";
 import apiCall from "../../../utils/api";
 import PropTypes from 'prop-types';
@@ -7,25 +6,27 @@ import PropTypes from 'prop-types';
 PatientContent.propTypes = {
     isPatientSubmit: PropTypes.bool,
     setResDataPatient: PropTypes.func,
-    handleSubmitFailed: PropTypes.func
+    handleSubmitFailed: PropTypes.func,
+    medical_record: PropTypes.object,
+    api_patient_id: PropTypes.string,
+    setApi_patient_id: PropTypes.func
+
 };
 
 function PatientContent(props) {
-    const [showDatePicker, setShowDatePicker] = useState(false);
     const [patientObj, setPatientObj] = useState({});
+    const [api_patient_id, setApi_patient_id] = useState("")
  
-      
-    function toggleDatePicker() {
-        setShowDatePicker(pre => !pre);
-    }
 
-    const handleDateChange = (selectedDate) => {
-        const month = selectedDate.getMonth() + 1; // Months are zero-based, so add 1
-        const day = selectedDate.getDate();
-        const year = selectedDate.getFullYear();
-        setPatientObj({...patientObj, signup_date: `${year}-${month}-${day}`});
-        setShowDatePicker(false);
-    };
+    useEffect(() => {
+        if(props.medical_record){
+            setPatientObj(props.medical_record)
+            setApi_patient_id(props.api_patient_id)
+        }
+    }, [props.medical_record, props.api_patient_id]);
+    // console.log("patientObj",patientObj)
+    // console.log("props.medical_record",props.medical_record)
+
 
     function handlecurrent_treatment(e){
         setPatientObj({...patientObj, current_treatment: e.target.value})
@@ -43,25 +44,30 @@ function PatientContent(props) {
         setPatientObj({...patientObj, medical_history: e.target.value})
     }
 
-   
-
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
       }
-    const api_patient_id = getCookie('user_id');
+    //const api_patient_id = getCookie('user_id');
     //console.log("api_patient_id",api_patient_id)
+    useEffect(() => {
+        if(!props.api_patient_id){
+          // const api_patient_id = getCookie('user_id');
+          setApi_patient_id(getCookie('user_id'));
+        }
+      }, [props.api_patient_id]);
 
     useEffect(() => {
         if (props.isPatientSubmit) {
-            console.log("my api patient:",`/api/patient/${api_patient_id}/update`)
+            // console.log("my api patient:",`/api/patient/${api_patient_id}/update`)
+            // console.log("my api patient:",patientObj)   
             apiCall({
                 endpoint: `/api/patient/${api_patient_id}/update`,
                 method: "PATCH",
-                requestData: patientObj,
+                requestData: {"medical_record":patientObj},
             }).then((res_data) => {
-                console.log(res_data);
+                // console.log(res_data);
                 props.setResDataPatient(res_data);
             });
         }
@@ -74,33 +80,27 @@ function PatientContent(props) {
                     <h6 className="font-sans text-[20px] font-medium leading-[32px]">Mã bệnh nhân <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
                 </div>
                 <input 
-                    className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]"
+                    className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px] bg-gray-50"
                     type="text" 
                     placeholder="#0000001" 
-                    value={patientObj.patient_id}
-                    onChange={(e) => setPatientObj({...patientObj, patient_id: e.target.value})}
+                    value={api_patient_id}
+                    disabled={true}
                 />
 
             </div>
 
             <div className="w-[450px] h-[84px] flex flex-col items-start gap-[4px]">
                 <div className="w-[450px] h-[32px] flex items-center gap-[4px] self-stretch">
-                    <h6 className="font-sans text-[20px] font-medium leading-[32px]">Ngày đăng ký hồ sơ <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
+                    <h6 className="font-sans text-[20px] font-medium leading-[32px]">Mã hồ sơ <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
                 </div>
-                <div className="w-[450px] gap-[8px] h-[48px] py-[12px] px-[8px] flex items-center self-stretch rounded-[5px] border-[1px] border-black border-solid">
+                
                 <input 
-                    className="w-[402px] h-[24px] py-[12px] px-[8px] border-0  flex items-center self-stretch rounded-[5px]" 
+                    className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px] bg-gray-50"
                     type="text" 
-                    placeholder="10/03/2024" 
-                    value={patientObj.signup_date} 
+                    placeholder="#0000001" 
+                    value={patientObj.id} 
+                    disabled={true}
                 />
-                    <img src="/images/Patient_calender.png" alt="" onClick={toggleDatePicker}/>
-                    {showDatePicker && (
-                            <div style={{ position: "relative" }}>
-                                <Datepicker className="absolute top-5 right-0" inline onSelectedDateChanged={handleDateChange} />
-                            </div>
-                        )}
-                </div>
             </div>
 
             <div className="w-[450px] h-[84px] flex flex-col items-start gap-[4px]">
@@ -165,24 +165,24 @@ function PatientContent(props) {
                 </div>
                 <div className="w-[156px] h-[199px] gap-[45px] flex flex-col items-center">
                     <div className="flex items-start gap-[54px]">
-                        <input type="radio" name="option" value="Có" onChange={handlecurrent_treatment} />
-                        <input type="radio" name="option" value="Không" onChange={handlecurrent_treatment}/>
-                        <input type="radio" name="option" value="NA" onChange={handlecurrent_treatment}/>
+                        <input type="radio" name="option" value="Có" checked={patientObj.current_treatment === "Có"} onChange={handlecurrent_treatment} />
+                        <input type="radio" name="option" value="Không" checked={patientObj.current_treatment === "Không"} onChange={handlecurrent_treatment}/>
+                        <input type="radio" name="option" value="NA" checked={patientObj.current_treatment === "NA"} onChange={handlecurrent_treatment}/>
                     </div>
                     <div className="flex items-start gap-[54px]">
-                        <input type="radio" name="option1" value="Có" onChange={handlefood_allergies} />
-                        <input type="radio" name="option1" value="Không" onChange={handlefood_allergies}/>
-                        <input type="radio" name="option1" value="NA" onChange={handlefood_allergies}/>
+                        <input type="radio" name="option1" value="Có" checked={patientObj.food_allergies === "Có"} onChange={handlefood_allergies} />
+                        <input type="radio" name="option1" value="Không" checked={patientObj.food_allergies === "Không"} onChange={handlefood_allergies}/>
+                        <input type="radio" name="option1" value="NA" checked={patientObj.food_allergies === "NA"} onChange={handlefood_allergies}/>
                     </div>
                     <div className="flex items-start gap-[54px]">
-                        <input type="radio" name="option2" value="Có" onChange={handledrug_allergies}/>
-                        <input type="radio" name="option2" value="Không" onChange={handledrug_allergies}/>
-                        <input type="radio" name="option2" value="NA" onChange={handledrug_allergies}/>
+                        <input type="radio" name="option2" value="Có" checked={patientObj.drug_allergies === "Có"} onChange={handledrug_allergies}/>
+                        <input type="radio" name="option2" value="Không" checked={patientObj.drug_allergies === "Không"} onChange={handledrug_allergies}/>
+                        <input type="radio" name="option2" value="NA" checked={patientObj.drug_allergies === "NA"} onChange={handledrug_allergies}/>
                     </div>
                     <div className="flex items-start gap-[54px]">
-                        <input type="radio" name="option3" value="Có" onChange={handlemedical_history}/>
-                        <input type="radio" name="option3" value="Không" onChange={handlemedical_history}/>
-                        <input type="radio" name="option3" value="NA" onChange={handlemedical_history}/>
+                        <input type="radio" name="option3" value="Có" checked={patientObj.medical_history === "Có"} onChange={handlemedical_history}/>
+                        <input type="radio" name="option3" value="Không" checked={patientObj.medical_history === "Không"} onChange={handlemedical_history}/>
+                        <input type="radio" name="option3" value="NA" checked={patientObj.medical_history === "NA"} onChange={handlemedical_history}/>
                     </div>
                 </div>
             </div>

@@ -2,6 +2,7 @@ import TableList from "../TableList";
 import Shortcurt from "../Shortcurt";
 import PatientAdd from "./PatientsAdd/PatientsAdd";
 import apiCall from "../../utils/api";
+import PatientDetail from "./PatientsAdd/PatientDetail";
 
 import { useEffect, useState } from "react";
 
@@ -20,6 +21,14 @@ function PatientsList() {
   const [currentpage, setCurrentPage] = useState(1);
 
   const [checkedCount, setCheckedCount] = useState(0);
+  
+  const [isdetail, setIsDetail] = useState(false);
+
+  const [currentUser_id, setCurrentUser_id] = useState("");
+
+  // const [list_Delete, setlist_Delete] = useState([]);
+
+  // const [isSubmitDelete, setIsSubmitDelete] = useState(false);
 
   function closeAlert() {
     setIsStore(false);
@@ -29,14 +38,14 @@ function PatientsList() {
     setIsStore(true);
   }
   
-  console.log("currentpage",currentpage)
+  //console.log("currentpage",currentpage)
   useEffect(() => {
     apiCall({
       endpoint: `/api/patient/list?page=${currentpage}&limit=13`,
       method: "GET",
     })
       .then((data) => {
-        console.log("Mydata",data)
+        // console.log("Mydata",data)
         if(data && data?.data && data.data?.length > 0){
           setListPatient_Info(data.data);
           setCheckedState(new Array(data.data.length).fill(false));
@@ -45,13 +54,42 @@ function PatientsList() {
       .catch((error) => console.error('Error fetching patient data:', error));
   }, [currentpage]);
 
+  // useEffect(() => {
+  //   console.log("list_Delete state", list_Delete);
+  //   for (let i = 0; i < list_Delete.length; i++) {
+  //     apiCall({
+  //       endpoint: `/api/patient/delete/${list_Delete[i].id}`,
+  //       method: "DELETE",
+  //     })
+  //       .then((data) => {
+  //         console.log("Mydata", data);
+  //         if (data && data?.data && data.data?.length > 0) {
+  //           setListPatient_Info(data.data);
+  //           setCheckedState(new Array(data.data.length).fill(false));
+  //         }
+  //       })
+  //       .catch((error) => console.error("Error fetching patient data:", error));
+  //   }
+  //   setIsSubmitDelete(false);
+  // }, [isSubmitDelete]);
+  
+  // console.log("isSubmitDelete",isSubmitDelete)
+
   function handleClick() {
       setIsAdd(true);
   }
 
   function handleCheckAll() {
     setIsCheckedAll(prev => !prev);
+    
     setCheckedState(checkedState.map(() => !isCheckedAll));
+  //   const info_patient_selected = listPatient_Info.filter((item, index) =>
+  //     (isCheckedAll===false)
+  // );
+  // setlist_Delete(info_patient_selected);
+  // console.log("info_patient_selected state",list_Delete)
+  // console.log("info_patient_selected",info_patient_selected)
+
     if(isCheckedAll){
       setCheckedCount(0);}
     else{
@@ -67,20 +105,28 @@ function checkedTrue(value) {
     const updatedCheckedState = checkedState.map((item, index) =>
         index === position ? !item : item
     );
+    
     // if(isCheckedAll){
     //   setCheckedCount(13);
     // }
     setCheckedState(updatedCheckedState);
     const isAllChecked = updatedCheckedState.every(Boolean);
     setIsCheckedAll(isAllChecked);
-
+  //   const info_patient_selected = listPatient_Info.filter((item, index) =>
+  //     (updatedCheckedState[index] === true||isAllChecked===true)
+  // );
+  // setlist_Delete(info_patient_selected);
+  // console.log("info_patient_selected state",list_Delete)
+  // console.log("info_patient_selected",info_patient_selected)
     const count = updatedCheckedState.filter(checkedTrue).length;
     setCheckedCount(count);
+
 }
 
-console.log("checkedCount",checkedCount)
 
-  if(!isAdd){
+//console.log("checkedCount",checkedCount)
+// console.log("user_id",currentUser_id)
+  if(!isAdd&&!isdetail){
     return (
         <div className="w-full bg-[#EFF7FE] flex justify-center items-center ">
           <div className="h-[1116px] w-[1080px] flex flex-col items-start gap-[40px]">
@@ -120,7 +166,7 @@ console.log("checkedCount",checkedCount)
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[146px] h-[24px] text-right">
                       {info.time}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right">
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right text-[#0544E4]" onClick={()=>{setIsDetail(true);setCurrentUser_id(info.id)}}>
                       Hồ sơ ↗
                     </p>
                   </div>
@@ -130,7 +176,14 @@ console.log("checkedCount",checkedCount)
           </div>
         </div>
     );
-  }else{
+  }else if(isdetail){
+    return(
+      <div className="w-full bg-[#EFF7FE] flex justify-center items-center ">
+        <PatientDetail  CloseAdd={()=>setIsDetail(false)} setStore={setStore} closeAlert={closeAlert} isStore={isStore} user_id={currentUser_id} />
+      </div>
+    )
+  }
+  else{
     return(
       <div className="w-full bg-[#EFF7FE] flex justify-center items-center ">
         <PatientAdd  CloseAdd={()=>setIsAdd(false)} setStore={setStore} closeAlert={closeAlert} isStore={isStore} />
