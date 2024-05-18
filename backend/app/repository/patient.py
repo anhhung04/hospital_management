@@ -1,6 +1,7 @@
 from repository.schemas.patient import Patient, MedicalRecord, PatientProgress, EmployeeHandlePatient, ProgressType
 from repository.schemas.user import User
-from sqlalchemy.sql import text, between, and_
+from sqlalchemy.sql import text, and_, cast, func
+from sqlalchemy import Date
 from repository.user import UserRepo
 from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import IntegrityError
@@ -10,6 +11,7 @@ from models.patient_progress import NewPatientProgressModel, QueryPatientProgres
 from repository import Storage
 from fastapi import Depends
 from datetime import datetime, timedelta
+
 
 class PatientRepo:
     def __init__(
@@ -240,9 +242,13 @@ class PatientRepo:
             dates = [current_date - timedelta(days=i) for i in range(days)]
             counts = []
             for date in dates:
-                count = self._sess.query(PatientProgress).filter(
-                    between(PatientProgress.created_at,
-                            date, date + timedelta(days=1))
+                count = self._sess.query(PatientProgress.patient_id, func.count(PatientProgress.id)).group_by(
+                    cast(
+                        PatientProgress.patient_id,
+                        Date
+                    ), PatientProgress.patient_id
+                ).filter(
+                    cast(PatientProgress.created_at, Date) == date.date()
                 ).count()
                 counts.append(count)
             return counts, None
