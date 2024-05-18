@@ -2,6 +2,7 @@ import Login from '../pages/login';
 import Homepage from '../pages/homepage';
 import LoginLayout from '../components/Layout/LoginLayout';
 import Patients from '../pages/patients';
+import Medicines from '../pages/medicines';
 
 const publicRoutes = [
     {
@@ -17,6 +18,10 @@ const publicRoutes = [
         path: '/patient',
         component: Patients,
     },
+    {
+        path: '/medicine',
+        component: Medicines,
+    }
 ]
 
 const privateRoutes = [
