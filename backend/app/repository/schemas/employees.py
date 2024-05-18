@@ -1,9 +1,11 @@
-from sqlalchemy import String, Date, ForeignKey
+from sqlalchemy import String, Date, ForeignKey, Time, Boolean, Table, Column
 from sqlalchemy import Enum as DBEnum
-from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from enum import Enum
 from permissions.user import EmployeeType
 from repository.schemas import Base, ObjectID
+# from repository.schemas.warehouse import employee_manage_container, Container
+from typing import List
 
 
 class EducateLevel(Enum):
@@ -21,6 +23,50 @@ class EmployeeStatus(Enum):
     SUSPENDED = 'SUSPENDED'
     WIP = 'WIP'
 
+class DayOfWeek(Enum):
+    MONDAY = 'MONDAY'
+    TUESDAY = 'TUESDAY'
+    WEDNESDAY = 'WEDNESDAY'
+    THURSDAY = 'THURSDAY'
+    FRIDAY = 'FRIDAY'
+    SATURDAY = 'SATURDAY'
+    SUNDAY = 'SUNDAY'
+
+class Frequency(Enum):
+    SINGLE= 'SINGLE'
+    DAILY = 'DAILY'
+    WEEKLY = 'WEEKLY'
+    MONTHLY = 'MONTHLY'
+    YEARLY = 'YEARLY'
+
+class ScheduleStatus(Enum):
+    ACTIVE = 'ACTIVE'
+    INACTIVE = 'INACTIVE'
+    PENDING = 'PENDING'
+    SUSPENDED = 'SUSPENDED'
+    INPROGRESS = 'INPROGRESS'
+
+class Event(Base):
+    __tablename__ = 'events'
+    id = mapped_column(ObjectID, primary_key=True, autoincrement=False, nullable=False)
+    title = mapped_column(String)
+    day_of_week = mapped_column(DBEnum(DayOfWeek))
+    begin_time = mapped_column(Time)
+    end_time = mapped_column(Time)
+    begin_date = mapped_column(Date)
+    end_date = mapped_column(Date)
+    is_recurring = mapped_column(Boolean)
+    frequency = mapped_column(DBEnum(Frequency))
+    employee: Mapped["Employee"] = relationship("Employee", secondary="schedules", back_populates="event", lazy="select")
+
+schedule = Table(
+    "schedules", Base.metadata,
+    Column("employee_id", ObjectID, ForeignKey("employees.user_id")),
+    Column("event_id", ObjectID, ForeignKey("events.id")),
+    extend_existing=True
+)
+    
+
 class Employee(Base):
     __tablename__ = 'employees'
 
@@ -32,5 +78,6 @@ class Employee(Base):
     faculty = mapped_column(String)
     status = mapped_column(DBEnum(EmployeeStatus))
     personal_info = relationship("User", primaryjoin="Employee.user_id == User.id", uselist=False)
-    
+    event: Mapped[List["Event"]] = relationship("Event", secondary="schedules", back_populates="employee", lazy="select")
+    # container_management: Mapped[List["Container"]] = relationship(secondary=employee_manage_container)
     __table_args__ = {"extend_existing": True}

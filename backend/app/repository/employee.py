@@ -1,5 +1,4 @@
 from collections import namedtuple
-from repository.schemas.employees import Employee 
 from repository.user import UserRepo
 from repository.schemas.user import User
 from typing import Tuple
@@ -12,7 +11,15 @@ from models.employee import(
   AddEmployeeModel,
   PatchEmployeeModel
 )
-from repository.schemas.employees import EmployeeStatus, EducateLevel
+from models.event import(
+  PatchEventRequestModel, 
+  AddEventModel
+)
+from repository.schemas.employees import(
+  Employee, 
+  EmployeeStatus, EducateLevel, 
+  Event, DayOfWeek, Frequency, schedule
+)
 from permissions.user import EmployeeType
 
 GetEmployeeQuery = namedtuple("GetEmployeeQuery", ["id", "username"])
@@ -35,14 +42,13 @@ class EmployeeRepo:
     async def list_employees(self, employee_type: EmployeeType | None, page: int, employee_per_page: int) -> Tuple[list[Employee], Exception | None]:
         try:
             query = self._sess.query(Employee)
-            if employee_type:
+            if employee_type is not None:
                 query = query.filter(Employee.employee_type == employee_type)
             query = query.limit(employee_per_page).offset(
                 (page - 1) * employee_per_page
             )
             employees = query.all()
         except Exception as e:
-            print(e)
             return [], e
         return employees, None
     
@@ -109,3 +115,117 @@ class EmployeeRepo:
             self._sess.rollback()
             return None, e
         return employee, None
+    
+
+    async def list_events(
+        self,
+        query: QueryEmployeeModel
+    ) -> Tuple[list[Event], Exception | None]:
+        try:
+            events = self._sess.query(Event).join(schedule).filter(
+                schedule.c.employee_id == query.user_id
+            ).all()
+            # events = query.filter(Event.begin_date >= begin_date, Event.begin_date <= end_date).all()
+        except Exception as e:
+            return [], e
+        return events, None
+    
+    async def create_event(
+        self,
+        event_info: AddEventModel,
+        employee_id: str
+    ) -> Tuple[Event, Exception | None]:
+        try:
+            event = Event(
+                id=event_info.id,
+                title=event_info.title,
+                day_of_week=DayOfWeek(event_info.day_of_week),
+                begin_time=event_info.begin_time,
+                end_time=event_info.end_time,
+                begin_date=event_info.begin_date,
+                end_date=event_info.end_date,
+                is_recurring=event_info.is_recurring,
+                frequency=Frequency(event_info.frequency)
+            )
+            employee = self._sess.query(Employee).filter(
+                Employee.user_id == employee_id
+            ).first()
+            employee.event.append(event)
+            self._sess.add(event)
+            self._sess.commit()
+        except IntegrityError as e:
+            self._sess.rollback()
+            return None, e
+        except Exception as e:
+            return None, e
+        return event, None
+        
+    async def get_event(
+        self,
+        query: QueryEmployeeModel,
+        event_id: str
+    ) -> Tuple[Event, Exception | None]:
+        try:
+            event = self._sess.query(Event).join(schedule).filter(
+                schedule.c.employee_id == query.user_id,
+                Event.id == event_id
+            ).first()
+        except Exception as e:
+            return None, e
+        return event, None
+    
+    async def update_event(
+        self,
+        query: QueryEmployeeModel,
+        event_id: str,
+        patch_event: PatchEventRequestModel
+    ) -> Tuple[Event, Exception | None]:
+        try:
+            event, error = await self.get_event(query, event_id)
+            if error:
+                return None, error
+            new_event_dict = patch_event.model_dump()
+            for attr, value in new_event_dict.items():
+                if value is not None:
+                    if attr == "frequency":
+                        value = Frequency(value)
+                    setattr(
+                        event,
+                        attr,
+                        value
+                    )
+            self._sess.add(event)
+            self._sess.commit()
+            self._sess.refresh(event)
+        except IntegrityError as e:
+            self._sess.rollback()
+            return None, e
+        except Exception as e:
+            return None, e
+        return event, None
+    
+    async def delete_event(
+        self,
+        query: QueryEmployeeModel,
+        event_id: str
+    ) -> Exception | None:
+        try:
+            event = self._sess.query(Event).join(schedule).filter(
+                schedule.c.employee_id == query.user_id,
+                Event.id == event_id
+            ).first()
+            self._sess.delete(event)
+            self._sess.commit()
+        except Exception as e:
+            self._sess.rollback()
+            return e
+        return None
+
+    async def count(self, type: EmployeeType | None = None):
+        try:
+            query = self._sess.query(Employee)
+            if type:
+                query = query.filter(Employee.employee_type == type)
+            return query.count(), None
+        except Exception as err:
+            return 0, err
