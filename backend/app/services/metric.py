@@ -22,6 +22,15 @@ class MetricService:
             num_doctors, err = await self._employee_repo.count(type=EmployeeType.DOCTOR)
             if err:
                 raise err
+            num_nurses, err = await self._employee_repo.count(type=EmployeeType.NURSE)
+            if err:
+                raise err
+            num_managers, err = await self._employee_repo.count(type=EmployeeType.MANAGER)
+            if err:
+                raise err
+            num_other, err = await self._employee_repo.count(type=EmployeeType.OTHER)
+            if err:
+                raise err
             num_employee, err = await self._employee_repo.count()
             if err:
                 raise err
@@ -31,6 +40,9 @@ class MetricService:
             return MetricModel(
                 num_patients=num_patients,
                 num_doctors=num_doctors,
+                num_nurses=num_nurses,
+                num_managers=num_managers,
+                num_other=num_other,
                 num_employee=num_employee,
                 patients_per_day=patients_per_day
             )
