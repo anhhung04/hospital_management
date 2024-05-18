@@ -244,7 +244,7 @@ class PatientRepo:
             for date in dates:
                 count = self._sess.query(PatientProgress.patient_id, func.count(PatientProgress.id)).group_by(
                     cast(
-                        PatientProgress.patient_id,
+                        PatientProgress.created_at,
                         Date
                     ), PatientProgress.patient_id
                 ).filter(
