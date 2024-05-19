@@ -1,7 +1,8 @@
-import EmployeeList from "../components/Employees/employeelist";
-
+import EmployeeList from "../components/Employee/EmployeeList";
 function Employee() {
-    return ( <EmployeeList/>);
+    return ( 
+            <EmployeeList/>
+     );
 }
 
 export default Employee;

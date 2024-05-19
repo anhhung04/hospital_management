@@ -1,0 +1,17 @@
+.wrapper {
+    width: fit-content;
+    display: inline-block;
+}
+
+
+.wrapper .hover-button {
+    display: none;
+}
+
+.wrapper:hover .default-button {
+    display: none;
+  }
+  
+.wrapper:hover .hover-button {
+  display: flex;
+}
