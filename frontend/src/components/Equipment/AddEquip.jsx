@@ -3,6 +3,21 @@ import LuuButton from "../Button/Luu_Button";
 import { useState, useEffect } from 'react';
 import apiCall from "../../utils/api";
 import NotiPopup from "./NotiPopup";
+import PropTypes from 'prop-types';
+
+AddEquip.propTypes = {
+    viewEquip: PropTypes.bool,
+    viewEquipId: PropTypes.string,
+    handleAddDone: PropTypes.func,
+    equipInfo: PropTypes.shape ({
+        name: PropTypes.string,
+        status: PropTypes.string,
+        maintanance_history: PropTypes.string,
+        availability: PropTypes.bool,
+        description: PropTypes.string,
+    })
+};
+
 
 function AddEquip({viewEquip, viewEquipId, handleAddDone, equipInfo}) {
     const [showNotiPopup, setShowNotiPopup] = useState(false);
@@ -41,7 +56,7 @@ function AddEquip({viewEquip, viewEquipId, handleAddDone, equipInfo}) {
             .then(res => console.log("Create equipment", res))
             .catch(err => console.log("Error", err))
         }
-    }, [dataDone])
+    }, [dataDone, newEquipInfo])
 
     const handleSave = () => {
         if (['name', 'availability', 'maintanance_history', 'status'].every(field => newEquipInfo[field] !== null && newEquipInfo[field] !== "")) {

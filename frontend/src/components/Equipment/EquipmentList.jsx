@@ -3,7 +3,6 @@ import ListBar from "../Employee/Component/ListBar/ListBar";
 import "./style.css";
 import { useEffect, useState } from "react";
 import apiCall from "../../utils/api";
-import NotiPopup from "../Employee/Component/NotiPopup";
 import AddEquip from "./AddEquip";
 
 function EquipmentList() {
