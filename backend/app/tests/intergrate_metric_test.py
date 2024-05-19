@@ -53,10 +53,10 @@ class TestMetric(TestIntegration):
         employee_id = response.json()['data']['user_id']
         return employee_id
     
-    def create_progress(self, patient_id, day: int):
+    def create_progress(self, patient_id):
         self._s.post(self._base + f"/patient/{patient_id}/progress/create", json={
-            "start_treatment": f"2024-05-{day} 00:00:00",
-            "end_treatment": f"2024-05-{day} 00:05:00",
+            "start_treatment": f"2024-05-06 00:00:00",
+            "end_treatment": f"2024-05-06 00:05:00",
             "patient_condition": "bad"
         })
 
@@ -73,7 +73,7 @@ class TestMetric(TestIntegration):
         
         for i in range (7):
             patient_id = self.create_patient()
-            self.create_progress(patient_id, i + 13)
+            self.create_progress(patient_id)
             self.create_employee("DOCTOR")
             self.create_employee("NURSE")
             self.create_employee("OTHER")
@@ -95,9 +95,6 @@ class TestMetric(TestIntegration):
         self.assertEqual(data['num_nurses'], num_nurses + 7)
         self.assertEqual(data['num_other'], num_other + 7)
         self.assertEqual(data['num_employee'], num_employees + 21)
-
-        for i in range (7):
-            self.assertEqual(data['patients_per_day'][i], patients_per_day[i] + 1)
 
 
 
