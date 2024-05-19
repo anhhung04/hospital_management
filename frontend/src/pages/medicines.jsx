@@ -1,4 +1,4 @@
-import PatientsList from "../components/Patients/PatientList";
+// import PatientsList from "../components/Patients/PatientList";
 import MedicineList from "../components/Medicine/MedicineList";
 
 

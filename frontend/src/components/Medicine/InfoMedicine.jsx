@@ -1,10 +1,10 @@
 import PropTypes from "prop-types";
-import { useState, useEffect, useRef } from "react";
-import { Datepicker } from "flowbite-react";
-import apiCall from "../../utils/api";
-import ProgressInfo from "../ProgressInfo";
-import AddStaff from "../Patients/PatientsAdd/addStaff";
-import AddStaffNonHeader from "../Patients/PatientsAdd/addStaffNonHeader";
+import { useEffect, useRef } from "react";
+//import { Datepicker } from "flowbite-react";
+// import apiCall from "../../utils/api";
+// import ProgressInfo from "../ProgressInfo";
+// import AddStaff from "../Patients/PatientsAdd/addStaff";
+// import AddStaffNonHeader from "../Patients/PatientsAdd/addStaffNonHeader";
 
 InfoMedicine.propTypes = {
   isAdd: PropTypes.bool,
@@ -24,89 +24,89 @@ InfoMedicine.propTypes = {
 };
 
 function InfoMedicine(props) {
-  const [date_performance, setDate_performance] = useState("");
-  const [time_performance, setTime_performance] = useState("");
-  const [time_finished, setTime_finished] = useState("");
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [date_finished, setDate_finished] = useState("");
-  const [showDatePickerFinished, setShowDatePickerFinished] = useState(false);
-  const [ishaveProgress, setIshaveProgress] = useState(false);
-  const [progress, setProgress] = useState([]);
-  const [objProgress, setObjProgress] = useState({});
-  const [api_patient_id, setApi_patient_id] = useState("");
+  // const [date_performance, setDate_performance] = useState("");
+  // const [time_performance, setTime_performance] = useState("");
+  // const [time_finished, setTime_finished] = useState("");
+  // const [showDatePicker, setShowDatePicker] = useState(false);
+  // const [date_finished, setDate_finished] = useState("");
+  // const [showDatePickerFinished, setShowDatePickerFinished] = useState(false);
+  // const [ishaveProgress, setIshaveProgress] = useState(false);
+  // const [progress, setProgress] = useState([]);
+  // const [objProgress, setObjProgress] = useState({});
+  // const [api_patient_id, setApi_patient_id] = useState("");
 
-  function toggleDatePicker() {
-    setShowDatePicker((pre) => !pre);
-  }
+  // function toggleDatePicker() {
+  //   setShowDatePicker((pre) => !pre);
+  // }
   //console.log("progress_data", props.progress_data)
   // console.log("api_patient_id111111111", props.api_patient_id);
-  useEffect(() => {
-    if (props?.progress_data?.length >= 0) {
-      // console.log("progress_data listtttt", props.progress_data);
-      // console.log("api_patient_id", props.api_patient_id);
-      // console.log("da va useeffect")
-      setProgress(props.progress_data);
-      setIshaveProgress(true);
-      setApi_patient_id(props.api_patient_id);
-    }
-  },[props.progress_data, props.api_patient_id]);
+  // useEffect(() => {
+  //   if (props?.progress_data?.length >= 0) {
+  //     // console.log("progress_data listtttt", props.progress_data);
+  //     // console.log("api_patient_id", props.api_patient_id);
+  //     // console.log("da va useeffect")
+  //     setProgress(props.progress_data);
+  //     //setIshaveProgress(true);
+  //     setApi_patient_id(props.api_patient_id);
+  //   }
+  // },[props.progress_data, props.api_patient_id]);
 
-  function toggleDatePickerFinished() {
-    setShowDatePickerFinished((pre) => !pre);
-  }
+  // function toggleDatePickerFinished() {
+  //   setShowDatePickerFinished((pre) => !pre);
+  // }
 
-  function handleDateChange(selectedDate) {
-    const month = selectedDate.getMonth() + 1; // Months are zero-based, so add 1
-    const day = selectedDate.getDate();
-    const year = selectedDate.getFullYear();
-    setDate_performance(`${year}-${month}-${day}`);
-    setObjProgress({
-      ...objProgress,
-      start_treatment: `${year}-${month}-${day} ${time_performance}:00`,
-      date_performance: `${year}-${month}-${day}`,
-    });
-    setShowDatePicker(false);
-  }
+  // function handleDateChange(selectedDate) {
+  //   const month = selectedDate.getMonth() + 1; // Months are zero-based, so add 1
+  //   const day = selectedDate.getDate();
+  //   const year = selectedDate.getFullYear();
+  //   setDate_performance(`${year}-${month}-${day}`);
+  //   setObjProgress({
+  //     ...objProgress,
+  //     start_treatment: `${year}-${month}-${day} ${time_performance}:00`,
+  //     date_performance: `${year}-${month}-${day}`,
+  //   });
+  //   setShowDatePicker(false);
+  // }
 
-  function handleIncrease() {
-    props.setCurrentPage(pre => pre + 1);
-  }
+  // function handleIncrease() {
+  //   props.setCurrentPage(pre => pre + 1);
+  // }
 
-  function handleDecrease() {
-    if (props.currentpage === 1) return;
-    props.setCurrentPage(pre => pre - 1);
-  }
+  // function handleDecrease() {
+  //   if (props.currentpage === 1) return;
+  //   props.setCurrentPage(pre => pre - 1);
+  // }
 
-  function handleDateChangeFinished(selectedDate) {
-    const month = selectedDate.getMonth() + 1; // Months are zero-based, so add 1
-    const day = selectedDate.getDate();
-    const year = selectedDate.getFullYear();
-    setDate_finished(`${year}-${month}-${day}`);
-    setObjProgress({
-      ...objProgress,
-      end_treatment: `${year}-${month}-${day} ${time_finished}:00`,
-      date_finished: `${year}-${month}-${day}`,
-    });
-    setShowDatePickerFinished(false);
-  }
+  // function handleDateChangeFinished(selectedDate) {
+  //   const month = selectedDate.getMonth() + 1; // Months are zero-based, so add 1
+  //   const day = selectedDate.getDate();
+  //   const year = selectedDate.getFullYear();
+  //   setDate_finished(`${year}-${month}-${day}`);
+  //   setObjProgress({
+  //     ...objProgress,
+  //     end_treatment: `${year}-${month}-${day} ${time_finished}:00`,
+  //     date_finished: `${year}-${month}-${day}`,
+  //   });
+  //   setShowDatePickerFinished(false);
+  // }
 
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  }
+  // function getCookie(name) {
+  //   const value = `; ${document.cookie}`;
+  //   const parts = value.split(`; ${name}=`);
+  //   if (parts.length === 2) return parts.pop().split(";").shift();
+  // }
 
-  useEffect(() => {
-    if (!props.api_patient_id) {
-      // const api_patient_id = getCookie('user_id');
-      setApi_patient_id(getCookie("user_id"));
-    }
-  },[props.api_patient_id]);
+  // useEffect(() => {
+  //   if (!props.api_patient_id) {
+  //     // const api_patient_id = getCookie('user_id');
+  //     setApi_patient_id(getCookie("user_id"));
+  //   }
+  // },[props.api_patient_id]);
 
-  const progressRef = useRef(progress);
-  useEffect(() => {
-    progressRef.current = progress;
-  }, [progress]);
+  // const progressRef = useRef(progress);
+  // useEffect(() => {
+  //   progressRef.current = progress;
+  // }, [progress]);
 
   const propsRef = useRef(props.getDataProgress);
 
@@ -114,25 +114,25 @@ function InfoMedicine(props) {
     propsRef.current = props.getDataProgress;
   }, [props.getDataProgress]);
 
-  useEffect(() => {
-    if (props.isProgressSubmit) {
-      // console.log("objProgress", objProgress);
-      apiCall({
-        endpoint: `/api/patient/${api_patient_id}/progress/create`,
-        method: "POST",
-        requestData: objProgress,
-      }).then((res_data) => {
-        // console.log(res_data);
-        if (res_data.status_code === 200) {
-          const newprogress = [...progressRef.current, res_data.data];
-          setProgress(newprogress);
-          // console.log(newprogress);
-          setIshaveProgress(true);
-        }
-        propsRef.current(res_data);
-      });
-    }
-  }, [props.isProgressSubmit, objProgress, api_patient_id]);
+  // useEffect(() => {
+  //   if (props.isProgressSubmit) {
+  //     // console.log("objProgress", objProgress);
+  //     apiCall({
+  //       endpoint: `/api/patient/${api_patient_id}/progress/create`,
+  //       method: "POST",
+  //       requestData: objProgress,
+  //     }).then((res_data) => {
+  //       // console.log(res_data);
+  //       if (res_data.status_code === 200) {
+  //         const newprogress = [...progressRef.current, res_data.data];
+  //         setProgress(newprogress);
+  //         // console.log(newprogress);
+  //         //setIshaveProgress(true);
+  //       }
+  //       propsRef.current(res_data);
+  //     });
+  //   }
+  // }, [props.isProgressSubmit, objProgress, api_patient_id]);
 
   // console.log("progress", objProgress);
   // {
@@ -144,84 +144,16 @@ function InfoMedicine(props) {
 
   return (
     <>
-      <div className="w-[960px] h-[450px] flex flex-col gap-[20px] mt-[40px] mb-[40px] items-center justify-between">
-        <div className="flex items-center flex-col gap-[20px]">
-        <div className="w-[960px] h-[44px] flex items-center content-center self-stretch mb-[26px] gap-[436px]">
-          <div className="w-[166px] h-[36px] flex items-center gap-[6px]">
-            <button className="w-[32px] h-[32px]" onClick={props.setAdd}>
-              <img src="/images/Component_plus_icon.png" alt="plus_icon" />
-            </button>
-            <div className="w-[126px] h-[36px] flex items-center gap-[10px]">
-              <h5 className="font-sans text-[24px] font-semibold leading-12 text-[#032B91]">
-                Tiến trình
-              </h5>
-            </div>
-          </div>
-          <div className="w-[573px] h-[44px] gap-[16px] flex items-center content-end">
-            <div className="w-[237px] h-[42px] flex shrink-0 items-center rounded-full bg-[#EFF7FE] px-[20px] py-[12px]">
-              <div className="font-sans text-[12px] font-normal leading-[18px] text-[#000]">
-                Tìm kiếm
-              </div>
-            </div>
-            <img src="/images/Patient_Sorted.png" alt="sorted" />
-            <img src="/images/Patient_filter.png" alt="filter" />
-          </div>
+      <div className="w-[960px] h-[436px] flex flex-col gap-[40px] mt-[40px] mb-[40px] items-center justify-between">
+        <div className="w-[960px] h-[84px] flex flex-col items-start gap-[4px] ">
+          <p className="flex items-center gap-[4px] text-[20px] font-medium leading-[32px]">Tên <span className="text-[#F00] font-medium leading-8">*</span></p>
+          <input type="text" placeholder="Paracetamol" className="flex w-[960px] h-[48px] py-[12px] px-[8px] border-[1px] border-solid items-center rounded-[5px] " />
         </div>
-        <div className="w-[960px] h-[56px] flex shrink-0 bg-[#CDDBFE] rounded-lg items-center justify-start mb-[20px]">
-          <div className=" w-[956px] h-[32px] flex items-center gap-[19px] shrink-0 ml-[20px]">
-            <input
-              type="checkbox"
-              // checked={isCheckAll}
-              // onChange={toggleCheckAll}
-            />
-            <div className="flex justify-center items-end gap-[50px]">
-              <h6 className="font-sans text-[20px] font-medium leading-[32px] ">
-                STT
-              </h6>
-              <h6 className="font-sans text-[20px] font-medium leading-[32px] ">
-                Mã tiến trình
-              </h6>
-              <h6 className="font-sans text-[20px] font-medium leading-[32px] ">
-                Ngày thực hiện
-              </h6>
-              <h6 className="font-sans text-[20px] font-medium leading-[32px] ">
-                Giờ thực hiện
-              </h6>
-              <h6 className="font-sans text-[20px] font-medium leading-[32px] ">
-                Tình trạng
-              </h6>
-              <h6 className="font-sans text-[20px] font-medium leading-[32px] ">
-                Chi tiết
-              </h6>
-            </div>
-          </div>
+        <div className="w-[960px] h-[233px] flex flex-col items-start gap-[4px]">
+        <p className="flex items-center gap-[4px] text-[20px] font-medium leading-[32px]">Hướng dẫn sử dụng <span className="text-[#F00] font-medium leading-8">*</span></p>
+        <input type="text" className="w-[960px] h-[196px] flex py-[12px] px-[8px] rounded-[5px]"/>
         </div>
-
-        {!ishaveProgress && (
-          <h4 className="text-[34px] font-semibold leading-[48px] ">
-            Chưa có dữ liệu nào
-          </h4>
-        )}
-        {ishaveProgress &&
-          progress.map((info, index) => (
-            <ProgressInfo
-              key={index}
-              keyy={index}
-              id={info.id}
-              time={info.start_treatment}
-              patient_condition={info.patient_condition}
-              status={info.status}
-              setIsDetail={props.setIsDetailProgress}
-              setObjProgress={setObjProgress}
-              detailContent={info}
-            />
-          ))}
-        </div>
-
-        {/* {props.isAdd && (
-          <div className="w-[960px] h-[56px] flex items-center content-center self-stretch mb-[26px] gap-[436px]"></div>
-        )} */}
-        <div className="w-[960px] h-[32px] flex items-end gap-[26px]">
+        {/* <div className="w-[960px] h-[32px] flex items-end gap-[26px]">
           <div className="w-[802px] px-[20px] flex gap-[10px]">
             <h3 className="font-sans text-[18px] font-medium">Tổng số lượng: {progress.length}</h3>
           </div>
@@ -230,9 +162,9 @@ function InfoMedicine(props) {
             <div className="flex w-[32px] h-[32px] py-[2px] px-[11px] justify-center items-center gap-[10px] bg-[#032B91] rounded-[10px] text-[#fff]">{props.currentpage}</div>
             <button className="font-inter text-[30px] font-medium leading-normal text-[#BEC6CF]" onClick={handleIncrease}>→</button>
           </div>
-        </div>
+        </div> */}
       </div>
-      {(props.isAdd || props.isDetailProgress) && (
+      {/* {(props.isAdd || props.isDetailProgress) && (
         <>
           <hr className="bg-[#6ABFFD] mb-[20px] border-solid w-[960px] h-[4px]" />
           <div className="h-[600px] w-[960px]">
@@ -430,7 +362,7 @@ function InfoMedicine(props) {
             </div>
           </div>
         </>
-      )}
+      )} */}
     </>
   );
 }

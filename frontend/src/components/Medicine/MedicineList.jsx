@@ -7,6 +7,84 @@ import TableListMedicine from "./TableListMedicine";
 
 import { useEffect, useState } from "react";
 
+
+const list_Medicine_Info = [
+    { medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },{ medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },{ medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },
+    { medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },
+    { medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },
+    { medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },{ medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },{ medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },
+    { medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },
+    { medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },
+    { medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },{ medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    },
+    { medicine_id: "#00001",
+      medicine_name: "Paracetamol",
+      size_medicine: 1000,
+      HSD: "2024-12-30",
+      Date_of_manufacture: "2022-12-30",
+    }
+
+]
+
 function MedicineList() {
 
   const [checkedState, setCheckedState] = useState([]);
@@ -139,7 +217,7 @@ function checkedTrue(value) {
 
             <TableListMedicine handleClick={handleClick} handleCheckedAll = {handleCheckAll} isCheckedAll={isCheckedAll} activeButton={currentpage} setActiveButton={setCurrentPage} checkedCount={checkedCount}>
             <div className="w-[1032px] h-[716px] inline-flex flex-col items-start gap-[12px]">
-                {listPatient_Info.length!=0&&listPatient_Info.map((info, index) => (
+                {list_Medicine_Info.length!=0&&list_Medicine_Info.map((info, index) => (
                   <div
                     key={index}
                     className="w-[1032px] h-[44px] flex items-center gap-[12px] bg-[#EFF7FE] py-[10px] px-[20px]"
@@ -153,19 +231,19 @@ function checkedTrue(value) {
                       {index}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[116px] h-[24px] text-right">
-                      {info.medical_record_id}
+                      {info.medicine_id}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right">
-                      {info.full_name}
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-center">
+                      {info.medicine_name}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[125px] h-[24px] text-right">
-                      {info.phone_number}
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[80px] h-[24px] text-right">
+                      {info.size_medicine}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[130px] h-[24px] text-right">
-                      {info.appointment_date}
+                      {info.HSD}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[146px] h-[24px] text-right">
-                      {info.time}
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[190px] h-[24px] text-right">
+                      {info.Date_of_manufacture}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right text-[#0544E4]" onClick={()=>{setIsDetail(true);setCurrentUser_id(info.id)}}>
                       Hồ sơ ↗
