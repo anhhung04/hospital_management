@@ -1,5 +1,5 @@
 import InfoContent from "./InfoContent";
-import { useState} from "react";
+import { useEffect, useState } from "react";
 import ProgressContent from "./ProgressContent";
 import PatientContent from "./PatientContent";
 import ResultContent from "./ResultContent";
@@ -7,19 +7,23 @@ import MedicineContent from "./MedicineContent";
 import HuyButton from "../../Button/Huy_Button";
 import LuuButton from "../../Button/Luu_Button";
 import Alert from "../../Alert";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import apiCall from "../../../utils/api";
 
 PatientAdd.propTypes = {
-    isStore: PropTypes.bool,
-    closeAlert: PropTypes.func,
-    CloseAdd: PropTypes.func,
-    setStore: PropTypes.func,
+  isStore: PropTypes.bool,
+  closeAlert: PropTypes.func,
+  CloseAdd: PropTypes.func,
+  setStore: PropTypes.func,
+  user_id: PropTypes.string,
 };
 
 function PatientAdd(props) {
   const [current_content, setCurrent_content] = useState("info");
 
   const [isAdd, setIsAdd] = useState(false);
+
+  const [isDetailProgress, setIsDetailProgress] = useState(false);
 
   const [isAddResult, setIsAddResult] = useState(false);
 
@@ -29,59 +33,68 @@ function PatientAdd(props) {
 
   var [numMedicineAdded, setNumMedicineAdded] = useState(0);
 
-  
-
-  const [isFinishInfo, setIsFinishInfo] = useState(false);
-  const [isAlertWarning, setIsAlertWarning] = useState(false);
+  // const [isFinishInfo, setIsFinishInfo] = useState(false);
+  // const [isAlertWarning, setIsAlertWarning] = useState(false);
   const [isSuccesAlert, setIsSuccesAlert] = useState(false);
-
-  
+  // const [isDetailInfo, setIsDetailInfo] = useState(true);
 
   const [isPostSubmit, setIsPostSubmit] = useState(false);
   const [isPatientSubmit, setIsPatientSubmit] = useState(false);
   const [isProgressSubmit, setIsProgressSubmit] = useState(false);
   const [isSubmitFailed, setIsSubmitFailed] = useState(false);
+  const [currentpage, setCurrentPage] = useState(1);
 
+  const [resDataInfo, setResDataInfo] = useState({
+    status_code: 500,
+    data: {},
+  });
 
-  const [resDataInfo, setResDataInfo] = useState({status_code: 500, data: {}});
+  const [detailData, setDetailData] = useState({});
 
-  function getDataInfo(res_data){
-    // console.log("res_data:",res_data);
-    // console.log("resDataInfo:",resDataInfo);
-    if(res_data.status_code === 200){
+  useEffect(() => {
+    apiCall({
+      endpoint: `/api/patient/${props.user_id}?progress_page=${currentpage}&page_limit=3`,
+      method: "GET",
+    }).then((res_data) => {
+      // console.log("res_data:", res_data);
+      setDetailData(res_data.data);
+    });
+  }, [props.user_id,currentpage]);
+  // console.log("user_id", props.user_id);
+  // console.log("detailData11111111111111111111", detailData);
+
+  function getDataInfo(res_data) {
+    //console.log("res_data:",res_data);
+    //console.log("resDataInfo:",resDataInfo);
+    if (res_data.status_code === 200) {
       // console.log("resDataInfo",resDataInfo);
       setResDataInfo(res_data);
       props.setStore();
-      setIsFinishInfo(true);
-      document.cookie = `user_id=${res_data.data.user_id};max-age=0.5;path=/`;
-    }
-    else if(resDataInfo.status_code === 500){
+      // setIsFinishInfo(true);
+      //document.cookie = `user_id=${res_data.data.user_id};max-age=0.5;path=/`;
+    } else if (resDataInfo.status_code === 500) {
       setIsSubmitFailed(true);
     }
   }
 
-
-
-  function getDataProgress(res_data){
-    // console.log("res_data11111111111111111:",res_data);
-    if(res_data.status_code === 200){
+  function getDataProgress(res_data) {
+    // console.log("res_data11111111111111111:", res_data);
+    if (res_data.status_code === 200) {
       // console.log("resDataInfo");
       setIsSuccesAlert(true);
-    }else{
+    } else {
       setIsSubmitFailed(true);
     }
   }
 
-
-  function getDataPatient(res_data){
-    // console.log("res_data11111111111111111:",res_data);
-    if(res_data.status_code === 200){
+  function getDataPatient(res_data) {
+    // console.log("res_data11111111111111111:", res_data);
+    if (res_data.status_code === 200) {
       // console.log("resDataInfo");
       setIsSuccesAlert(true);
-    }else{
+    } else {
       setIsSubmitFailed(true);
     }
-    
   }
 
   function setAdd() {
@@ -101,41 +114,35 @@ function PatientAdd(props) {
     setNumMedicineAdded((pre) => pre + 1);
   }
 
-
-  function closeWarningAlert() {
-    setIsAlertWarning(false)
-  }
-
-
   function closeSuccesAlert() {
-    if(current_content === "info"){
+    if (current_content === "info") {
       props.closeAlert();
       setIsPostSubmit(false);
       setCurrent_content("patient");
-    }else if(current_content === "patient"){
-      setIsSuccesAlert(false)
+    } else if (current_content === "patient") {
+      setIsSuccesAlert(false);
       setIsPatientSubmit(false);
       setCurrent_content("progress");
-    }else if(current_content === "progress"){
-      setIsSuccesAlert(false)
+    } else if (current_content === "progress") {
+      setIsSuccesAlert(false);
       setIsProgressSubmit(false);
     }
   }
 
   function closeSubmitFailed() {
-    if(current_content === "info"){
+    if (current_content === "info") {
       setIsPostSubmit(false);
       setIsSubmitFailed(false);
-    }else if(current_content === "patient"){
+    } else if (current_content === "patient") {
       setIsPatientSubmit(false);
       setIsSubmitFailed(false);
-    }else if(current_content === "progress"){
+    } else if (current_content === "progress") {
       setIsProgressSubmit(false);
       setIsSubmitFailed(false);
     }
   }
 
-  function handleSubmitFailed(){
+  function handleSubmitFailed() {
     setIsSubmitFailed(true);
   }
 
@@ -151,14 +158,14 @@ function PatientAdd(props) {
     }
   }
 
-  function handleSubmit(){
-    if(current_content === "info"){
-      // console.log("info page"); 
+  function handleSubmit() {
+    if (current_content === "info") {
+      // console.log("info page");
       setIsPostSubmit(true);
-    }else if(current_content === "patient"){
+    } else if (current_content === "patient") {
       // console.log("patient page");
       setIsPatientSubmit(true);
-    }else if (current_content === "progress"){
+    } else if (current_content === "progress") {
       setIsProgressSubmit(true);
     }
   }
@@ -187,7 +194,7 @@ function PatientAdd(props) {
 
     if (content === "info" || content === "patient") {
       heightStyle = { height: "915px" };
-    } else if (content === "progress" && isAdd) {
+    } else if (content === "progress" && (isAdd || isDetailProgress)) {
       heightStyle = { height: `${dynamicHeight}px` };
     } else if (content === "medicine" && isAddMedicine) {
       heightStyle = { height: `${dynamicHeightMedicine}px` };
@@ -203,29 +210,29 @@ function PatientAdd(props) {
   return (
     <>
       {props.isStore && (
-  <Alert
-    message={`Thêm kết quả mới được thêm thành công<br />Username: ${resDataInfo.data.username}<br />Password: ${resDataInfo.data.password}`}
-    icon_type="success"
-    closeAlert={closeSuccesAlert}
-    type="Lưu thành công"
-  />
-)}
-{isAlertWarning && (
+        <Alert
+          message={`Cập nhật thông tin bệnh nhân thành công`}
+          icon_type="success"
+          closeAlert={closeSuccesAlert}
+          type="Thành công"
+        />
+      )}
+      {/* {isAlertWarning && (
   <Alert
     message={`Bạn cần phải điền thông tin bệnh nhân trước khi điền thông tin bệnh án`}
     icon_type="warning"
     closeAlert={closeWarningAlert}
     type="Cảnh báo"
   />
-)}
-{isSuccesAlert && (
-  <Alert
-    message={`Cập nhật thông tin bệnh án thành công`}
-    icon_type="success"
-    closeAlert={closeSuccesAlert}
-    type="Thành công"
-  />
-)}
+)} */}
+      {isSuccesAlert && (
+        <Alert
+          message={`Cập nhật thông tin bệnh án thành công`}
+          icon_type="success"
+          closeAlert={closeSuccesAlert}
+          type="Thành công"
+        />
+      )}
 
       {isSubmitFailed && (
         <Alert
@@ -238,10 +245,11 @@ function PatientAdd(props) {
       <div
         className={` w-[1087x] my-[5%] inline-flex flex-col justify-center items-end gap-[20px] `}
       >
-        <div className="w-[1080px] h-[48px] px-[36px] flex justify-end items-center gap-[712px] ">
-          <div className="w-[251px] h-[48px] flex justify-center items-center">
+        <div className="w-[1080px] h-[48px] px-[36px] flex justify-end items-center gap-[463px] ">
+          <div className="w-[500px] h-[48px] flex items-center">
             <p className="text-[#032B91] font-sans text-[34px] font-semibold leading-[48px]">
-              Bệnh nhân mới
+              {detailData?.personal_info?.first_name}{" "}
+              {detailData?.personal_info?.last_name}
             </p>
           </div>
           <button>
@@ -253,11 +261,15 @@ function PatientAdd(props) {
           </button>
         </div>
         <div
-          style={handleContainer(current_content, dynamicHeight, dynamicHeightMedicine)}
+          style={handleContainer(
+            current_content,
+            dynamicHeight,
+            dynamicHeightMedicine
+          )}
           className="w-[1080px] flex flex-col items-center bg-[#FFF] rounded-[50px] shadow-xl"
         >
           <div className="w-[1080px] h-[79px] flex flex-col items-center justify-center gap-[10px] bg-[#CDDBFE] rounded-t-[50px]">
-            <div className="w-[949px] h-[52px] flex items-center gap-[20px]  ">
+            <div className="w-[949px] h-[52px] flex items-center gap-[25px]  ">
               <div
                 className={`w-[200px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
                   current_content,
@@ -266,7 +278,7 @@ function PatientAdd(props) {
                 onClick={() => setCurrent_content("info")}
               >
                 <p
-                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
+                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[20px] py-[8px] ${handleClickText(
                     current_content,
                     "info"
                   )}`}
@@ -280,11 +292,11 @@ function PatientAdd(props) {
                   "patient"
                 )}`}
                 onClick={() => {
-                  isFinishInfo ? setCurrent_content("patient") : setIsAlertWarning(true)
-              }}
+                  setCurrent_content("patient");
+                }}
               >
                 <p
-                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
+                  className={`text-[24px] w-full text-center font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
                     current_content,
                     "patient"
                   )}`}
@@ -298,11 +310,11 @@ function PatientAdd(props) {
                   "progress"
                 )}`}
                 onClick={() => {
-                  isFinishInfo ? setCurrent_content("progress") : setIsAlertWarning(true)
-              }}
+                  setCurrent_content("progress");
+                }}
               >
                 <p
-                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[25px] py-[8px] ${handleClickText(
+                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[20px] py-[8px] ${handleClickText(
                     current_content,
                     "progress"
                   )}`}
@@ -316,11 +328,11 @@ function PatientAdd(props) {
                   "result"
                 )}`}
                 onClick={() => {
-                  isFinishInfo ? setCurrent_content("result") : setIsAlertWarning(true)
-              }}
+                  setCurrent_content("result");
+                }}
               >
                 <p
-                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
+                  className={`w-[200px] text-center text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
                     current_content,
                     "result"
                   )}`}
@@ -334,8 +346,8 @@ function PatientAdd(props) {
                   "medicine"
                 )}`}
                 onClick={() => {
-                  isFinishInfo ? setCurrent_content("medicine") : setIsAlertWarning(true)
-              }}
+                  setCurrent_content("medicine");
+                }}
               >
                 <p
                   className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[20px] py-[8px] ${handleClickText(
@@ -348,8 +360,25 @@ function PatientAdd(props) {
               </div>
             </div>
           </div>
-          {current_content === "info" && <InfoContent isSubmit={isPostSubmit} setResDataInfo={getDataInfo} handleSubmitFailed={handleSubmitFailed} />}
-          {current_content === "patient" && <PatientContent isPatientSubmit={isPatientSubmit} resDataInfo={resDataInfo} handleSubmitFailed={handleSubmitFailed} setResDataPatient={getDataPatient}/>}
+          {current_content === "info" && (
+            <InfoContent
+              isSubmit={isPostSubmit}
+              setResDataInfo={getDataInfo}
+              handleSubmitFailed={handleSubmitFailed}
+              infoData={detailData.personal_info}
+              // isDetailInfo={isDetailInfo}
+            />
+          )}
+          {current_content === "patient" && (
+            <PatientContent
+              isPatientSubmit={isPatientSubmit}
+              resDataInfo={resDataInfo}
+              handleSubmitFailed={handleSubmitFailed}
+              setResDataPatient={getDataPatient}
+              medical_record={detailData.medical_record}
+              api_patient_id={detailData.personal_info.id}
+            />
+          )}
           {current_content === "progress" && (
             <ProgressContent
               setAdd={setAdd}
@@ -359,6 +388,12 @@ function PatientAdd(props) {
               numStaffAdded={numStaffAdded}
               isProgressSubmit={isProgressSubmit}
               getDataProgress={getDataProgress}
+              progress_data={detailData.medical_record.progress}
+              api_patient_id={detailData.personal_info.id}
+              isDetailProgress={isDetailProgress}
+              setIsDetailProgress={setIsDetailProgress}
+              currentpage={currentpage}
+              setCurrentPage={setCurrentPage}
             />
           )}
           {current_content === "result" && (
