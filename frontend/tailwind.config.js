@@ -24,5 +24,7 @@ module.exports = {
       // => @media (min-width: 1280px) { ... }
     },
   },
-  plugins: [require('flowbite/plugin')],
+  plugins: [require('flowbite/plugin')({
+         charts: true,
+  })],
 };
