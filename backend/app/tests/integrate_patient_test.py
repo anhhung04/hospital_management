@@ -61,7 +61,7 @@ class TestPatient(TestIntegration):
             "first_name":        first_name,
             "last_name":        last_name,
             "birth_date":       "2004-05-06",
-            "gender":           "male",
+            "gender":           "Nam",
             "ssn":              gen_ssn(),
             "phone_number":     "0123456789",
             "email":            gen_username() + "@user.com",
