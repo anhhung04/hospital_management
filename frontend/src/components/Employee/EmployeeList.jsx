@@ -101,7 +101,7 @@ function EmployeeList() {
                             ></InfoTag>
                             <InfoTag 
                                 title="Y tá"
-                                value={quantity?.num_nurse || 0}
+                                value={quantity?.num_nurses || 0}
                                 source="/images/NurseImage1.png"
                             ></InfoTag>
                     </div>
@@ -121,7 +121,7 @@ function EmployeeList() {
                             <p className='text-black text-lg font-medium leading-6'>Tổng số lượng: {
                                 filterType === 'ALL'? (quantity?.num_employee || 0) :
                                 filterType === 'DOCTOR'? (quantity?.num_doctors || 0) :
-                                filterType === 'NURSE'? (quantity?.num_nurse || 0) : ((quantity?.num_employee - quantity?.num_doctors - quantity?.num_nurse) || 0)
+                                filterType === 'NURSE'? (quantity?.num_nurses || 0) : ((quantity?.num_other) || 0)
                             }</p>
                         </div>
                         <ListBar pageNumber={pageNumber} handlePage={(page) => setPageNumber(page)}/>
