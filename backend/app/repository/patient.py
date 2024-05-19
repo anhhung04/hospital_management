@@ -1,6 +1,6 @@
 from repository.schemas.patient import Patient, MedicalRecord, PatientProgress, EmployeeHandlePatient, ProgressType
 from repository.schemas.user import User
-from sqlalchemy.sql import text, and_, cast, func
+from sqlalchemy.sql import text, and_, cast
 from sqlalchemy import Date
 from repository.user import UserRepo
 from sqlalchemy.orm import Session, noload
@@ -149,7 +149,6 @@ class PatientRepo:
             if not medical_record_id:
                 raise Exception("Medical record not found")
             new_progress = PatientProgress(
-                created_at=progress.start_treatment,
                 medical_record_id=medical_record_id,
                 patient_id=patient_id,
                 **progress.model_dump()
@@ -243,13 +242,8 @@ class PatientRepo:
             dates = [current_date - timedelta(days=i) for i in range(days)]
             counts = []
             for date in dates:
-                count = self._sess.query(PatientProgress.patient_id, func.count(PatientProgress.id)).group_by(
-                    cast(
-                        PatientProgress.created_at,
-                        Date
-                    ), PatientProgress.patient_id
-                ).filter(
-                    cast(PatientProgress.created_at, Date) == date.date()
+                count = self._sess.query(PatientProgress.id).filter(
+                    cast(PatientProgress.start_treatment, Date) == date.date()
                 ).count()
                 counts.append(count)
             return counts, None
