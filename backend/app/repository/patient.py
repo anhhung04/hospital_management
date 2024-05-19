@@ -149,6 +149,7 @@ class PatientRepo:
             if not medical_record_id:
                 raise Exception("Medical record not found")
             new_progress = PatientProgress(
+                created_at=progress.start_treatment,
                 medical_record_id=medical_record_id,
                 patient_id=patient_id,
                 **progress.model_dump()

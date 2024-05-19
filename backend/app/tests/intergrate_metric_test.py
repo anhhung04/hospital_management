@@ -53,11 +53,11 @@ class TestMetric(TestIntegration):
         employee_id = response.json()['data']['user_id']
         return employee_id
     
-    def create_progress(self, patient_id, day):
-        self._s.post(self._base + f"patient/{patient_id}/progress/create", json={
+    def create_progress(self, patient_id, day: int):
+        self._s.post(self._base + f"/patient/{patient_id}/progress/create", json={
             "start_treatment": f"2024-05-{day} 00:00:00",
-            "end_treatment": f"2024-06-{day} 00:00:00",
-            "patient_condition": "good"
+            "end_treatment": f"2024-05-{day} 00:05:00",
+            "patient_condition": "bad"
         })
 
     def test_fetch_general_logic(self):
@@ -69,11 +69,11 @@ class TestMetric(TestIntegration):
         num_other = data['num_other']
         num_employees = data['num_employee']
         patients_per_day = data['patients_per_day']
+        total_patients_per_day = sum(patients_per_day)
         
         for i in range (7):
-            day = f"0{i+1}"
             patient_id = self.create_patient()
-            self.create_progress(patient_id, day)
+            self.create_progress(patient_id, i + 13)
             self.create_employee("DOCTOR")
             self.create_employee("NURSE")
             self.create_employee("OTHER")
@@ -88,15 +88,16 @@ class TestMetric(TestIntegration):
 
         res = self._s.get(self.path('/'))
         data = res.json()['data']
+      
         self.assertEqual(data['num_patients'], num_patients + 7)
-        # for i in range (7):
-        #     self.assertEqual(data['patients_per_day'][i], patients_per_day[i] + 1)
-
+        self.assertEqual(total_patients_per_day + 7, sum(data['patients_per_day']))
         self.assertEqual(data['num_doctors'], num_doctors + 7)
         self.assertEqual(data['num_nurses'], num_nurses + 7)
         self.assertEqual(data['num_other'], num_other + 7)
         self.assertEqual(data['num_employee'], num_employees + 21)
 
+        for i in range (7):
+            self.assertEqual(data['patients_per_day'][i], patients_per_day[i] + 1)
 
 
 
