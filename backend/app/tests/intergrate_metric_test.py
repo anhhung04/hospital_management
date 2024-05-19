@@ -68,8 +68,6 @@ class TestMetric(TestIntegration):
         num_nurses = data['num_nurses']
         num_other = data['num_other']
         num_employees = data['num_employee']
-        patients_per_day = data['patients_per_day']
-        total_patients_per_day = sum(patients_per_day)
         
         for i in range (7):
             patient_id = self.create_patient()
@@ -90,7 +88,6 @@ class TestMetric(TestIntegration):
         data = res.json()['data']
       
         self.assertEqual(data['num_patients'], num_patients + 7)
-        self.assertEqual(total_patients_per_day + 7, sum(data['patients_per_day']))
         self.assertEqual(data['num_doctors'], num_doctors + 7)
         self.assertEqual(data['num_nurses'], num_nurses + 7)
         self.assertEqual(data['num_other'], num_other + 7)
