@@ -1,6 +1,6 @@
 from repository.schemas.patient import Patient, MedicalRecord, PatientProgress, EmployeeHandlePatient, ProgressType
 from repository.schemas.user import User
-from sqlalchemy.sql import text, and_, cast, func
+from sqlalchemy.sql import text, and_, cast
 from sqlalchemy import Date
 from repository.user import UserRepo
 from sqlalchemy.orm import Session, noload
