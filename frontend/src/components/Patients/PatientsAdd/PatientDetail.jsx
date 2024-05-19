@@ -271,14 +271,14 @@ function PatientAdd(props) {
           <div className="w-[1080px] h-[79px] flex flex-col items-center justify-center gap-[10px] bg-[#CDDBFE] rounded-t-[50px]">
             <div className="w-[949px] h-[52px] flex items-center gap-[25px]  ">
               <div
-                className={`w-[172px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
+                className={`w-[200px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
                   current_content,
                   "info"
                 )}`}
                 onClick={() => setCurrent_content("info")}
               >
                 <p
-                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
+                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[20px] py-[8px] ${handleClickText(
                     current_content,
                     "info"
                   )}`}
@@ -287,7 +287,7 @@ function PatientAdd(props) {
                 </p>
               </div>
               <div
-                className={`w-[172px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
+                className={`w-[200px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
                   current_content,
                   "patient"
                 )}`}
@@ -305,7 +305,7 @@ function PatientAdd(props) {
                 </p>
               </div>
               <div
-                className={`w-[172px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
+                className={`w-[200px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
                   current_content,
                   "progress"
                 )}`}
@@ -314,7 +314,7 @@ function PatientAdd(props) {
                 }}
               >
                 <p
-                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
+                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[20px] py-[8px] ${handleClickText(
                     current_content,
                     "progress"
                   )}`}
@@ -323,7 +323,7 @@ function PatientAdd(props) {
                 </p>
               </div>
               <div
-                className={`w-[172px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
+                className={`w-[200px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
                   current_content,
                   "result"
                 )}`}
@@ -332,7 +332,7 @@ function PatientAdd(props) {
                 }}
               >
                 <p
-                  className={`w-[172px] text-center text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
+                  className={`w-[200px] text-center text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[31px] py-[8px] ${handleClickText(
                     current_content,
                     "result"
                   )}`}
@@ -341,7 +341,7 @@ function PatientAdd(props) {
                 </p>
               </div>
               <div
-                className={`w-[172px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
+                className={`w-[200px] h-[52px] flex justify-center items-center hover:bg-[#032B91] rounded-[50px] ${handleClick(
                   current_content,
                   "medicine"
                 )}`}
@@ -350,7 +350,7 @@ function PatientAdd(props) {
                 }}
               >
                 <p
-                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[27px] py-[8px] ${handleClickText(
+                  className={`text-[24px] font-semibold leading-[36px] hover:text-[#F9FBFF] px-[20px] py-[8px] ${handleClickText(
                     current_content,
                     "medicine"
                   )}`}

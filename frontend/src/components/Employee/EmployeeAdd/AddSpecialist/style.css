@@ -1,0 +1,11 @@
+.Add-button:hover svg .cir {
+    stroke: black;
+}
+
+.Add-button:hover svg .plus {
+    fill: black;
+}
+
+.Delete-button:hover {
+    cursor: not-allowed;
+}
