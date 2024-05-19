@@ -1,0 +1,12 @@
+button:hover {
+    cursor: pointer;
+}
+button:hover svg .cir {
+    fill: #BEE1F9;
+    stroke: none;
+}
+
+button:hover svg .plus {
+    fill: #F9FBFF;
+}
+

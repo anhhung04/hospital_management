@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
-TableList.propTypes = {
+TableListMedicine.propTypes = {
     children: PropTypes.node,
     handleClick: PropTypes.func,
     handleCheckedAll: PropTypes.func,
@@ -11,7 +11,7 @@ TableList.propTypes = {
     checkedCount: PropTypes.number
 };
 
-function TableList({children,handleClick, handleCheckedAll,isCheckedAll, activeButton, setActiveButton,checkedCount}) {
+function TableListMedicine({children,handleClick, handleCheckedAll,isCheckedAll, activeButton, setActiveButton,checkedCount}) {
 
 
 const handleButtonClick = (value) => {
@@ -41,7 +41,7 @@ const handleButtonClick = (value) => {
                         <img src="/images/Component_plus_icon.png" alt="plus_icon"  />
                     </button>
                     <div className="w-[126px] h-[36px] flex items-center gap-[10px]">
-                        <h5 className="font-sans text-[24px] font-semibold leading-12 text-[#032B91]">Bệnh nhân</h5>
+                        <h5 className="font-sans text-[24px] font-semibold leading-12 text-[#032B91]">Thuốc</h5>
                     </div>
                 </div>
                 <div className="w-[573px] h-[44px] gap-[16px] flex items-center content-end">
@@ -67,13 +67,13 @@ const handleButtonClick = (value) => {
                         checked={isCheckedAll}
                         onChange={handleCheckedAll}
                     />
-                    <div className="flex justify-center items-end gap-[87px]">
+                    <div className="flex justify-center items-end gap-[83px]">
                         <h6 className="font-sans text-[20px] font-medium leading-[32px] ">STT</h6>
-                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">ID</h6>
-                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">Họ tên</h6>
-                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">SĐT</h6>
-                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">Ngày hẹn</h6>
-                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">Giờ hẹn</h6>
+                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">Mã</h6>
+                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">Tên</h6>
+                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">Số lượng</h6>
+                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">HSD</h6>
+                        <h6 className="font-sans text-[20px] font-medium leading-[32px] ">Ngày nhập kho</h6>
                         <h6 className="font-sans text-[20px] font-medium leading-[32px] ">Chi tiết</h6>
                     </div>
                 </div>
@@ -106,4 +106,4 @@ const handleButtonClick = (value) => {
     </div> );
 }
 
-export default TableList;
+export default TableListMedicine;
