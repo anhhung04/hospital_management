@@ -55,8 +55,8 @@ class TestMetric(TestIntegration):
     
     def create_progress(self, patient_id):
         self._s.post(self._base + f"/patient/{patient_id}/progress/create", json={
-            "start_treatment": f"2024-05-06 00:00:00",
-            "end_treatment": f"2024-05-06 00:05:00",
+            "start_treatment": "2024-05-06 00:00:00",
+            "end_treatment": "2024-05-06 00:05:00",
             "patient_condition": "bad"
         })
 
