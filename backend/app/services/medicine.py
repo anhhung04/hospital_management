@@ -26,7 +26,7 @@ class MedicineService:
         self._medicine_repo = medicine_repo
         self._user_repo = user_repo
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def list_medicines(self, page: int, medicine_per_page: int):
         page = 1 if page < 1 else page
         medicine_per_page = 1 if medicine_per_page <= 0 else medicine_per_page
@@ -47,7 +47,7 @@ class MedicineService:
                                 detail="Error in fetching medicines list")
         return medicines
 
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def get(self, id: str):
         medicine, error = await self._medicine_repo.get(id)
         if error:
@@ -60,7 +60,7 @@ class MedicineService:
             quantity=medicine.quantity
         ).model_dump()
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def create(self, medicine: MedicineRequestModel):
         medicine_info = medicine.model_dump()
         medicine_id = str(uuid4())
@@ -78,7 +78,7 @@ class MedicineService:
             quantity=medicine.quantity
         ).model_dump()
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def list_batches(self, medicine_id: str, page: int, batches_per_page: int):
         page = 1 if page < 1 else page
         batches_per_page = 1 if batches_per_page <= 0 else batches_per_page
@@ -107,7 +107,7 @@ class MedicineService:
                                 detail="Error in fetching medicine batches")
         return batches
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def create_batch(self, medicine_id: str, batch: MedicineBatchRequestModel):
         batch_info = batch.model_dump()
         batch_id = str(uuid4())
@@ -132,7 +132,7 @@ class MedicineService:
             details=batch.details
         ).model_dump()
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def get_batch(self, medicine_id: str, batch_id: str):
         batch, error = await self._medicine_repo.get_batch(medicine_id, batch_id)
         if error:
