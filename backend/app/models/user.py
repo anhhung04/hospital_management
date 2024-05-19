@@ -76,13 +76,13 @@ class AddUserDetailModel(UserDetail):
     password: str
 
 class AddUserModel(BaseModel):
-    first_name: str = Field(pattern=r'^[A-Za-z]+$')
-    last_name: str = Field(pattern=r'^[A-Za-z]+$')
+    first_name: str = Field(pattern=r'^[^\d!@#%^&*()_\-+=.,/\\`~{}\[\]|":;]+$')
+    last_name: str = Field(pattern=r'^[^\d!@#%^&*()_\-+=.,/\\`~{}\[\]|":;]+$')
     birth_date: str = Field(pattern=r'^\d{4}-\d{1,2}-\d{1,2}$')
     gender: str = Field(pattern=r'^(Nam|Nữ|Khác)$')
     ssn: str = Field(pattern=r'^\d{10,12}$')
     phone_number: str = Field(pattern=r'^\d{10,12}$')
-    address: str = Field(pattern=r'^[A-Za-z0-9\s,]+$', max_length=255)
+    address: str = Field(pattern=r'^[^!@#$%^&*\(\)_=+\[\]{}:"\'\.`~]+$', max_length=255)
     email: str = Field(pattern=r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
     health_insurance: str = Field(pattern=r'^[A-Z0-9]+$')
 
