@@ -4,7 +4,7 @@ from middleware.user_ctx import UserContext
 from repository.user import UserRepo
 from repository.warehouse import MedicineRepo
 from permissions import Permission
-from permissions.user import EmployeeType
+from permissions.user import EmployeeType, UserRole
 from util.log import logger
 from models.medicine import(
   MedicineModel,
@@ -26,7 +26,7 @@ class MedicineService:
         self._medicine_repo = medicine_repo
         self._user_repo = user_repo
     
-    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
+    @Permission.permit([UserRole.EMPLOYEE])
     async def list_medicines(self, page: int, medicine_per_page: int):
         page = 1 if page < 1 else page
         medicine_per_page = 1 if medicine_per_page <= 0 else medicine_per_page
@@ -47,7 +47,7 @@ class MedicineService:
                                 detail="Error in fetching medicines list")
         return medicines
 
-    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
+    @Permission.permit([UserRole.EMPLOYEE])
     async def get(self, id: str):
         medicine, error = await self._medicine_repo.get(id)
         if error:
@@ -78,7 +78,7 @@ class MedicineService:
             quantity=medicine.quantity
         ).model_dump()
     
-    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
+    @Permission.permit([UserRole.EMPLOYEE])
     async def list_batches(self, medicine_id: str, page: int, batches_per_page: int):
         page = 1 if page < 1 else page
         batches_per_page = 1 if batches_per_page <= 0 else batches_per_page
@@ -118,7 +118,6 @@ class MedicineService:
             AddMedicineBatchModel.model_validate(batch_info)
         )
         if error:
-            print(error)
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                                 detail="Error in adding batch")
         return MedicineBatchModel(
@@ -132,7 +131,7 @@ class MedicineService:
             details=batch.details
         ).model_dump()
     
-    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
+    @Permission.permit([UserRole.EMPLOYEE])
     async def get_batch(self, medicine_id: str, batch_id: str):
         batch, error = await self._medicine_repo.get_batch(medicine_id, batch_id)
         if error:
