@@ -1,12 +1,109 @@
-import TableList from "../TableList";
+
 import Shortcurt from "../Shortcurt";
-import PatientAdd from "./PatientsAdd/PatientsAdd";
+import MedicineAdd from "./MedicineAdd";
 import apiCall from "../../utils/api";
-import PatientDetail from "./PatientsAdd/PatientDetail";
+import PatientDetail from "../Patients/PatientsAdd/PatientDetail";
+import TableListMedicine from "./TableListMedicine";
 
 import { useEffect, useState } from "react";
 
-function PatientsList() {
+
+const list_Medicine_Info = [
+  { 
+    medicine_id: "#00001",
+    medicine_name: "Paracetamol",
+    size_medicine: 1000,
+    HSD: "2024-12-30",
+    Date_of_manufacture: "2022-12-30",
+  },
+  { 
+    medicine_id: "#00002",
+    medicine_name: "Ibuprofen",
+    size_medicine: 200,
+    HSD: "2025-01-15",
+    Date_of_manufacture: "2023-01-15",
+  },
+  { 
+    medicine_id: "#00003",
+    medicine_name: "Aspirin",
+    size_medicine: 500,
+    HSD: "2023-11-20",
+    Date_of_manufacture: "2021-11-20",
+  },
+  { 
+    medicine_id: "#00004",
+    medicine_name: "Cetirizine",
+    size_medicine: 10,
+    HSD: "2024-08-25",
+    Date_of_manufacture: "2022-08-25",
+  },
+  { 
+    medicine_id: "#00005",
+    medicine_name: "Amoxicillin",
+    size_medicine: 250,
+    HSD: "2023-07-14",
+    Date_of_manufacture: "2021-07-14",
+  },
+  { 
+    medicine_id: "#00006",
+    medicine_name: "Metformin",
+    size_medicine: 500,
+    HSD: "2024-03-30",
+    Date_of_manufacture: "2022-03-30",
+  },
+  { 
+    medicine_id: "#00007",
+    medicine_name: "Lisinopril",
+    size_medicine: 20,
+    HSD: "2025-10-10",
+    Date_of_manufacture: "2023-10-10",
+  },
+  { 
+    medicine_id: "#00008",
+    medicine_name: "Omeprazole",
+    size_medicine: 40,
+    HSD: "2023-05-05",
+    Date_of_manufacture: "2021-05-05",
+  },
+  { 
+    medicine_id: "#00009",
+    medicine_name: "Atorvastatin",
+    size_medicine: 80,
+    HSD: "2024-09-12",
+    Date_of_manufacture: "2022-09-12",
+  },
+  { 
+    medicine_id: "#00010",
+    medicine_name: "Simvastatin",
+    size_medicine: 40,
+    HSD: "2023-04-22",
+    Date_of_manufacture: "2021-04-22",
+  },
+  { 
+    medicine_id: "#00011",
+    medicine_name: "Levothyroxine",
+    size_medicine: 100,
+    HSD: "2024-02-18",
+    Date_of_manufacture: "2022-02-18",
+  },
+  { 
+    medicine_id: "#00012",
+    medicine_name: "Clopidogrel",
+    size_medicine: 75,
+    HSD: "2023-06-30",
+    Date_of_manufacture: "2021-06-30",
+  },
+  { 
+    medicine_id: "#00013",
+    medicine_name: "Pantoprazole",
+    size_medicine: 20,
+    HSD: "2024-01-01",
+    Date_of_manufacture: "2022-01-01",
+  }
+];
+
+
+function MedicineList() {
 
   const [checkedState, setCheckedState] = useState([]);
 
@@ -131,14 +228,14 @@ function checkedTrue(value) {
         <div className="w-full bg-[#EFF7FE] flex justify-center items-center ">
           <div className="h-[1116px] w-[1080px] flex flex-col items-start gap-[40px]">
             <Shortcurt
-              title="Bệnh nhân"
+              title="Thuốc"
               value={listPatient_Info.length}
-              source="/images/Patient_HeartRateMonitor.png"
+              source="/images/Pills.png"
             />
-  
-            <TableList handleClick={handleClick} handleCheckedAll = {handleCheckAll} isCheckedAll={isCheckedAll} activeButton={currentpage} setActiveButton={setCurrentPage} checkedCount={checkedCount} >
-              <div className="w-[1032px] h-[716px] inline-flex flex-col items-start gap-[12px]">
-                {listPatient_Info.length!=0&&listPatient_Info.map((info, index) => (
+
+            <TableListMedicine handleClick={handleClick} handleCheckedAll = {handleCheckAll} isCheckedAll={isCheckedAll} activeButton={currentpage} setActiveButton={setCurrentPage} checkedCount={checkedCount}>
+            <div className="w-[1032px] h-[716px] inline-flex flex-col items-start gap-[12px]">
+                {list_Medicine_Info.length!=0&&list_Medicine_Info.map((info, index) => (
                   <div
                     key={index}
                     className="w-[1032px] h-[44px] flex items-center gap-[12px] bg-[#EFF7FE] py-[10px] px-[20px]"
@@ -151,20 +248,20 @@ function checkedTrue(value) {
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[43px] h-[24px] text-right ">
                       {index}
                     </p>
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[116px] h-[24px] text-right">
+                      {info.medicine_id}
+                    </p>
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-center">
+                      {info.medicine_name}
+                    </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[80px] h-[24px] text-right">
-                      {info.medical_record_id}
+                      {info.size_medicine}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[200px] h-[24px] text-center">
-                      {info.full_name}
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[130px] h-[24px] text-right">
+                      {info.HSD}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[125px] h-[24px] text-left">
-                      {info.phone_number}
-                    </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[100px] h-[24px] text-right">
-                      {info.appointment_date}
-                    </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[100px] h-[24px] text-right">
-                      {info.time}
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[190px] h-[24px] text-right">
+                      {info.Date_of_manufacture}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right text-[#0544E4]" onClick={()=>{setIsDetail(true);setCurrentUser_id(info.id)}}>
                       Hồ sơ ↗
@@ -172,7 +269,11 @@ function checkedTrue(value) {
                   </div>
                 ))}
               </div>
-            </TableList>
+            </TableListMedicine>
+  
+            {/* <TableListMedicine  >
+             
+            </TableListMedicine> */}
           </div>
         </div>
     );
@@ -186,11 +287,11 @@ function checkedTrue(value) {
   else{
     return(
       <div className="w-full bg-[#EFF7FE] flex justify-center items-center ">
-        <PatientAdd  CloseAdd={()=>setIsAdd(false)} setStore={setStore} closeAlert={closeAlert} isStore={isStore} />
+        <MedicineAdd  CloseAdd={()=>setIsAdd(false)} setStore={setStore} closeAlert={closeAlert} isStore={isStore} />
       </div>
     )
   }
   
 }
 
-export default PatientsList;
+export default MedicineList;

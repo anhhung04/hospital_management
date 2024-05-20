@@ -12,8 +12,8 @@ class MedicineListResponseModel(BaseResponseModel):
     data: list[MedicineModel]
 
 class MedicineRequestModel(BaseModel):
-    name: str
-    description: str
+    name: str = Field(min_length=1)
+    description: str = Field(min_length=1)
     quantity: int = Field(ge=0, default=0)
 
 class AddMedicineModel(MedicineRequestModel):
@@ -35,8 +35,8 @@ class MedicineBatchRequestModel(BaseModel):
     quantity: int = Field(gt=0)
     price: float = Field(gt=0)
     price_per_unit: Optional[float] = Field(default=None, gt=0)
-    manufacturer: str
-    details: str
+    manufacturer: str = Field(min_length=1)
+    details: str = Field(min_length=1)
 
 class AddMedicineBatchModel(MedicineBatchRequestModel):
     id: str

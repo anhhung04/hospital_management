@@ -75,6 +75,7 @@ function EmployeeAdd({handleCloseAdd, handleAddDone, viewEmp, viewEmpId}) {
                 requestData: newEmpInfo,
             }).then((res) => {
                 console.log(res);
+                console.log("epm submit", newEmpInfo);
                 if (res.status_code !== 200) {
                     handleSubmitFail();
                 }
