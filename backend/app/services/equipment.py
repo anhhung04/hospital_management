@@ -26,7 +26,7 @@ class EquipmentService():
         self._user_repo = user_repo
         self._equipment_repo = equipment_repo
 
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def list_equipments(self, page: int, equipment_per_page: int):
         page = 1 if page < 1 else page
         equipment_per_page = 1 if equipment_per_page <= 0 else equipment_per_page
@@ -50,7 +50,7 @@ class EquipmentService():
                                 detail="Error in fetching equipments list")
         return equipments
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def get(self, id: str):
         equipment, error = await self._equipment_repo.get(id)
         if error:
@@ -69,7 +69,7 @@ class EquipmentService():
             maintanance_history=equipment.maintanance_history
         ).model_dump()
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def create(self, new_equipment_request: EquipmentRequestModel):
         new_equipment = AddEquipmentModel(
             id=str(uuid4()),
@@ -94,7 +94,7 @@ class EquipmentService():
             maintanance_history=equipment.maintanance_history
         ).model_dump()
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def list_batches(self, equipment_id: str, page: int, batches_per_page: int):
         page = 1 if page < 1 else page
         batches_per_page = 1 if batches_per_page <= 0 else batches_per_page
@@ -118,7 +118,7 @@ class EquipmentService():
                                 detail="Error in fetching equipment batches")
         return batches
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def get_batch(self, equipment_id: str, batch_id: str):
         batch, error = await self._equipment_repo.get_batch(equipment_id, batch_id)
         if error:
@@ -137,7 +137,7 @@ class EquipmentService():
             details=batch.details
         ).model_dump()
     
-    @Permission.permit([EmployeeType.OTHER])
+    @Permission.permit([EmployeeType.MANAGER, EmployeeType.OTHER])
     async def create_batch(self, equipment_id: str, batch: EquipmentBatchRequestModel):
         new_batch = AddEquipmentBatchModel(
             id=str(uuid4()),
