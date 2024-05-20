@@ -151,19 +151,19 @@ function checkedTrue(value) {
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[43px] h-[24px] text-right ">
                       {index}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[116px] h-[24px] text-right">
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[80px] h-[24px] text-right">
                       {info.medical_record_id}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right">
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[200px] h-[24px] text-center">
                       {info.full_name}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[125px] h-[24px] text-right">
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[125px] h-[24px] text-left">
                       {info.phone_number}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[130px] h-[24px] text-right">
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[100px] h-[24px] text-right">
                       {info.appointment_date}
                     </p>
-                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[146px] h-[24px] text-right">
+                    <p className="font-sans text-[16px] font-normal leading-[24px] w-[100px] h-[24px] text-right">
                       {info.time}
                     </p>
                     <p className="font-sans text-[16px] font-normal leading-[24px] w-[150px] h-[24px] text-right text-[#0544E4]" onClick={()=>{setIsDetail(true);setCurrentUser_id(info.id)}}>

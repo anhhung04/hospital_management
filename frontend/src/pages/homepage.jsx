@@ -152,9 +152,9 @@ function Homepage() {
                 // console.log(data);
             })},[]);
 
-    console.log("listpatient1111111",listpatient);
-    console.log("listemployee",listemployee);
-    console.log("metricData",metricData);
+    // console.log("listpatient1111111",listpatient);
+    // console.log("listemployee",listemployee);
+    // console.log("metricData",metricData);
 
     const navigate = useNavigate();
 
@@ -207,9 +207,9 @@ function Homepage() {
                     <div className="w-[170px] h-[36px] rounded-lg mt-[40px] ml-[40px]">
                         <h5 className="font-sans text-[24px] font-semibold leading-[36px] text-[#032B91] text-left ">Bệnh nhân</h5>
                     </div>
-                    <div className="mt-[20px] ml-[25px] w-[594px] h-[56px] bg-[#CDDBFE] rounded-2xl px-[22px] py-[12px] inline-flex items-center justify-center gap-[76px] shadow-md">
+                    <div className="mt-[20px] ml-[25px] w-[594px] h-[56px] bg-[#CDDBFE] rounded-2xl px-[22px] py-[12px] inline-flex items-center justify-center gap-[37px] shadow-md">
                         <h6 className="font-sans text-[20px] font-medium leading-[32px]">STT</h6>
-                        <h6 className="font-sans text-[20px] font-medium leading-[32px]">Tên</h6>
+                        <h6 className="font-sans text-[20px] font-medium leading-[32px] px-[65px]">Tên</h6>
                         <h6 className="font-sans text-[20px] font-medium leading-[32px]">Giờ</h6>
                         <h6 className="font-sans text-[20px] font-medium leading-[32px]">Ngày</h6>
                         <h6 className="font-sans text-[20px] font-medium leading-[32px]">Chi Tiết</h6>
@@ -217,10 +217,10 @@ function Homepage() {
                     <div className={`w-[594px] h-[280px] mx-[25px] mt-[20px] flex flex-col items-start gap-[12px] ${isBlur}`}>
                         {listpatient?.map((patient, index) => (<div key={index} className="w-[594px] h-[44px] px-[20px] py-[10px] flex items-center gap-[12px] ">
                             <h4 className="font-sans text-[16px] font-normal leading-[24px] w-[55px] text-right">{index}</h4>
-                            <h4 className="font-sans text-[16px] font-normal leading-[24px] w-[140px] text-left ml-[5px]">{patient.full_name}</h4>
-                            <h4 className="font-sans text-[16px] font-normal leading-[24px] w-[92px] text-left">10:00</h4>
-                            <h4 className="font-sans text-[16px] font-normal leading-[24px] w-[92px] text-left">2024-5-12</h4>
-                            <h4 className="font-sans  text-[16px] font-normal leading-[24px] w-[109px] text-right text-[#0544E4]">Hồ sơ ↗</h4>
+                            <h4 className="font-sans text-[16px] font-normal leading-[24px] w-[200px] text-center ml-[5px]">{patient.full_name}</h4>
+                            <h4 className="font-sans text-[16px] font-normal leading-[24px] w-[50px] text-right">10:00</h4>
+                            <h4 className="font-sans text-[16px] font-normal leading-[24px] w-[92px] text-right">2024-5-12</h4>
+                            <h4 className="font-sans  text-[16px] font-normal leading-[24px] w-[80px] text-right text-[#0544E4]">Hồ sơ ↗</h4>
                         </div>))
                             }
                     </div>
