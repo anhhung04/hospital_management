@@ -8,4 +8,5 @@ async def index():
 
 @router.get("/demo")
 async def demo():
+    demo = "This is a demo route!"
     return {"demo": "This is a demo route!"}
