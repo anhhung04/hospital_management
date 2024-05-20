@@ -8,10 +8,11 @@ TableList.propTypes = {
     activeButton: PropTypes.number,
     setActiveButton: PropTypes.func,
     isCheckedAll: PropTypes.bool,
-    checkedCount: PropTypes.number
+    checkedCount: PropTypes.number,
+    numlist: PropTypes.number,
 };
 
-function TableList({children,handleClick, handleCheckedAll,isCheckedAll, activeButton, setActiveButton,checkedCount}) {
+function TableList({children,handleClick, handleCheckedAll,isCheckedAll, activeButton, setActiveButton,checkedCount,numlist}) {
 
 
 const handleButtonClick = (value) => {
@@ -82,7 +83,7 @@ const handleButtonClick = (value) => {
         </div>
         <div className="w-[1080px] h-[44px] flex justify-center items-end gap-[10px] self-stretch">
             <div className="w-[858px] h-[44px] flex p-[10px] items-end gap-[10px] ">
-                <p className="font-sans text-[18px] font-medium leading-[24px]">Tổng số lượng: 13</p>
+                <p className="font-sans text-[18px] font-medium leading-[24px]">Tổng số lượng: {numlist}</p>
             </div>
             <div className="w-[212px] h-[32px] flex justify-center items-center gap-[10px]">
                 <button className="font-sans text-[20px] font-normal leading-normal text-[#BEC6CF]" onClick={handleDecrease}>←</button>

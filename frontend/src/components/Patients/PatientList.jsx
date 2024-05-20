@@ -136,7 +136,7 @@ function checkedTrue(value) {
               source="/images/Patient_HeartRateMonitor.png"
             />
   
-            <TableList handleClick={handleClick} handleCheckedAll = {handleCheckAll} isCheckedAll={isCheckedAll} activeButton={currentpage} setActiveButton={setCurrentPage} checkedCount={checkedCount} >
+            <TableList handleClick={handleClick} handleCheckedAll = {handleCheckAll} isCheckedAll={isCheckedAll} activeButton={currentpage} setActiveButton={setCurrentPage} checkedCount={checkedCount} numlist = {listPatient_Info.length}  >
               <div className="w-[1032px] h-[716px] inline-flex flex-col items-start gap-[12px]">
                 {listPatient_Info.length!=0&&listPatient_Info.map((info, index) => (
                   <div
