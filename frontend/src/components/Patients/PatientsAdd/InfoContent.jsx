@@ -58,7 +58,7 @@
                             <h6 className="font-sans text-[20px] font-medium leading-[32px]">Họ <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
                         </div>
                         <input className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]" 
-                        type="text" placeholder="Nguyễn" value={patchObj.first_name} onChange={(e)=>setPatchObj({...patchObj,"first_name":e.target.value})}/>
+                        type="text" placeholder="Nguyễn" value={patchObj.last_name} onChange={(e)=>setPatchObj({...patchObj,"last_name":e.target.value})}/>
                     </div>
 
                     <div className="w-[450px] h-[84px] flex flex-col items-start gap-[4px]">
@@ -66,7 +66,7 @@
                             <h6 className="font-sans text-[20px] font-medium leading-[32px]">Tên <span className="text-[#F00] text-[20px] font-medium leading-8">*</span></h6>
                         </div>
                         <input className="w-[450px] h-[48px] py-[12px] px-[8px] border-[1px] border-black border-solid flex items-center self-stretch rounded-[5px]"
-                        type="text" placeholder="Văn A" value={patchObj.last_name} onChange={(e)=>setPatchObj({...patchObj,"last_name":e.target.value})}/>
+                        type="text" placeholder="Văn A" value={patchObj.first_name} onChange={(e)=>setPatchObj({...patchObj,"first_name":e.target.value})}/>
                     </div>
 
                     <div className="w-[450px] h-[84px] flex flex-col items-start gap-[4px]">
